@@ -8,9 +8,11 @@ kotlin {
     targetHierarchy.default()
 
     android {
+
         compilations.all {
+
             kotlinOptions {
-                jvmTarget = "1.8"
+                jvmTarget = "18"
             }
         }
     }
@@ -29,6 +31,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 //put your multiplatform dependencies here
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             }
         }
         val commonTest by getting {
@@ -44,5 +47,10 @@ android {
     compileSdk = 33
     defaultConfig {
         minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_18
+        targetCompatibility = JavaVersion.VERSION_18
     }
 }
