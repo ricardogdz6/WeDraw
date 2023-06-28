@@ -7,19 +7,24 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
@@ -31,8 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.bupware.wedraw.android.Components.DrawableBox.DrawableBox
-import com.bupware.wedraw.android.Components.DrawableBox.rememberDrawableController
 import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.rememberDrawController
 
@@ -54,13 +57,13 @@ fun DrawingScreenBody(navController: NavController, viewModel: DrawingScreenView
 
     //Canvas container
     Column() {
-        Column(Modifier.weight(1f)) {
+        Box(Modifier.height(200.dp)) {
             //DrawableBox(drawableController = rememberDrawableController())
             DrawBox(drawController = controller, bitmapCallback = processImage())
         }
 
-        Column(Modifier.weight(1f).background(Color.Yellow)) {
-            Button(onClick = { controller.unDo() }) {
+        Column(){
+            Button(onClick = {  }) {
                 Text(text = "aaa")
             }
         }
