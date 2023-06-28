@@ -80,4 +80,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
 
 
+    implementation("io.ak1:drawbox:1.0.3")
+
+
 }
