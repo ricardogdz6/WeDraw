@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StartingPoint(){
     NavigationHost(navController = rememberNavController(), startDestination = Destinations.SplashScreen.ruta )
+    var i = 0;
 }
 
 
