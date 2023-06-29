@@ -24,7 +24,7 @@ fun DrawingScreen(navController: NavController){
 
 @Composable
 fun DrawingScreenBody(navController: NavController, viewModel: DrawingScreenViewModel = hiltViewModel()){
-
+//Prueba de rama
     val controller = rememberDrawController()
 
     //Canvas container
