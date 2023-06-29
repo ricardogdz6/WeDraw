@@ -56,6 +56,7 @@ fun DrawingScreenBody(navController: NavController, viewModel: DrawingScreenView
     val controller = rememberDrawController()
 
     //Canvas container
+    /*
     Column() {
         Box(Modifier.height(200.dp)) {
             //DrawableBox(drawableController = rememberDrawableController())
@@ -67,6 +68,12 @@ fun DrawingScreenBody(navController: NavController, viewModel: DrawingScreenView
                 Text(text = "aaa")
             }
         }
+    }
+    
+     */
+    
+    Column(Modifier.fillMaxSize()) {
+
     }
 
 

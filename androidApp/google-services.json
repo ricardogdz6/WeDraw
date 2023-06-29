@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1094055760489",
+    "project_id": "wedraw-26bdc",
+    "storage_bucket": "wedraw-26bdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1094055760489:android:f56efe4648cec3a39dc8f8",
+        "android_client_info": {
+          "package_name": "com.bupware.wedraw.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1094055760489-ec45qp7u6sfrr8f61509up7cqrntvj12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTYp9JXpWHUpl28ydqM8QXwgwpu_6u_FE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1094055760489-ec45qp7u6sfrr8f61509up7cqrntvj12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

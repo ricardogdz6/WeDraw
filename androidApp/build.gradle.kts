@@ -3,6 +3,8 @@ plugins {
     kotlin("android")
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
+
+    id("com.google.gms.google-services")
 }
 
 
@@ -79,8 +81,12 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
 
-
+    //Libreria de dibujo
     implementation("io.ak1:drawbox:1.0.3")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
+    implementation("com.google.firebase:firebase-auth-ktx")
 
 
 }
