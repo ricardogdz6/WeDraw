@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.UI.drawingScreen
+package com.bupware.wedraw.android.ui.drawingScreen
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle

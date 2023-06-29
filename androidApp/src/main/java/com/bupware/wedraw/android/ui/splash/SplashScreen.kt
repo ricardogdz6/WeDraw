@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.UI.splash
+package com.bupware.wedraw.android.ui.splash
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
-import com.bupware.wedraw.android.Logic.navigation.Destinations
+import com.bupware.wedraw.android.logic.navigation.Destinations
 
 @Composable
 fun SplashScreen(navController: NavController){

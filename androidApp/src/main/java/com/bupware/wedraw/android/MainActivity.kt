@@ -6,8 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.bupware.wedraw.android.Logic.navigation.Destinations
-import com.bupware.wedraw.android.Logic.navigation.NavigationHost
+import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.bupware.wedraw.android.logic.navigation.NavigationHost
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 

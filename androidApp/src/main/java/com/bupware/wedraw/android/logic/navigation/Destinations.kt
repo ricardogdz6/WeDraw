@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.Logic.navigation
+package com.bupware.wedraw.android.logic.navigation
 
 sealed class Destinations (val ruta : String) {
 

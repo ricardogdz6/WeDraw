@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.UI.drawingScreen
+package com.bupware.wedraw.android.ui.drawingScreen
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
