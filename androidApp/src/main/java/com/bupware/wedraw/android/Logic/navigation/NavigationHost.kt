@@ -1,17 +1,12 @@
-package com.bupware.wedraw.android.Logic.Navigation
+package com.bupware.wedraw.android.Logic.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.bupware.wedraw.android.Login.LoginScreen
-import com.bupware.wedraw.android.UI.DrawingScreen.DrawingScreen
-import com.bupware.wedraw.android.UI.Splash.SplashScreen
+import com.bupware.wedraw.android.UI.drawingScreen.DrawingScreen
+import com.bupware.wedraw.android.UI.splash.SplashScreen
 
 @Composable
 fun NavigationHost (navController: NavHostController,startDestination: String) {

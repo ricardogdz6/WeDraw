@@ -4,7 +4,6 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
 
-    id("com.google.gms.google-services")
 }
 
 
@@ -83,10 +82,6 @@ dependencies {
 
     //Libreria de dibujo
     implementation("io.ak1:drawbox:1.0.3")
-
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
-    implementation("com.google.firebase:firebase-auth-ktx")
 
 
 }
