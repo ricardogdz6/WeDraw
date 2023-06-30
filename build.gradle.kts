@@ -2,6 +2,9 @@ buildscript {
     dependencies {
         classpath ("com.google.dagger:hilt-android-gradle-plugin:2.44")
         classpath ("com.google.gms:google-services:4.3.15")
+
+        //Shared resources
+        classpath("dev.icerock.moko:resources-generator:0.22.3")
     }
 }
 

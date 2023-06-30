@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization") version "1.8.20"
+    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -25,6 +26,8 @@ kotlin {
     ).forEach {
         it.binaries.framework {
             baseName = "shared"
+            export("dev.icerock.moko:resources:0.22.3")
+            export("dev.icerock.moko:graphics:0.9.0")
         }
     }
 
@@ -33,6 +36,7 @@ kotlin {
             dependencies {
                 //put your multiplatform dependencies here
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                api("dev.icerock.moko:resources:0.22.3")
             }
         }
         val commonTest by getting {
@@ -54,4 +58,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_18
         targetCompatibility = JavaVersion.VERSION_18
     }
+}
+
+multiplatformResources{
+    multiplatformResourcesPackage = "com.bupware.wedraw"
+    multiplatformResourcesClassName = "SharedRes"
 }
