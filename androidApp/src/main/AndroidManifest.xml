@@ -8,7 +8,8 @@
         android:allowBackup="false"
         android:supportsRtl="true"
         android:name = ".WeDraw"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:screenOrientation="portrait">
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="firebase_server_id">1094055760489-q7e8hc4t6dolg4n3s97hgdalu9h1p28c.apps.googleusercontent.com</string>
+    <string name="crear_grupo">Crear grupo</string>
+    <string name="unirse_a_grupo">Unirse a grupo</string>
 </resources>
