@@ -24,6 +24,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,12 +46,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
+import com.bupware.wedraw.android.components.animations.ChipPop
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.checkinapp.ui.theme.blueWeDraw
 import com.checkinapp.ui.theme.Lexend
 import com.checkinapp.ui.theme.greenWeDraw
 import com.checkinapp.ui.theme.redWeDraw
 import com.checkinapp.ui.theme.yellowWeDraw
+import kotlinx.coroutines.delay
 
 @Composable
 @Preview
@@ -55,7 +62,7 @@ fun PreviewMain(){
 }
 
 @Composable
-fun MainScreen(navController: NavController){
+fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
 
     SystemBarColor(color = Color(0xFF2C4560))
 
@@ -137,50 +144,88 @@ fun GroupBackground(navController: NavController,viewModel: MainViewModel = hilt
 //region Groups
 
 @Composable
-fun GroupContent(){
+fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
+
+    //TODO quitar este hardcode
+    LaunchedEffect(Unit){
+        viewModel.showGroups = true
+    }
+
+    var animationLoading = true
+
     //TODO quitar el hardcodeo de esto
-    LazyColumn(contentPadding = PaddingValues(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)){
-        items(9) { index ->
-            GroupBar(index)
+    LazyColumn(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally){
+        items(10) { index ->
+
+            //region delay Incremental
+            var visible by remember { mutableStateOf(false) }
+
+            if (animationLoading) {
+                LaunchedEffect(viewModel.showGroups) {
+                    delay((index + 1) * 100L) // Retraso incremental para cada elemento
+                    visible = true
+                    animationLoading = false
+                }
+            } else visible = true
+            //endregion
+
+            ChipPop(content = { GroupBar(index) }, show = visible)
             Spacer(modifier = Modifier.height(25.dp))
         }
     }
 }
 
 @Composable
-fun GroupBar(index: Int){
+fun GroupBar(index: Int) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = colors.random()
 
-    Box() {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Row(
-            Modifier
-                .height(70.dp)
-                .fillMaxWidth()
-                .background(selectedColor, RoundedCornerShape(10.dp))) {
-            Text(text = "")
-        }
+        Box() {
 
-        Row(
-            Modifier
-                .height(60.dp)
-                .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(10.dp)), verticalAlignment = Alignment.CenterVertically
-        ) {
-            //TODO controlar que no se desborde el text este y poner ...
-            Text(modifier = Modifier.padding(start = 10.dp),text = "$index", fontSize = 20.sp, fontFamily = Lexend)
-            Text(modifier = Modifier
-                .weight(1f)
-                .padding(start = 10.dp, end = 5.dp),text = "x$index", fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End, fontFamily = Lexend)
+            Row(
+                Modifier
+                    .height(70.dp)
+                    .fillMaxWidth(0.9f)
+                    .background(selectedColor, RoundedCornerShape(10.dp))
+            ) {
+                Text(text = "")
+            }
 
-            Icon(
-                modifier = Modifier.padding(end = 5.dp),
-                imageVector = ImageVector.vectorResource(id = R.drawable.person),
-                tint = selectedColor,
-                contentDescription = "People in group"
-            )
+            Row(
+                Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(0.9f)
+                    .background(Color.White, RoundedCornerShape(10.dp)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                //TODO controlar que no se desborde el text este y poner ...
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = "$index",
+                    fontSize = 20.sp,
+                    fontFamily = Lexend
+                )
+                Text(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 10.dp, end = 5.dp),
+                    text = "x$index",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.End,
+                    fontFamily = Lexend
+                )
+
+                Icon(
+                    modifier = Modifier.padding(end = 5.dp),
+                    imageVector = ImageVector.vectorResource(id = R.drawable.person),
+                    tint = selectedColor,
+                    contentDescription = "People in group"
+                )
+            }
         }
     }
 
@@ -193,8 +238,8 @@ fun GroupBar(index: Int){
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
     val buttonsList = listOf(
-        SettingsButtonFunctionality(stringResource(R.string.crear_grupo)) { viewModel.a = !viewModel.a },
-        SettingsButtonFunctionality(stringResource(R.string.unirse_a_grupo)) { viewModel.a = !viewModel.a }
+        SettingsButtonFunctionality(stringResource(R.string.crear_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
+        SettingsButtonFunctionality(stringResource(R.string.unirse_a_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled }
     )
 
     LazyColumn(contentPadding = PaddingValues(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)){

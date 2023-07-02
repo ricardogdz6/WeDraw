@@ -11,7 +11,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     var moreOptionsEnabled by savedStateHandle.saveable { mutableStateOf(false) }
-    var a by savedStateHandle.saveable { mutableStateOf(false) }
+    var showGroups by savedStateHandle.saveable { mutableStateOf(false) }
 
 
 }
