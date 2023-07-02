@@ -12,6 +12,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     var moreOptionsEnabled by savedStateHandle.saveable { mutableStateOf(false) }
     var showGroups by savedStateHandle.saveable { mutableStateOf(false) }
+    var showSettings by savedStateHandle.saveable { mutableStateOf(false) }
 
 
 }

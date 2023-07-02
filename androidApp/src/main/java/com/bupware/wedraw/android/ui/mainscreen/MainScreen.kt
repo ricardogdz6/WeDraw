@@ -1,11 +1,13 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,7 +86,11 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     //endregion
 
     //Fondo de los backgrounds
-    GroupBackground(navController)
+    Box {
+        GroupBackground(navController)
+        UpperBackgroundContent()
+    }
+
 
     //Boton +
     Column(
@@ -124,6 +131,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 
 }
 
+//region Background && Content
 @Composable
 fun GroupBackground(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
     Column(
@@ -131,14 +139,23 @@ fun GroupBackground(navController: NavController,viewModel: MainViewModel = hilt
             .fillMaxSize()
             .padding(top = 90.dp, bottom = 60.dp, start = 20.dp, end = 20.dp)
             .background(Color.Black.copy(0.4f), RoundedCornerShape(15.dp))) {
+    }
+}
 
-        when(viewModel.moreOptionsEnabled){
+@Composable
+fun UpperBackgroundContent(viewModel: MainViewModel = hiltViewModel()) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(top = 90.dp, bottom = 60.dp)
+    ) {
+        when (viewModel.moreOptionsEnabled) {
             true -> SettingsContent()
             false -> GroupContent()
         }
-
     }
 }
+//endregion
 
 
 //region Groups
@@ -188,7 +205,7 @@ fun GroupBar(index: Int) {
             Row(
                 Modifier
                     .height(70.dp)
-                    .fillMaxWidth(0.9f)
+                    .fillMaxWidth(0.85f)
                     .background(selectedColor, RoundedCornerShape(10.dp))
             ) {
                 Text(text = "")
@@ -197,7 +214,7 @@ fun GroupBar(index: Int) {
             Row(
                 Modifier
                     .height(60.dp)
-                    .fillMaxWidth(0.9f)
+                    .fillMaxWidth(0.85f)
                     .background(Color.White, RoundedCornerShape(10.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -212,19 +229,29 @@ fun GroupBar(index: Int) {
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 10.dp, end = 5.dp),
-                    text = "x$index",
+                    text = "$index",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.End,
                     fontFamily = Lexend
                 )
 
-                Icon(
-                    modifier = Modifier.padding(end = 5.dp),
-                    imageVector = ImageVector.vectorResource(id = R.drawable.person),
-                    tint = selectedColor,
-                    contentDescription = "People in group"
-                )
+                Box(Modifier.padding(end = 10.dp)) {
+                    Box(
+                        Modifier
+                            .background(selectedColor, RoundedCornerShape(10.dp))
+                            .height(IntrinsicSize.Max)
+                            .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier,
+                            imageVector = ImageVector.vectorResource(id = R.drawable.notification),
+                            tint = Color.White,
+                            contentDescription = "People in group"
+                        )
+                    }
+                }
+
             }
         }
     }
@@ -237,14 +264,26 @@ fun GroupBar(index: Int) {
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
-    val buttonsList = listOf(
-        SettingsButtonFunctionality(stringResource(R.string.crear_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
-        SettingsButtonFunctionality(stringResource(R.string.unirse_a_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled }
-    )
+    //TODO quitar este hardcode
+    LaunchedEffect(Unit){
+        viewModel.showSettings = true
+    }
 
-    LazyColumn(contentPadding = PaddingValues(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)){
-        items(buttonsList.size) { index ->
-            ButtonSettings(buttonsList[index])
+    var buttonDelay by remember { mutableStateOf(false) }
+    var buttonDelay2 by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit){
+        delay(100)
+        buttonDelay = true
+        delay(100)
+        buttonDelay2 = true
+    }
+
+    LazyColumn(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally){
+        item {
+            ChipPop(content = { CreateGroupButton() }, show = buttonDelay)
+            Spacer(modifier = Modifier.height(25.dp))
+            ChipPop(content = { JoinGroupButton() }, show = buttonDelay2)
             Spacer(modifier = Modifier.height(25.dp))
         }
     }
@@ -257,25 +296,114 @@ fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = colors.random()
 
-    Box(modifier = Modifier.clickable { dataHolder.action() }) {
-        //Esta row es el color de abajo
-        Row(
-            Modifier
-                .height(70.dp)
-                .fillMaxWidth()
-                .background(selectedColor, RoundedCornerShape(10.dp))) {
-            Text(text = "")
-        }
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box() {
+            //Esta row es el color de abajo
+            Row(
+                Modifier
+                    .height(70.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(selectedColor, RoundedCornerShape(10.dp))
+            ) {
+                Text(text = "")
+            }
 
-        Row(
-            Modifier
-                .height(60.dp)
-                .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(10.dp)), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
-        ) {
-            Text(modifier = Modifier.padding(start = 10.dp),text = dataHolder.text, fontSize = 20.sp, fontFamily = Lexend, fontWeight = FontWeight.Bold)
+            Row(
+                Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(Color.White, RoundedCornerShape(10.dp)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = dataHolder.text,
+                    fontSize = 20.sp,
+                    fontFamily = Lexend,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
+}
+
+@Composable
+fun CreateGroupButton(){
+
+    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
+    val selectedColor = colors.random()
+
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.clickable { Log.i("wawa","aafwaf") }) {
+            //Esta row es el color de abajo
+            Row(
+                Modifier
+                    .height(70.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(selectedColor, RoundedCornerShape(10.dp))
+            ) {
+                Text(text = "")
+            }
+
+            Row(
+                Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(Color.White, RoundedCornerShape(10.dp)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = stringResource(R.string.unirse_a_grupo),
+                    fontSize = 20.sp,
+                    fontFamily = Lexend,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
+fun JoinGroupButton(){
+
+    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
+    val selectedColor = colors.random()
+
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.clickable { Log.i("wawa","aafwaf") }) {
+            //Esta row es el color de abajo
+            Row(
+                Modifier
+                    .height(70.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(selectedColor, RoundedCornerShape(10.dp))
+            ) {
+                Text(text = "")
+            }
+
+            Row(
+                Modifier
+                    .height(60.dp)
+                    .fillMaxWidth(0.85f)
+                    .background(Color.White, RoundedCornerShape(10.dp)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 10.dp),
+                    text = stringResource(R.string.crear_grupo),
+                    fontSize = 20.sp,
+                    fontFamily = Lexend,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+
 }
 
 data class SettingsButtonFunctionality(
