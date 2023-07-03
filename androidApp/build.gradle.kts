@@ -12,7 +12,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "com.bupware.wedraw.android"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -90,6 +90,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
 
+    //Glance Widget
+    implementation ("androidx.glance:glance-appwidget:1.0.0-alpha05")
 
+    implementation ("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
 
 }
