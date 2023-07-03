@@ -61,8 +61,8 @@ dependencies {
     implementation ("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     //Navigation
-    implementation ("androidx.navigation:navigation-compose:2.6.0")
-    implementation ("org.jetbrains.kotlin:kotlin-script-runtime:1.8.21")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-script-runtime:1.8.22")
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.44")

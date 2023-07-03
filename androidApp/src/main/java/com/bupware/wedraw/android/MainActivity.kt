@@ -35,20 +35,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StartingPoint(){
     NavigationHost(navController = rememberNavController(), startDestination = Destinations.SplashScreen.ruta )
-
-    //FBAuth.user.email.toString()
-    /*
-    val user = Firebase.auth.currentUser
-    when (user){
-        null -> {
-            Log.i("wawa", "No hay sesión iniciada")}
-        else -> {
-            Log.i("wawa","sesion iniciada")
-            Log.i("wawa",user.email.toString())
-        }
-    }
-
-     */
 }
 
 

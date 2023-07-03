@@ -63,14 +63,15 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
     //val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = blueWeDraw
 
-    Box(Modifier.fillMaxWidth(0.85f), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box(Modifier.clickable { viewModel.expandButton(1) }) {
 
             //region Shadow Color
             Column(
                 Modifier
                     .background(selectedColor, RoundedCornerShape(10.dp))
-                    .fillMaxSize()
+                    .fillMaxWidth(0.85f)
+
             ) {
                 Text(text = " ")
 
@@ -87,7 +88,7 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
                     Column(
                         Modifier
                             .height(if (state) 320.dp else 50.dp)
-                            .fillMaxWidth()
+
 
                     ) {
                         Text(text = " ")
@@ -98,7 +99,7 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
             }
 
             //endregion
-            Column() {
+            Column(Modifier.fillMaxWidth(0.85f)) {
 
                 val targetTextColor by animateColorAsState(
                     targetValue = if (viewModel.expandCreateGroup) Color.White else Color.Black,
@@ -203,14 +204,14 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
     //val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = redWeDraw
     
-    Box(Modifier.fillMaxWidth(0.85f), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Box(Modifier.clickable { viewModel.expandButton(2) }) {
 
             //region Shadow Color
             Column(
                 Modifier
                     .background(selectedColor, RoundedCornerShape(10.dp))
-                    .fillMaxSize()
+                    .fillMaxWidth(0.85f)
             ) {
                 Text(text = " ")
 
@@ -227,7 +228,7 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
                     Column(
                         Modifier
                             .height(if (state) 260.dp else 50.dp)
-                            .fillMaxWidth()
+
 
                     ) {
                         Text(text = " ")
@@ -238,7 +239,7 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
             }
 
         //endregion
-        Column() {
+        Column(Modifier.fillMaxWidth(0.85f)) {
 
             val targetTextColor by animateColorAsState(
                 targetValue = if (viewModel.expandJoinGroup) Color.White else Color.Black,

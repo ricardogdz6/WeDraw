@@ -25,16 +25,16 @@ class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : V
             FBAuth.auth.signInWithCredential(credential)
                 .addOnCompleteListener { task->
                     if (task.isSuccessful){
-                        Log.i("wawa","god")
+                        Log.i("auth","Éxito iniciando sesión")
                         returningLambda()
                     }
                 }
                 .addOnFailureListener {
-                    Log.i("wawa","sadge")
+                    Log.i("auth","Inicio de sesión fallido")
                 }
         }
         catch (e:Exception){
-            Log.i("wawa",e.stackTraceToString())
+            Log.i("auth","Excepcion durante login")
         }
     }
 

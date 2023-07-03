@@ -24,6 +24,7 @@ fun TextFieldJoin(modificador: Modifier){
             maxLines = 1,
             shape = RoundedCornerShape(20.dp),
             colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.LightGray,
                 disabledTextColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,

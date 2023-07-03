@@ -1,5 +1,6 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,9 @@ import com.bupware.wedraw.android.components.buttons.CreateGroupButton
 import com.bupware.wedraw.android.components.buttons.GroupBar
 import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
+import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
 
 @Composable
@@ -121,7 +125,39 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 
     }
 
+
+    //TODO ELIMINAR
+    Column() {
+    Button(onClick = {
+        //Firebase.auth.signOut();
+
+        /*
+        navController.popBackStack()
+        navController.navigate(route =Destinations.LoginScreen.ruta)
+
+         */
+
+        //navController.popBackStack(Destinations.LoginScreen.ruta, inclusive = false)
+
+
+        navController.navigate(Destinations.LoginScreen.ruta) {
+            popUpTo(Destinations.MainScreen.ruta) {
+                inclusive = true
+            }
+        }
+
+
+
+    }) {
+        Text(text = "DESLOGUEAR")
+    }
+    }
+
+
+
 }
+
+
 
 //region Background && Content
 @Composable
@@ -186,6 +222,7 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
 
 //endregion
 
+//TODO ARREGLAR ANIMACIONES DE ESTO
 //region Settings content
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
@@ -215,50 +252,5 @@ fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
     }
 
 }
-
-/*
-@Composable
-fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
-
-    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
-
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Box() {
-            //Esta row es el color de abajo
-            Row(
-                Modifier
-                    .height(70.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(selectedColor, RoundedCornerShape(10.dp))
-            ) {
-                Text(text = "")
-            }
-
-            Row(
-                Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(Color.White, RoundedCornerShape(10.dp)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = dataHolder.text,
-                    fontSize = 20.sp,
-                    fontFamily = Lexend,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
-
- */
-
-
-
-
 //endregion
 

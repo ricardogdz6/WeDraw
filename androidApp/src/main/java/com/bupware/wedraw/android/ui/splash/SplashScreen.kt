@@ -9,14 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SplashScreen(navController: NavController){
 
-    //TODO si sesion iniciada entonces mainscreen
-    navController.navigate(route = Destinations.LoginScreen.ruta)
-
     SplashScreenBody()
+
+    //NAVIGATE
+    if (Firebase.auth.currentUser != null){
+        navController.navigate(route = Destinations.MainScreen.ruta)
+    } else navController.navigate(route = Destinations.LoginScreen.ruta)
 
 }
 

@@ -18,6 +18,8 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var expandJoinGroup by savedStateHandle.saveable { mutableStateOf(false) }
     var expandCreateGroup by savedStateHandle.saveable { mutableStateOf(false) }
 
+    var pepe by savedStateHandle.saveable { mutableStateOf(false) }
+
     fun expandButton(index:Int){
 
         when(index){
