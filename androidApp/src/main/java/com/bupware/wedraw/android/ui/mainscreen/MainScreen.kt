@@ -1,13 +1,10 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,10 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,12 +44,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.animations.ChipPop
+import com.bupware.wedraw.android.components.buttons.CreateGroupButton
+import com.bupware.wedraw.android.components.buttons.GroupBar
+import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
-import com.checkinapp.ui.theme.blueWeDraw
-import com.checkinapp.ui.theme.Lexend
-import com.checkinapp.ui.theme.greenWeDraw
-import com.checkinapp.ui.theme.redWeDraw
-import com.checkinapp.ui.theme.yellowWeDraw
 import kotlinx.coroutines.delay
 
 @Composable
@@ -192,72 +184,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
     }
 }
 
-@Composable
-fun GroupBar(index: Int) {
-
-    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
-
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        //Esta row es el color de abajo
-        Box() {
-
-            Row(
-                Modifier
-                    .height(70.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(selectedColor, RoundedCornerShape(10.dp))
-            ) {
-                Text(text = "")
-            }
-
-            Row(
-                Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(Color.White, RoundedCornerShape(10.dp)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                //TODO controlar que no se desborde el text este y poner ...
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = "$index",
-                    fontSize = 20.sp,
-                    fontFamily = Lexend
-                )
-                Text(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 10.dp, end = 5.dp),
-                    text = "$index",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                    fontFamily = Lexend
-                )
-
-                Box(Modifier.padding(end = 10.dp)) {
-                    Box(
-                        Modifier
-                            .background(selectedColor, RoundedCornerShape(10.dp))
-                            .height(IntrinsicSize.Max)
-                            .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            modifier = Modifier,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.notification),
-                            tint = Color.White,
-                            contentDescription = "People in group"
-                        )
-                    }
-                }
-
-            }
-        }
-    }
-
-}
-
 //endregion
 
 //region Settings content
@@ -290,6 +216,7 @@ fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
 }
 
+/*
 @Composable
 fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
 
@@ -328,87 +255,10 @@ fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
     }
 }
 
-@Composable
-fun CreateGroupButton(){
+ */
 
-    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
 
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Box(Modifier.clickable { Log.i("wawa","aafwaf") }) {
-            //Esta row es el color de abajo
-            Row(
-                Modifier
-                    .height(70.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(selectedColor, RoundedCornerShape(10.dp))
-            ) {
-                Text(text = "")
-            }
 
-            Row(
-                Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(Color.White, RoundedCornerShape(10.dp)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = stringResource(R.string.unirse_a_grupo),
-                    fontSize = 20.sp,
-                    fontFamily = Lexend,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
 
-}
-
-@Composable
-fun JoinGroupButton(){
-
-    val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
-
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Box(Modifier.clickable { Log.i("wawa","aafwaf") }) {
-            //Esta row es el color de abajo
-            Row(
-                Modifier
-                    .height(70.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(selectedColor, RoundedCornerShape(10.dp))
-            ) {
-                Text(text = "")
-            }
-
-            Row(
-                Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(0.85f)
-                    .background(Color.White, RoundedCornerShape(10.dp)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    modifier = Modifier.padding(start = 10.dp),
-                    text = stringResource(R.string.crear_grupo),
-                    fontSize = 20.sp,
-                    fontFamily = Lexend,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-
-}
-
-data class SettingsButtonFunctionality(
-    val text: String,
-    val action: () -> Unit
-)
 //endregion
 

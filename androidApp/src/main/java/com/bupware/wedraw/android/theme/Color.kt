@@ -20,4 +20,7 @@ val greenWeDraw = Color(0xFF00DFA2)
 val yellowWeDraw = Color(0xFFF6FA70)
 val redWeDraw = Color(0xFFFF0060)
 
+val blueVariantWeDraw = Color(0xFF3D6DA2)
+val blueVariant2WeDraw = Color(0xFF2C4560)
+
 

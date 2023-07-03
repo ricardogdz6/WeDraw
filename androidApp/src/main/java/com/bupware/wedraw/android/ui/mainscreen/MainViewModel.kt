@@ -14,5 +14,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var showGroups by savedStateHandle.saveable { mutableStateOf(false) }
     var showSettings by savedStateHandle.saveable { mutableStateOf(false) }
 
+    //Settings Menu
+    var expandJoinGroup by savedStateHandle.saveable { mutableStateOf(false) }
+    var expandCreateGroup by savedStateHandle.saveable { mutableStateOf(false) }
+
 
 }

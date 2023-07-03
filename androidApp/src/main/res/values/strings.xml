@@ -4,4 +4,5 @@
     <string name="crear_grupo">Crear grupo</string>
     <string name="unirse_a_grupo">Unirse a grupo</string>
     <string name="a">a</string>
+    <string name="c_digo_del_grupo">"CÓDIGO DEL GRUPO: "</string>
 </resources>
