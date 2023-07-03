@@ -5,4 +5,6 @@
     <string name="unirse_a_grupo">Unirse a grupo</string>
     <string name="a">a</string>
     <string name="c_digo_del_grupo">"CÓDIGO DEL GRUPO: "</string>
+    <string name="nombre_del_grupo">NOMBRE DEL GRUPO:</string>
+    <string name="limite_de_personas">"LIMITE DE PERSONAS: "</string>
 </resources>
