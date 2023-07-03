@@ -95,4 +95,10 @@ dependencies {
 
     implementation ("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
 
+
+    //Room Components
+    implementation("androidx.room:room-ktx:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
+    implementation("androidx.room:room-runtime:2.5.2")
+
 }

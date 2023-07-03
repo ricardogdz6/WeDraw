@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.bupware.wedraw.android.Login.LoginScreen
+import com.bupware.wedraw.android.ui.login.LoginScreen
 import com.bupware.wedraw.android.ui.drawingScreen.DrawingScreen
 import com.bupware.wedraw.android.ui.mainscreen.MainScreen
 import com.bupware.wedraw.android.ui.splash.SplashScreen

@@ -23,6 +23,8 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,12 +59,12 @@ import kotlinx.coroutines.delay
 
 @Composable
 @Preview
-fun PreviewMain(){
+fun PreviewMain() {
     MainScreen(rememberNavController())
 }
 
 @Composable
-fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+fun MainScreen(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
 
     SystemBarColor(color = Color(0xFF2C4560))
 
@@ -70,15 +72,21 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
 }
 
 @Composable
-fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hiltViewModel()){
+fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
 
     //region Image background
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.Red)) {
+            .background(Color.Red)
+    ) {
 
-        Image(painter = painterResource(R.drawable.mainbackground), contentDescription = "background", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
+        Image(
+            painter = painterResource(R.drawable.mainbackground),
+            contentDescription = "background",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
     }
     //endregion
 
@@ -89,10 +97,29 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Column(
         Modifier
             .fillMaxSize()
-            .padding(bottom = 30.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-        Button(colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3D6DA2)),onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled }, shape = CircleShape) {
-            Text(modifier = Modifier.padding(start = 8.dp, end = 8.dp),text = "+", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 40.sp)
+            .padding(bottom = 30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        IconButton(
+            onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
+            modifier = Modifier
+                .size(70.dp)
+                .background(
+                    color = blueWeDraw,
+                    shape = CircleShape
+                )
+
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.add),
+                contentDescription = null,
+                tint = Color.White,
+
+
+            )
         }
+
     }
 
     //Logo
@@ -110,7 +137,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Row(Modifier.fillMaxWidth()) {
 
         //Settings
-        IconButton(modifier = Modifier.padding(top = 10.dp, start = 15.dp),onClick = {
+        IconButton(modifier = Modifier.padding(top = 10.dp, start = 15.dp), onClick = {
 
         }) {
             Icon(
@@ -125,14 +152,15 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 }
 
 @Composable
-fun GroupBackground(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+fun GroupBackground(navController: NavController, viewModel: MainViewModel = hiltViewModel()) {
     Column(
         Modifier
             .fillMaxSize()
             .padding(top = 90.dp, bottom = 60.dp, start = 20.dp, end = 20.dp)
-            .background(Color.Black.copy(0.4f), RoundedCornerShape(15.dp))) {
+            .background(Color.Black.copy(0.4f), RoundedCornerShape(15.dp))
+    ) {
 
-        when(viewModel.moreOptionsEnabled){
+        when (viewModel.moreOptionsEnabled) {
             true -> SettingsContent()
             false -> GroupContent()
         }
@@ -144,17 +172,21 @@ fun GroupBackground(navController: NavController,viewModel: MainViewModel = hilt
 //region Groups
 
 @Composable
-fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
+fun GroupContent(viewModel: MainViewModel = hiltViewModel()) {
 
     //TODO quitar este hardcode
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         viewModel.showGroups = true
     }
 
     var animationLoading = true
 
     //TODO quitar el hardcodeo de esto
-    LazyColumn(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally){
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         items(10) { index ->
 
             //region delay Incremental
@@ -235,14 +267,25 @@ fun GroupBar(index: Int) {
 
 //region Settings content
 @Composable
-fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
+fun SettingsContent(viewModel: MainViewModel = hiltViewModel()) {
 
     val buttonsList = listOf(
-        SettingsButtonFunctionality(stringResource(R.string.crear_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
-        SettingsButtonFunctionality(stringResource(R.string.unirse_a_grupo)) { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled }
+        SettingsButtonFunctionality(stringResource(R.string.crear_grupo)) {
+            viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled
+        },
+        SettingsButtonFunctionality(stringResource(R.string.unirse_a_grupo)) {
+            viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled
+        }
     )
 
-    LazyColumn(contentPadding = PaddingValues(top = 70.dp, start = 20.dp, end = 20.dp, bottom = 10.dp)){
+    LazyColumn(
+        contentPadding = PaddingValues(
+            top = 70.dp,
+            start = 20.dp,
+            end = 20.dp,
+            bottom = 10.dp
+        )
+    ) {
         items(buttonsList.size) { index ->
             ButtonSettings(buttonsList[index])
             Spacer(modifier = Modifier.height(25.dp))
@@ -252,7 +295,7 @@ fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 }
 
 @Composable
-fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
+fun ButtonSettings(dataHolder: SettingsButtonFunctionality) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = colors.random()
@@ -263,7 +306,8 @@ fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
             Modifier
                 .height(70.dp)
                 .fillMaxWidth()
-                .background(selectedColor, RoundedCornerShape(10.dp))) {
+                .background(selectedColor, RoundedCornerShape(10.dp))
+        ) {
             Text(text = "")
         }
 
@@ -271,9 +315,17 @@ fun ButtonSettings(dataHolder:SettingsButtonFunctionality){
             Modifier
                 .height(60.dp)
                 .fillMaxWidth()
-                .background(Color.White, RoundedCornerShape(10.dp)), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+                .background(Color.White, RoundedCornerShape(10.dp)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text(modifier = Modifier.padding(start = 10.dp),text = dataHolder.text, fontSize = 20.sp, fontFamily = Lexend, fontWeight = FontWeight.Bold)
+            Text(
+                modifier = Modifier.padding(start = 10.dp),
+                text = dataHolder.text,
+                fontSize = 20.sp,
+                fontFamily = Lexend,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

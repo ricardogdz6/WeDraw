@@ -1,7 +1,5 @@
-package com.bupware.wedraw.android.Login
+package com.bupware.wedraw.android.ui.login
 
-import android.content.Context
-import android.provider.Settings.Global.getString
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,16 +19,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.logic.firebase.FBAuth
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+
 
 @Composable
 fun PreviewLogin(){
@@ -46,6 +41,7 @@ fun LoginScreen(navController: NavController){
 fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hiltViewModel()){
 
     val context = LocalContext.current
+
 
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()){
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
