@@ -1,6 +1,6 @@
 package com.bupware.wedraw.android.logic.sessionData
 
-import com.bupware.wedraw.android.logic.dataclasses.User
+import com.bupware.wedraw.android.logic.models.User
 
 
 object sessionData{

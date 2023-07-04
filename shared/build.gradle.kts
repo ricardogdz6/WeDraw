@@ -2,7 +2,6 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization") version "1.8.20"
-    id("dev.icerock.mobile.multiplatform-resources")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -60,7 +59,3 @@ android {
     }
 }
 
-multiplatformResources{
-    multiplatformResourcesPackage = "com.bupware.wedraw"
-    multiplatformResourcesClassName = "SharedRes"
-}

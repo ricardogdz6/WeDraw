@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.logic.dataclasses
+package com.bupware.wedraw.android.logic.models
 
 import java.io.Serializable
 import java.util.Date
