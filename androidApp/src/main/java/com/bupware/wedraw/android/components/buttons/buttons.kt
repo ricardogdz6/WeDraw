@@ -175,7 +175,7 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Text(text = stringResource(R.string.nombre_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(10.dp))
-                                TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
+                                if (viewModel.expandCreateGroup) TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Column(Modifier.padding(start = 10.dp, end = 10.dp)) {
                                     PeopleLimitBar()
@@ -315,7 +315,7 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(text = stringResource(R.string.c_digo_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(10.dp))
-                        TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
+                        if (viewModel.expandJoinGroup) TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
                         Spacer(modifier = Modifier.height(20.dp))
                          JoinGroupSubButton()
                         Spacer(modifier = Modifier.height(10.dp))

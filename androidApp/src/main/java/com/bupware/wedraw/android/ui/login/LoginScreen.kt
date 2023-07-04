@@ -3,6 +3,7 @@ package com.bupware.wedraw.android.Login
 import android.content.Context
 import android.provider.Settings.Global.getString
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -56,6 +57,9 @@ fun PreviewLogin(){
 
 @Composable
 fun LoginScreen(navController: NavController){
+    //TODO QUITAR ESTE FIX
+    BackHandler() {}
+
     LoginScreenBody(navController)
 }
 
@@ -75,6 +79,8 @@ fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hil
     Column(Modifier.padding(top = 230.dp, start = 10.dp, end = 10.dp)) {
         TransparentBackground(navController)
     }
+
+
 
 }
 
@@ -125,19 +131,6 @@ fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: Na
 
                 navController.navigate(route =Destinations.MainScreen.ruta){navController.popBackStack()}}
 
-                /*
-                navController.navigate(
-                    route = Destinations.MainScreen.ruta,
-                    builder = {
-                        popUpTo(route = Destinations.LoginScreen.ruta) {
-                            inclusive = true
-                        }
-                    }
-                )
-
-            }
-
-                 */
         } catch (e: Exception) {
             Log.e("Auth", "GoogleSignIn Failed!")
             Log.e("Auth", e.stackTraceToString())

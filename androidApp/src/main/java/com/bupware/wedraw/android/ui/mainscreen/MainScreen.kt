@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +63,9 @@ fun PreviewMain(){
 
 @Composable
 fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+
+    //TODO QUITAR ESTE FIX
+    BackHandler() {}
 
     SystemBarColor(color = Color(0xFF2C4560))
 
@@ -129,16 +133,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     //TODO ELIMINAR
     Column() {
     Button(onClick = {
-        //Firebase.auth.signOut();
-
-        /*
-        navController.popBackStack()
-        navController.navigate(route =Destinations.LoginScreen.ruta)
-
-         */
-
-        //navController.popBackStack(Destinations.LoginScreen.ruta, inclusive = false)
-
+        Firebase.auth.signOut();
 
         navController.navigate(Destinations.LoginScreen.ruta) {
             popUpTo(Destinations.MainScreen.ruta) {
@@ -151,6 +146,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     }) {
         Text(text = "DESLOGUEAR")
     }
+
     }
 
 
