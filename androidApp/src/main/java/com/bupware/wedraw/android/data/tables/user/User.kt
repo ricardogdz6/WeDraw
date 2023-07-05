@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.data.tables.relationTables.user
+package com.bupware.wedraw.android.data.tables.user
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.bupware.wedraw.android.data.tables.group.Group
-import com.bupware.wedraw.android.data.tables.relationTables.user.User
+import com.bupware.wedraw.android.data.tables.user.User
 
 @Entity(
     tableName = "users_groups", foreignKeys = [

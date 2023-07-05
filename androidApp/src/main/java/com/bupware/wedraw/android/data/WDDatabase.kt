@@ -11,13 +11,13 @@ import com.bupware.wedraw.android.data.tables.group.Group
 import com.bupware.wedraw.android.data.tables.group.GroupDao
 import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.image.ImageDao
-import com.bupware.wedraw.android.data.tables.relationTables.user.User
+import com.bupware.wedraw.android.data.tables.user.User
 import com.bupware.wedraw.android.data.tables.relationTables.Users_groups
-import com.bupware.wedraw.android.data.tables.relationTables.user.UserDao
+import com.bupware.wedraw.android.data.tables.user.UserDao
 
-@Database(entities = [User::class, Group::class, Users_groups::class, Image::class, Message::class], version = 1)
+@Database(entities = [User::class, Group::class, Users_groups::class, Image::class, Message::class], version = 2)
 @TypeConverters(DataConverter::class)
-abstract class UserDatabase : RoomDatabase() {
+abstract class WDDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun groupDao(): GroupDao
     abstract fun imageDao(): ImageDao
@@ -25,9 +25,9 @@ abstract class UserDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: UserDatabase? = null
+        private var INSTANCE: WDDatabase? = null
 
-        fun getDatabase(context: Context): UserDatabase {
+        fun getDatabase(context: Context): WDDatabase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
                 return tempInstance
@@ -36,9 +36,9 @@ abstract class UserDatabase : RoomDatabase() {
                 // Create database here
                 val instance = androidx.room.Room.databaseBuilder(
                     context.applicationContext,
-                    UserDatabase::class.java,
+                    WDDatabase::class.java,
                     "user_database"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance
             }

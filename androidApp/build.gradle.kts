@@ -91,14 +91,33 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
 
     //Glance Widget
+    // For Glance support
+    implementation ("androidx.glance:glance:1.0.0-alpha05")
+    // For AppWidgets support
     implementation ("androidx.glance:glance-appwidget:1.0.0-alpha05")
 
+    // For Wear-Tiles support
     implementation ("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
-
 
     //Room Components
     implementation("androidx.room:room-ktx:2.5.2")
     kapt("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-runtime:2.5.2")
+
+
+    //Coil - AsyncImage
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+
+    //android Widgets
+
+
+
+    //Corutines WorkManager
+    // Dependencia de WorkManager
+    implementation ("androidx.work:work-runtime-ktx:2.7.0")
+
+    // Dependencia de Kotlin Coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
 
 }

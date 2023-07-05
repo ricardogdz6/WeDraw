@@ -1,8 +1,8 @@
-package com.bupware.wedraw.android.data.tables
+package com.bupware.wedraw.android.data.tables.user
 
 import androidx.lifecycle.LiveData
-import com.bupware.wedraw.android.data.tables.relationTables.user.User
-import com.bupware.wedraw.android.data.tables.relationTables.user.UserDao
+import com.bupware.wedraw.android.data.tables.user.User
+import com.bupware.wedraw.android.data.tables.user.UserDao
 
 class UserRepository(private val userDao: UserDao) {
     suspend fun insert(user: User) {

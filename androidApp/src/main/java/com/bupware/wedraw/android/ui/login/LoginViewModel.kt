@@ -39,8 +39,8 @@ class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : V
 
     //pruebas
 
+/***
 
-    /***
      * fun readAllData(context: Context) = viewModelScope.launch {
     val readAllData: LiveData<List<User>>
     val userDao = UserDatabase.getDatabase(context).userDao()
