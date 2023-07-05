@@ -9,6 +9,7 @@
         android:supportsRtl="true"
         android:name = ".WeDraw"
         android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
         android:screenOrientation="portrait">
         <activity
             android:name=".MainActivity"

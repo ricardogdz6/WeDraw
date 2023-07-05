@@ -11,10 +11,11 @@ import java.util.*
 
 object RetrofitClient {
 
+    //TODO QUITAR ESTA LINEA DEL MANIFEST android:usesCleartextTraffic="true"
 
     //private const val BASE_URL = "http://ec2-13-40-218-75.eu-west-2.compute.amazonaws.com:5000/"
     //private const val BASE_URL = "http://ec2-18-130-254-216.eu-west-2.compute.amazonaws.com:5000/"
-    private const val BASE_URL = "http://192.168.1.126:8000/"
+    private const val BASE_URL = "http://localhost:8080/"
 
     var gson = GsonBuilder()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
