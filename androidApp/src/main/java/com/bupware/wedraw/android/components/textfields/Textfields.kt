@@ -35,4 +35,24 @@ fun TextFieldJoin(modificador: Modifier){
     }
 
 }
+
+@Composable
+fun TextFieldUsername(value:String,onValueChange:(String)->Unit){
+    Column(modifier = Modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            value = value,
+            onValueChange = {onValueChange(it)},
+            maxLines = 1,
+            shape = RoundedCornerShape(20.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.LightGray,
+                disabledTextColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+                //TODO CAMBIAR EL COLOR DE LA LINEA CUANDO ESCRIBES
+            )
+        )
+    }
+}
 //endregion

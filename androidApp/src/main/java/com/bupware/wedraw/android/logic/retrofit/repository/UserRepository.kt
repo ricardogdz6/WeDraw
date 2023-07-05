@@ -18,7 +18,7 @@ object UserRepository {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if (response.isSuccessful) {
                     continuation.resume(response.body(),null)
-                } else Log.i("wawa", response.code().toString())
+                }
             }
 
             override fun onFailure(call: Call<List<User>>, t: Throwable) {

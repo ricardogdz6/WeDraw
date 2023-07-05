@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -50,6 +51,7 @@ import com.bupware.wedraw.android.components.buttons.CreateGroupButton
 import com.bupware.wedraw.android.components.buttons.GroupBar
 import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
+import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -70,6 +72,8 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
     SystemBarColor(color = Color(0xFF2C4560))
 
     MainScreenBody(navController = navController)
+    
+    if (viewModel.askForUsername) UsernamePopUp()
 }
 
 @Composable
@@ -153,6 +157,30 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 
 }
 
+@Composable
+fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
+    Box(contentAlignment = Alignment.Center) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .background(Color(0xD3000000))) {
+            Text(text = " ")
+        }
+        
+        Column(
+            Modifier
+                .background(Color.Red)
+                .fillMaxHeight(0.5f)
+                .fillMaxWidth(0.9f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "ELIGE NUEVO USERNAME")
+            TextFieldUsername(viewModel.username,onValueChange = {viewModel.username = it})
+            Button(onClick = { if (viewModel.username.isNotBlank()) viewModel.launchUpdateUsername() }) {
+                Text(text = "VALIDAR")
+            }
+        }
+        
+    }
+}
 
 
 //region Background && Content
@@ -218,7 +246,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
 
 //endregion
 
-//TODO ARREGLAR ANIMACIONES DE ESTO
 //region Settings content
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){

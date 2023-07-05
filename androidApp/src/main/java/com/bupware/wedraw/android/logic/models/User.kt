@@ -4,7 +4,7 @@ import java.io.Serializable
 import java.util.Date
 
 data class User(
-    var id:String,
+    var id:String?,
     val email: String,
     var username: String?,
     var premium: Boolean,

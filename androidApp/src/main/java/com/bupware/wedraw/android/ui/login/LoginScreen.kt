@@ -128,7 +128,6 @@ fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: Na
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
             viewModel.signInWithGoogleCredential(credential) {
-
                 navController.navigate(route =Destinations.MainScreen.ruta){navController.popBackStack()}}
 
         } catch (e: Exception) {
