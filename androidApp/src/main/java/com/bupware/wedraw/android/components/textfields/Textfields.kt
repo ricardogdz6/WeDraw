@@ -56,3 +56,25 @@ fun TextFieldUsername(value:String,onValueChange:(String)->Unit){
     }
 }
 //endregion
+
+@Composable
+fun TextFieldMessage(){
+
+    Column( horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            value = "aa",
+            onValueChange = {},
+            maxLines = 1,
+            shape = RoundedCornerShape(20.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.LightGray,
+                disabledTextColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent
+                //TODO CAMBIAR EL COLOR DE LA LINEA CUANDO ESCRIBES
+            )
+        )
+    }
+
+}

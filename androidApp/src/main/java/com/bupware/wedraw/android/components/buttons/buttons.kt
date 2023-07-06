@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -357,7 +359,8 @@ fun PremiumInfoButton(){
         Modifier
             .clickable { /*TODO METER INFO*/ }
             .background(Color.White, RoundedCornerShape(10.dp))
-            .fillMaxHeight().padding(start = 10.dp, end = 10.dp)
+            .fillMaxHeight()
+            .padding(start = 10.dp, end = 10.dp)
             ,contentAlignment = Alignment.Center) {
         Text(text = "?", fontWeight = FontWeight.Bold, fontSize = 20.sp)
     }
@@ -480,3 +483,10 @@ fun GroupBar(index: Int) {
 
 }
 //endregion
+
+@Composable
+fun SendMessageButton(){
+    Button(onClick = { /*TODO*/ }, shape = CircleShape) {
+        Text(text = "send Message")
+    }
+}

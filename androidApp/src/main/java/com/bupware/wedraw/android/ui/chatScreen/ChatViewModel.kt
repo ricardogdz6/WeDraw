@@ -10,6 +10,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    var gameList by savedStateHandle.saveable { mutableStateOf("") }
+    var switchDrawingStatus by savedStateHandle.saveable { mutableStateOf(false) }
 
 }
