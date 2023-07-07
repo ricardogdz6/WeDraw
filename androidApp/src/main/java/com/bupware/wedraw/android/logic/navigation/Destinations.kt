@@ -7,4 +7,6 @@ sealed class Destinations (val ruta : String) {
     object LoginScreen:Destinations("LoginScreen")
     object MainScreen:Destinations("MainScreen")
 
+    object ChatScreen:Destinations("ChatScreen")
+
 }

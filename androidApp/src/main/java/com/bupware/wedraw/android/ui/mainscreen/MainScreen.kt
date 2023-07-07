@@ -92,7 +92,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     //Fondo de los backgrounds
     Box {
         GroupBackground(navController)
-        UpperBackgroundContent()
+        UpperBackgroundContent(navController)
     }
 
 
@@ -195,7 +195,7 @@ fun GroupBackground(navController: NavController,viewModel: MainViewModel = hilt
 }
 
 @Composable
-fun UpperBackgroundContent(viewModel: MainViewModel = hiltViewModel()) {
+fun UpperBackgroundContent(navController: NavController,viewModel: MainViewModel = hiltViewModel()) {
     Column(
         Modifier
             .fillMaxSize()
@@ -203,7 +203,7 @@ fun UpperBackgroundContent(viewModel: MainViewModel = hiltViewModel()) {
     ) {
         when (viewModel.moreOptionsEnabled) {
             true -> SettingsContent()
-            false -> GroupContent()
+            false -> GroupContent(navController = navController)
         }
     }
 }
@@ -213,7 +213,7 @@ fun UpperBackgroundContent(viewModel: MainViewModel = hiltViewModel()) {
 //region Groups
 
 @Composable
-fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
+fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavController){
 
     //TODO quitar este hardcode
     LaunchedEffect(Unit){
@@ -238,7 +238,7 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel()){
             } else visible = true
             //endregion
 
-            ChipPop(content = { GroupBar(index) }, show = visible)
+            ChipPop(content = { GroupBar(index,navController) }, show = visible)
             Spacer(modifier = Modifier.height(25.dp))
         }
     }

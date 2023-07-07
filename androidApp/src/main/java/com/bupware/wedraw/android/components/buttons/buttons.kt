@@ -26,11 +26,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -46,8 +49,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.textfields.TextFieldJoin
+import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
 import com.checkinapp.ui.theme.Lexend
 import com.checkinapp.ui.theme.blueVariant2WeDraw
@@ -405,14 +410,14 @@ fun JoinGroupQRButton(){
 }
 
 @Composable
-fun GroupBar(index: Int) {
+fun GroupBar(index: Int,navController: NavController) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = colors.random()
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Box() {
+        Box(Modifier.clickable { navController.navigate(route = Destinations.ChatScreen.ruta) }){
 
             Row(
                 Modifier
@@ -484,9 +489,57 @@ fun GroupBar(index: Int) {
 }
 //endregion
 
+//region chatscreen
 @Composable
 fun SendMessageButton(){
-    Button(onClick = { /*TODO*/ }, shape = CircleShape) {
-        Text(text = "send Message")
+    Button(onClick = { /*TODO*/ }, shape = CircleShape,
+    colors = ButtonDefaults.buttonColors(
+        backgroundColor = blueVariant2WeDraw
+    ), modifier = Modifier.size(45.dp)) {
+        Icon(
+            modifier = Modifier.fillMaxSize(),
+            imageVector = ImageVector.vectorResource(id = R.drawable.send),
+            tint = Color.White,
+            contentDescription = "send message"
+        )
     }
 }
+
+@Composable
+fun SwitchToDrawingButton(action: () -> Unit, drawingState:Boolean){
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+
+        Box(
+            Modifier
+                .height(75.dp)
+                .width(90.dp)
+                .padding(5.dp)
+                .background(redWeDraw, RoundedCornerShape(15.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+
+            Box(
+                Modifier.background(
+                    blueVariant2WeDraw,
+                    RoundedCornerShape(10.dp)
+                )
+            ) {
+                IconButton(
+                    modifier = Modifier.padding(top = 3.dp, bottom = 3.dp, start = 6.dp, end = 6.dp),
+                    onClick = {
+                       action()
+                    }) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = if (drawingState) R.drawable.chat else R.drawable.draw),
+                        tint = Color.White,
+                        contentDescription = "draw"
+                    )
+                }
+            }
+
+        }
+    }
+}
+
+//endregion
+

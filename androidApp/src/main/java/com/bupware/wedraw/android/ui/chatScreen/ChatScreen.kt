@@ -1,10 +1,17 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
+import android.annotation.SuppressLint
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.EaseInOutElastic
 import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.EaseOutBounce
+import androidx.compose.animation.core.EaseOutElastic
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -16,25 +23,42 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +72,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.buttons.SendMessageButton
+import com.bupware.wedraw.android.components.buttons.SwitchToDrawingButton
+import com.bupware.wedraw.android.components.composables.MessageBubble
+import com.bupware.wedraw.android.components.composables.MessageBubbleHost
+import com.bupware.wedraw.android.components.composables.RightBubbleShape
+import com.bupware.wedraw.android.components.composables.TriangleShape
+import com.bupware.wedraw.android.components.composables.drawRightBubble
+import com.bupware.wedraw.android.components.extra.DeviceConfig
+import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.checkinapp.ui.theme.Lexend
 import com.checkinapp.ui.theme.blueVariant2WeDraw
@@ -55,8 +87,9 @@ import com.checkinapp.ui.theme.blueWeDraw
 import com.checkinapp.ui.theme.greenWeDraw
 import com.checkinapp.ui.theme.redWeDraw
 import com.checkinapp.ui.theme.yellowWeDraw
-import com.bupware.wedraw.android.components.extra.DeviceConfig
-import com.bupware.wedraw.android.components.extra.GetDeviceConfig
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 
 @Preview
 @Composable
@@ -65,38 +98,62 @@ fun PreviewChatScreen(){
 }
 
 @Composable
-fun ChatScreen(navController: NavController){
+fun ChatScreen(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    BackHandler() {
+        if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}
+        else navController.popBackStack()
+    }
+
     ChatScreenBody(navController)
 }
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun ChatScreenBody(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    Body()
+
+    TopBar(navController = navController)
+
+}
+
+@Composable
+fun TopBar(navController: NavController){
+    //Topbar
+    Column() {
+        ChatTopBar(navController)
+        DrawingCanvas()
+    }
+}
+
+@Composable
+fun Body(viewModel: ChatScreenViewModel = hiltViewModel()) {
     //Background
     Column(
         Modifier
             .fillMaxSize()
     ) {
-        Image(painter = painterResource(R.drawable.mainbackground), contentDescription = "background", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
+        Image(
+            painter = painterResource(R.drawable.mainbackground),
+            contentDescription = "background",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 
-    //Topbar
-    Column() {
-        ChatTopBar(navController)
-    }
-    Column(Modifier.padding(top = DeviceConfig.heightPercentage(12))) {
-        DrawingCanvas()
-    }
+    Chat()
 
 
     //Footer
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
 
-        //TODO TRABAJAR MAS ESTO
+        Spacer(modifier = Modifier.height(10.dp))
+
         AnimatedVisibility(
             visible = !viewModel.switchDrawingStatus,
-            enter = slideInVertically{height -> height},
-            exit = slideOutVertically{height -> height}
+            enter = slideInVertically { height -> height },
+            exit = slideOutVertically { height -> height }
         ) {
             Footer()
         }
@@ -104,39 +161,28 @@ fun ChatScreenBody(navController: NavController, viewModel: ChatScreenViewModel 
         ColorfulLines()
     }
 
-    /*
-    AnimatedVisibility(
-        visible = viewModel.switchDrawingStatus,
-        enter = slideInVertically{height -> -height},
-        exit = slideOutVertically{height -> -height}
-    ) {
-        //DrawingScreen
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.95f)
-                .background(redWeDraw)) {
-            Text(text = "aaaa")
-        }
-    }
-     */
+
 }
 
 @Composable
-fun Footer(){
-    //TODO esto ha de ser expansible segun se escriba mas
+fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
     Row(
         Modifier
+            .fillMaxWidth()
             .background(Color.White, RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp))
             .padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-        TextFieldMessage()
+
+        Column(Modifier.weight(1f)) {
+            TextFieldMessage(value = viewModel.writingMessage, onValueChange = {viewModel.writingMessage = it})
+        }
         Spacer(modifier = Modifier.width(5.dp))
         SendMessageButton()
+
     }
 }
 
 @Composable
-fun ColorfulLines(height: Dp = 10.dp){
+fun ColorfulLines(height: Dp = 13.dp){
     Row(Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier
             .weight(1f)
@@ -165,31 +211,26 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
 
         Column() {
 
-            AnimatedContent(targetState = viewModel.switchDrawingStatus, transitionSpec = {
-                slideInVertically(
-                    animationSpec = tween(400, easing = EaseOut),
-                ) { height -> -height } with slideOutVertically(
-                    animationSpec = tween(300, easing = EaseOut),
-                ) { height -> -height }
-            }) { state ->
-                Canvas(state)
-            }
-
-
 
             AnimatedContent(targetState = viewModel.switchDrawingStatus, transitionSpec = {
                 slideInVertically(
-                    animationSpec = tween(400, easing = EaseOut),
+                    animationSpec = spring(dampingRatio = 1f, stiffness = Spring.StiffnessLow),
                 ) { height -> -height } with slideOutVertically(
-                    animationSpec = tween(300, easing = EaseOut),
+                    animationSpec = spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow),
                 ) { height -> -height }
             }) {state ->
 
-                val heightBar = if (state) (DeviceConfig.heightPercentage(73).value - 55).dp else 55.dp
-                //val heightButton = if (state) DeviceConfig.heightPercentage(73) - 55 else 55.dp
+                GetDeviceConfig()
+                val heightBar = if (state) (DeviceConfig.heightPercentage(80)) else 55.dp
+                val buttonPadding = if (state) (DeviceConfig.heightPercentage(75)) else 0.dp
+
 
                 //BAR SIN ICONOS
-                Box(Modifier) {
+                Box(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                        ) {
 
                     //region BAR
                     Row(
@@ -201,48 +242,24 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
+                        CanvasContent()
+
                     }
                     //endregion
 
 
                     //region MainButton
-                    //TODO ANIMATE ESTO
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Column(Modifier.offset(y = buttonPadding)) {
+                        SwitchToDrawingButton(action = { viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}, drawingState = viewModel.switchDrawingStatus)
 
-                        Box(
-                            Modifier
-                                .height(75.dp)
-                                .width(90.dp)
-                                .padding(5.dp)
-                                .background(redWeDraw, RoundedCornerShape(15.dp)),
-                            contentAlignment = Alignment.Center
-                        ) {
-
-                            Box(
-                                Modifier.background(
-                                    blueVariant2WeDraw,
-                                    RoundedCornerShape(10.dp)
-                                )
-                            ) {
-                                IconButton(
-                                    modifier = Modifier.padding(top = 0.dp, start = 5.dp),
-                                    onClick = {
-                                        viewModel.switchDrawingStatus =
-                                            !viewModel.switchDrawingStatus
-                                    }) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(id = R.drawable.draw),
-                                        tint = Color.White,
-                                        contentDescription = "draw"
-                                    )
-                                }
-                            }
-
-                        }
                     }
                     //endregion
 
+
+
                 }
+
+
             }
         }
 
@@ -278,14 +295,16 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
                 color = Color.White
             )
 
-            IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp),onClick = {
+            IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp, start = 2.dp),onClick = {
                 TODO()
             }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.person),
-                    tint = Color.White,
-                    contentDescription = "people in group"
-                )
+                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp))) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.people),
+                        tint = redWeDraw,
+                        contentDescription = "people in group"
+                    )
+                }
             }
             //endregion
             //endregion
@@ -296,22 +315,8 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
 }
 
 @Composable
-fun Canvas(expand:Boolean,viewModel: ChatScreenViewModel = hiltViewModel()){
+fun CanvasContent(){
 
-    //TODO ELIMINAR ESTO
-    GetDeviceConfig()
-
-    //73 porque el componente blanco de arriba ocupa un 12% y si le restas eso queda bien en todas las pantallas
-    val heightExpandible = if (expand) DeviceConfig.heightPercentage(73) else 0.dp
-    
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .background(redWeDraw)
-            .height(heightExpandible)) {
-        Text(text = "  ")
-    }
-    
 }
 
 @Composable
@@ -371,7 +376,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
             Row(
                 Modifier
                     .fillMaxHeight(0.8f)
-                    .offset(x = 7.dp)
+                    .offset(x = 7.dp, y = (-5).dp)
                     .border(1.dp, blueVariant2WeDraw, shape = RoundedCornerShape(8.dp))
                     .padding(4.dp)) {
                 Text(text = "CODIGO: 23FDSJD", color = blueVariant2WeDraw ,fontFamily = Lexend, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 15.dp))
@@ -379,7 +384,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
             }
 
             Box(modifier = Modifier
-                .offset(x = (-7).dp)
+                .offset(x = 7.dp, y = (-5).dp)
                 .fillMaxHeight(0.8f)
                 .background(color = blueVariant2WeDraw, RoundedCornerShape(8.dp))
                 .clickable { TODO() }){
@@ -397,3 +402,80 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
 
     }
 }
+
+//region CHAT
+@Composable
+fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            listState.scrollToItem(viewModel.messageList.size)
+        }
+    }
+
+    LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom){
+        items(viewModel.messageList.size){ index ->
+
+            val isIndexRestable = index!=0
+            val isMessageSenderSameThanLast = isIndexRestable && viewModel.messageList[index - 1].senderId == viewModel.messageList[index].senderId
+            val isMessageSenderDifferentThanLast = isIndexRestable && viewModel.messageList[index - 1].senderId != viewModel.messageList[index].senderId
+
+            when{
+
+                //Si el siguiente mensaje es de la misma persona se pone el bubble sin arrow
+                 isMessageSenderSameThanLast -> {
+                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            MessageBubbleHost(viewModel.messageList[index],false)
+                        }
+
+                    } else {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                            Spacer(modifier = Modifier.height(5.dp))
+                            MessageBubble(viewModel.messageList[index],false)
+                        }
+                    }
+                }
+
+                //Si el siguiente mensaje es de otra persona se vuelve a poner el mensaje básico normal
+                isMessageSenderDifferentThanLast -> {
+                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            MessageBubbleHost(viewModel.messageList[index],true)
+                        }
+                    } else {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            MessageBubble(viewModel.messageList[index],true)
+
+                        }
+                    }
+                }
+
+                //Si no, es un mensaje básico
+                else -> {
+                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
+                            MessageBubbleHost(viewModel.messageList[index],true)
+                        }
+                    } else {
+                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
+                            MessageBubble(viewModel.messageList[index],true)
+                        }
+                    }
+                }
+
+
+            }
+
+        }
+    }
+}
+
+
+//endregion

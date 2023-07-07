@@ -6,6 +6,7 @@ import java.util.Date
 data class Message(
     var id:Int?,
     val text: String,
-    var date: Date
+    var date: Date,
+    var senderId: String
 ): java.io.Serializable
 

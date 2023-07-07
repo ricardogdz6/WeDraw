@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.bupware.wedraw.android.Login.LoginScreen
+import com.bupware.wedraw.android.ui.chatScreen.ChatScreen
 import com.bupware.wedraw.android.ui.drawingScreen.DrawingScreen
 import com.bupware.wedraw.android.ui.mainscreen.MainScreen
 import com.bupware.wedraw.android.ui.splash.SplashScreen
@@ -31,6 +32,11 @@ fun NavigationHost (navController: NavHostController,startDestination: String) {
         }
         composable(Destinations.MainScreen.ruta){
             MainScreen(navController = navController)
+        }
+
+        //TODO NAVARGUMENTS
+        composable(Destinations.ChatScreen.ruta){
+            ChatScreen(navController = navController)
         }
     }
 }

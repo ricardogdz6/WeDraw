@@ -59,8 +59,6 @@ class DeviceConfig(){
         fun dpToFloat(initialDP: Dp):Float{
             return ((initialDP.toString().substringBefore('.').toFloat() * 1)/ returnWidth().toString().substringBefore('.').toFloat())
         }
-
-        //Cuanto corresponde 0.5f en big?
         fun tinyFloatToBig(initialFloat:Float):Float{
             return initialFloat * returnWidth().toString().substringBefore('.').toFloat()
         }
