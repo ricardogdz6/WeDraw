@@ -1,28 +1,21 @@
 package com.bupware.wedraw.android.ui.drawingScreen
 
-import android.content.ContentValues
-import android.content.Context
+
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -38,8 +31,6 @@ import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.bupware.wedraw.android.data.tables.image.Image
-import com.bupware.wedraw.android.data.tables.image.Image as draw
 import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.DrawBoxPayLoad
 import io.ak1.drawbox.rememberDrawController
@@ -76,7 +67,8 @@ fun DrawingScreenBody(
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
         Box(
-            modifier = Modifier.height(200.dp)
+            modifier = Modifier.size(500.dp, 500.dp)
+
         ) {
             //DrawableBox(drawableController = rememberDrawableController())
             DrawBox(drawController = controller, bitmapCallback = processImage())

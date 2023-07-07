@@ -2,9 +2,12 @@ package com.bupware.wedraw.android.ui.widget.callback
 
 import android.content.Context
 import android.content.Intent
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
+import androidx.glance.appwidget.state.updateAppWidgetState
+import com.bupware.wedraw.android.ui.widget.WeDrawWidgetConsolidator
 import com.bupware.wedraw.android.ui.widget.WeDrawWidgetReceiver
 
 class WeDrawWidgetCallback : ActionCallback {
@@ -25,3 +28,22 @@ class WeDrawWidgetCallback : ActionCallback {
         context.sendBroadcast(intent)
     }
 }
+
+object WDrawReverseLetterCallback : ActionCallback {
+    val IS_REVERSE = booleanPreferencesKey("isReverse")
+
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters
+    ) {
+        updateAppWidgetState(context, glanceId) { prefs ->
+            if (prefs[IS_REVERSE] == null) prefs[IS_REVERSE] = false else prefs[IS_REVERSE] =
+                !prefs[IS_REVERSE]!!
+
+        }
+
+        WeDrawWidgetConsolidator().update(context, glanceId)
+    }
+}
+

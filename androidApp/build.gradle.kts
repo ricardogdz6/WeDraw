@@ -92,9 +92,9 @@ dependencies {
 
     //Glance Widget
     // For Glance support
-    implementation ("androidx.glance:glance:1.0.0-alpha05")
+    implementation ("androidx.glance:glance:1.0.0-beta01")
     // For AppWidgets support
-    implementation ("androidx.glance:glance-appwidget:1.0.0-alpha05")
+    implementation ("androidx.glance:glance-appwidget:1.0.0-beta01")
 
     // For Wear-Tiles support
     implementation ("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
