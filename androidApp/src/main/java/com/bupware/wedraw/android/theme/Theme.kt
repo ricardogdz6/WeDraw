@@ -1,4 +1,4 @@
-package com.checkinapp.ui.theme
+package com.bupware.wedraw.android.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

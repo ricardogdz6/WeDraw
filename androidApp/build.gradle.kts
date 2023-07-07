@@ -109,10 +109,6 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.2.2")
 
 
-    //android Widgets
-
-
-
     //Corutines WorkManager
     // Dependencia de WorkManager
     implementation ("androidx.work:work-runtime-ktx:2.7.0")

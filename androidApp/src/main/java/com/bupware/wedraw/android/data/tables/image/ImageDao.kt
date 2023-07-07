@@ -14,4 +14,12 @@ interface ImageDao {
 
     @Query("SELECT id, uri FROM image_table WHERE id = :imageid")
     fun getDrawingImage(imageid: Long): LiveData<Image>
+
+
+
+    @Query("SELECT * FROM image_table ORDER BY id ASC")
+    fun readAllData(): LiveData<List<Image>>
+    @Query("DELETE FROM image_table")
+    suspend fun deleteAllImages()
+
 }

@@ -18,13 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -50,11 +46,11 @@ import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.animations.ChipPop
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
-import com.checkinapp.ui.theme.blueWeDraw
-import com.checkinapp.ui.theme.Lexend
-import com.checkinapp.ui.theme.greenWeDraw
-import com.checkinapp.ui.theme.redWeDraw
-import com.checkinapp.ui.theme.yellowWeDraw
+import com.bupware.wedraw.android.theme.blueWeDraw
+import com.bupware.wedraw.android.theme.Lexend
+import com.bupware.wedraw.android.theme.greenWeDraw
+import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.theme.yellowWeDraw
 import kotlinx.coroutines.delay
 
 @Composable

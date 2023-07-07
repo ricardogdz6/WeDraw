@@ -49,7 +49,7 @@ fun BitmapImageWG(draw: Bitmap) {
 }
 
 @Composable
-fun convertBitmapToImageBitmap(bitmap: ImageBitmap): Bitmap {
+fun convertImageBitmapToBitmap(bitmap: ImageBitmap): Bitmap {
     return bitmap.asAndroidBitmap()
 }
 

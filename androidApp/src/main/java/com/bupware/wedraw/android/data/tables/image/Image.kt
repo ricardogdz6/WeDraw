@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.data.tables.image
 
 import android.net.Uri
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "image_table")

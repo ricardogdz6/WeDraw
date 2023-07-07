@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.ui.widget
 
 import android.content.Context
 import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
@@ -15,26 +16,24 @@ class WeDrawWidgetWorker(
 
     private val imageRepository = WDDatabase.getDatabase(appContext).imageDao()
     private val repository = ImageRepository(imageRepository)
+//    private val imageService = ImageService()
 
     override suspend fun doWork(): Result {
-
-
-
-        val glanceId = GlanceAppWidgetManager(appContext).getGlanceIds(WeDrawWidget::class.java).firstOrNull()
+        val glanceId =
+            GlanceAppWidgetManager(appContext).getGlanceIds(WeDrawWidget::class.java).firstOrNull()
         println("ARM: glanceId: $glanceId")
-
 
         if (glanceId == null) {
             return Result.failure(
-                Data
-                    .Builder()
+                Data.Builder()
                     .putString("FAILURE_REASON", "NULL_GLANCE_ID")
-                    .build(),
+                    .build()
             )
         }
-        val result = repository.getDrawingImage(1)
 
 
+//        glanceAppWidget.update(appContext, glanceId)
+
+        return Result.success()
     }
-
 }

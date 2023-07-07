@@ -3,15 +3,13 @@ package com.bupware.wedraw.android.ui.drawingScreen
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.lifecycle.LiveData
+import androidx.core.content.FileProvider
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,7 +20,8 @@ import com.bupware.wedraw.android.data.tables.image.ImageRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
+import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -40,8 +39,14 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
         val imageDao = WDDatabase.getDatabase(context).imageDao()
         val repository: ImageRepository = ImageRepository(imageDao)
 
-        saveImageToExternalStorage(bitmap, "test", context)?.let { Image(0, it.toString()) }
+        saveImageToCache(context, bitmap, "test")?.let { Image(0, it.toString()) }
             ?.let { repository.insert(it) }
+    }
+
+    fun deleteData(context: Context) = viewModelScope.launch {
+        val imageDao = WDDatabase.getDatabase(context).imageDao()
+        val repository: ImageRepository = ImageRepository(imageDao)
+//        repository.deleteAllImages()
     }
 
 
@@ -53,6 +58,7 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
         val resolver = context.contentResolver
         val imageCollection =
             MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+
 
         val imageDetails = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -69,6 +75,24 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
         }
 
         return imageUri
+    }
+
+    fun saveImageToCache(context: Context, bitmap: Bitmap, filename: String): Uri? {
+        val cacheDirectory = context.cacheDir
+        val imageFile = File(cacheDirectory, filename)
+
+        val outputStream = FileOutputStream(imageFile)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+        outputStream.flush()
+        outputStream.close()
+
+        // Obtén el URI del archivo de imagen en la caché
+
+        return FileProvider.getUriForFile(
+            context,
+            "com.bupware.wedraw.android.fileprovider",
+            imageFile
+        )
     }
 
     fun bitmapToByteArray(bitmap: Bitmap): ByteArray {

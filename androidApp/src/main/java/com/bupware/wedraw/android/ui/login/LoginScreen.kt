@@ -1,19 +1,25 @@
 package com.bupware.wedraw.android.ui.login
 
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -28,6 +34,7 @@ import com.google.firebase.ktx.Firebase
 
 
 @Composable
+@Preview
 fun PreviewLogin(){
     LoginScreen(rememberNavController())
 }
@@ -63,7 +70,6 @@ fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hil
         Modifier
             .fillMaxSize()
             .background(Color.Black), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-
         Button(onClick = {
             val options = GoogleSignInOptions.Builder(
                 GoogleSignInOptions.DEFAULT_SIGN_IN
@@ -75,7 +81,17 @@ fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hil
             launcher.launch(googleSignInClient.signInIntent)
         }) {
             Text(text = "Sign with Google")
+            
         }
+//        viewModel.readAllData(context)
+//
+//        if(!viewModel.loading){
+//            val uri = Uri.parse(viewModel.imageUri)
+//            val inputStream = context.contentResolver.openInputStream(uri)
+//            val bitmap = BitmapFactory.decodeStream(inputStream)
+//
+//        }
+
 
         Button(onClick = { Firebase.auth.signOut() }) {
             Text(text = "Sign out")
