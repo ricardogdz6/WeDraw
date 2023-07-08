@@ -7,4 +7,6 @@
     <string name="c_digo_del_grupo">"CÓDIGO DEL GRUPO: "</string>
     <string name="nombre_del_grupo">NOMBRE DEL GRUPO:</string>
     <string name="limite_de_personas">"LIMITE DE PERSONAS: "</string>
+    <string name="introduce_el_nombre_del_grupo">Introduce el nombre del grupo</string>
+    <string name="introduce_el_c_digo">Introduce el código</string>
 </resources>

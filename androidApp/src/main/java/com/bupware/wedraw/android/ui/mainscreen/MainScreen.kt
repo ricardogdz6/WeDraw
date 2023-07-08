@@ -50,6 +50,7 @@ import com.bupware.wedraw.android.components.animations.ChipPop
 import com.bupware.wedraw.android.components.buttons.CreateGroupButton
 import com.bupware.wedraw.android.components.buttons.GroupBar
 import com.bupware.wedraw.android.components.buttons.JoinGroupButton
+import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.navigation.Destinations
@@ -132,6 +133,12 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
         }
 
     }
+
+    //ColorfulLines
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+        ColorfulLines()
+    }
+
 
 
     //TODO ELIMINAR

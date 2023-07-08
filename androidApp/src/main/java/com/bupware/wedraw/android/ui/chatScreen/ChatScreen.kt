@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -73,6 +74,7 @@ import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.buttons.SendMessageButton
 import com.bupware.wedraw.android.components.buttons.SwitchToDrawingButton
+import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.composables.MessageBubble
 import com.bupware.wedraw.android.components.composables.MessageBubbleHost
 import com.bupware.wedraw.android.components.composables.RightBubbleShape
@@ -181,28 +183,6 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
     }
 }
 
-@Composable
-fun ColorfulLines(height: Dp = 13.dp){
-    Row(Modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier
-            .weight(1f)
-            .background(blueWeDraw)
-            .height(height))
-        Spacer(modifier = Modifier
-            .weight(1f)
-            .background(greenWeDraw)
-            .height(height))
-        Spacer(modifier = Modifier
-            .weight(1f)
-            .background(yellowWeDraw)
-            .height(height))
-        Spacer(modifier = Modifier
-            .weight(1f)
-            .background(redWeDraw)
-            .height(height))
-    }
-}
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
@@ -298,8 +278,9 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
             IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp, start = 2.dp),onClick = {
                 TODO()
             }) {
-                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp))) {
+                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp)).padding(5.dp)) {
                     Icon(
+                        modifier = Modifier.size(35.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.people),
                         tint = redWeDraw,
                         contentDescription = "people in group"

@@ -3,10 +3,6 @@ package com.bupware.wedraw.android.components.buttons
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.EaseInOutBack
-import androidx.compose.animation.core.EaseInOutBounce
-import androidx.compose.animation.core.EaseInOutElastic
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -39,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -51,6 +46,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
+import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
+import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
 import com.bupware.wedraw.android.components.textfields.TextFieldJoin
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
@@ -182,7 +179,7 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Text(text = stringResource(R.string.nombre_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
                                 Spacer(modifier = Modifier.height(10.dp))
-                                if (viewModel.expandCreateGroup) TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
+                                if (viewModel.expandCreateGroup) Column(Modifier.padding(start = 10.dp, end = 10.dp)){CreateGroupTextfield(value = viewModel.groupName, onValueChange = {viewModel.groupName = it})}
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Column(Modifier.padding(start = 10.dp, end = 10.dp)) {
                                     PeopleLimitBar()
@@ -322,9 +319,9 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(text = stringResource(R.string.c_digo_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(10.dp))
-                        if (viewModel.expandJoinGroup) TextFieldJoin(modificador = Modifier.fillMaxWidth(0.95f))
+                        if (viewModel.expandJoinGroup) Column(Modifier.padding(start = 10.dp, end = 10.dp)){JoinGroupTextfield(value = viewModel.joinCode, onValueChange = {viewModel.joinCode = it})}
                         Spacer(modifier = Modifier.height(20.dp))
-                         JoinGroupSubButton()
+                        JoinGroupSubButton()
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 

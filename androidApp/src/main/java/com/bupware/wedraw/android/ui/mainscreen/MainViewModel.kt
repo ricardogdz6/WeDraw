@@ -28,6 +28,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var expandJoinGroup by savedStateHandle.saveable { mutableStateOf(false) }
     var expandCreateGroup by savedStateHandle.saveable { mutableStateOf(false) }
 
+    var groupName by savedStateHandle.saveable { mutableStateOf("") }
+    var joinCode by savedStateHandle.saveable { mutableStateOf("") }
+
     //Init
     var askForUsername by savedStateHandle.saveable { mutableStateOf(false) }
 
