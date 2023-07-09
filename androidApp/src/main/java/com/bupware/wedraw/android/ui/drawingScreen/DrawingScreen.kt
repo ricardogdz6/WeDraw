@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.drawingScreen
 
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -16,8 +17,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,9 +36,12 @@ import androidx.core.graphics.createBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.bupware.wedraw.android.ui.widget.WeDrawPreferences
 import io.ak1.drawbox.DrawBox
 import io.ak1.drawbox.DrawBoxPayLoad
 import io.ak1.drawbox.rememberDrawController
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.Q)
 @Preview
@@ -48,6 +56,7 @@ fun DrawingScreen(navController: NavController) {
     DrawingScreenBody(navController)
 }
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun DrawingScreenBody(
@@ -61,7 +70,19 @@ fun DrawingScreenBody(
     var a: DrawBoxPayLoad = DrawBoxPayLoad(Color.Black, emptyList())
     var b: Int
     var context = LocalContext.current
+    val dataStore = WeDrawPreferences(context)
+
     var scope = rememberCoroutineScope()
+    var uri by remember{mutableStateOf ("")}
+
+
+    scope.launch {
+        dataStore.setUri("asdadasdasda")
+        dataStore.getUri.collect {
+            uri = it
+        }
+    }
+
 
 
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -90,7 +111,7 @@ fun DrawingScreenBody(
                 //a = controller.exportPath()
 
             }) {
-                Text(text = "export")
+                Text(text = "export" + " ${uri}")
 
             }
 

@@ -11,17 +11,24 @@ import com.bupware.wedraw.android.data.tables.group.Group
 import com.bupware.wedraw.android.data.tables.group.GroupDao
 import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.image.ImageDao
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupUserCrossRef
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupWithUsersDao
+import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageDao
 import com.bupware.wedraw.android.data.tables.user.User
-import com.bupware.wedraw.android.data.tables.relationTables.Users_groups
 import com.bupware.wedraw.android.data.tables.user.UserDao
 
-@Database(entities = [User::class, Group::class, Users_groups::class, Image::class, Message::class], version = 2)
+@Database(entities = [User::class, Group::class, Image::class, Message::class, GroupUserCrossRef::class], version = 2)
 @TypeConverters(DataConverter::class)
 abstract class WDDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun groupDao(): GroupDao
     abstract fun imageDao(): ImageDao
     abstract fun messageDao(): MessageDao
+    abstract fun groupWithUsersDao(): GroupWithUsersDao
+
+    abstract fun messageWithImageDao(): MessageWithImageDao
+
+
 
     companion object {
         @Volatile
@@ -37,7 +44,8 @@ abstract class WDDatabase : RoomDatabase() {
                 val instance = androidx.room.Room.databaseBuilder(
                     context.applicationContext,
                     WDDatabase::class.java,
-                    "user_database"
+                    "wedraw_database"
+                //TODO: Remove fallbackToDestructiveMigration() el dia de despliegue
                 ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 return instance

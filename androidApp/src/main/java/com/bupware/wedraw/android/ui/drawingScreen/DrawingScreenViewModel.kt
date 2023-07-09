@@ -6,22 +6,40 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.core.content.FileProvider
+import androidx.datastore.dataStore
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.data.WDDatabase
+import com.bupware.wedraw.android.data.tables.group.Group
+import com.bupware.wedraw.android.data.tables.group.GroupRepository
 import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.image.ImageRepository
+import com.bupware.wedraw.android.data.tables.message.Message
+import com.bupware.wedraw.android.data.tables.message.MessageRepository
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupWithUsersRepository
+import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
+import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageRepository
+import com.bupware.wedraw.android.data.tables.user.User
+import com.bupware.wedraw.android.data.tables.user.UserRepository
+import com.bupware.wedraw.android.ui.widget.WeDrawPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -36,11 +54,91 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
 
 
     fun insertData(context: Context, bitmap: Bitmap) = viewModelScope.launch {
-        val imageDao = WDDatabase.getDatabase(context).imageDao()
-        val repository: ImageRepository = ImageRepository(imageDao)
+        //message
+//        val mwimg = WDDatabase.getDatabase(context).messageWithImageDao()
+//        val repository: MessageWithImageRepository = MessageWithImageRepository(mwimg)
 
-        saveImageToCache(context, bitmap, "test")?.let { Image(0, it.toString()) }
-            ?.let { repository.insert(it) }
+
+        //group
+        val groupDao = WDDatabase.getDatabase(context).groupDao()
+        val groupRepository: GroupRepository = GroupRepository(groupDao)
+
+        //user
+        val userDao = WDDatabase.getDatabase(context).userDao()
+        val userRepository: UserRepository = UserRepository(userDao)
+
+        //save image in cache and get uri
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val fileName = "wdraw_$timestamp.jpg"
+        val urisaved = saveImageToCache(context, bitmap, fileName)
+
+
+        //insert user
+//        userRepository.insert(User(userId = "testuid", name = "test"))
+//
+//        userRepository.readAllData.collect { ist ->
+//            ist.forEach {
+//
+//                Log.i("database", it.userId)            }
+//        }
+//        Log.i("database", "try")
+
+        //insert group
+//        val gid = groupRepository.insert(Group(name = "testgroup", leader_ID = "testuid"))
+
+//        Log.i("database", "try")
+//        val group = groupRepository.readAllData
+//        group.collect { ist ->
+//            ist.forEach {
+//                Log.i("database", it.name)
+//            }
+//        }
+
+        //cross group with user
+        val groupWithUsers = WDDatabase.getDatabase(context).groupWithUsersDao()
+        val groupWithUserRepository: GroupWithUsersRepository =
+            GroupWithUsersRepository(groupWithUsers)
+
+//        insert group with user
+//        groupWithUserRepository.crossGroupWithLeader(1, "testuid")
+//
+//
+//
+//
+//        insert message with image
+        val messageWithImage =
+            WDDatabase.getDatabase(context).messageWithImageDao()
+
+//        val messageWithImageRepository: MessageWithImageRepository =
+//            MessageWithImageRepository(messageWithImage)
+//        messageWithImageRepository.insertMessageWithImage(
+//            MessageWithImage(
+//                Image(uri =urisaved.toString()),
+//                Message(owner_group_Id = 1, text = "test funciona", ownerId = "testuid", date = null)
+//            )
+//        )
+
+        //message repository to readdata
+        val messageDao = WDDatabase.getDatabase(context).messageDao()
+        val messageRepository: MessageRepository = MessageRepository(messageDao)
+
+//        userRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
+//            .launchIn(viewModelScope)
+//        groupRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
+//            .launchIn(viewModelScope)
+//        groupWithUserRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
+//            .launchIn(viewModelScope)
+//        messageRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
+//            .launchIn(viewModelScope)
+
+//        dataStore.getUri.collect { ist -> Log.i("database", ist) }
+        
+    }
+
+    fun insertDataTest(context: Context) {
+        viewModelScope.launch {
+
+        }
     }
 
     fun deleteData(context: Context) = viewModelScope.launch {

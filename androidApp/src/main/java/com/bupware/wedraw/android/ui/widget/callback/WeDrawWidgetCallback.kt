@@ -3,6 +3,7 @@ package com.bupware.wedraw.android.ui.widget.callback
 import android.content.Context
 import android.content.Intent
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
@@ -38,11 +39,21 @@ object WDrawReverseLetterCallback : ActionCallback {
         parameters: ActionParameters
     ) {
         updateAppWidgetState(context, glanceId) { prefs ->
-            if (prefs[IS_REVERSE] == null) prefs[IS_REVERSE] = false else prefs[IS_REVERSE] =
+            if (prefs[IS_REVERSE] == null) prefs[IS_REVERSE] = true else prefs[IS_REVERSE] =
                 !prefs[IS_REVERSE]!!
 
         }
 
+        WeDrawWidgetConsolidator().update(context, glanceId)
+    }
+}
+
+object WDrawUpdateUriCallback : ActionCallback {
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters
+    ) {
         WeDrawWidgetConsolidator().update(context, glanceId)
     }
 }

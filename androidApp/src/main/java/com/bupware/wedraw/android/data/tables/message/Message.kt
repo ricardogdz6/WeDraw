@@ -1,30 +1,25 @@
 package com.bupware.wedraw.android.data.tables.message
 
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.bupware.wedraw.android.data.tables.relationTables.Users_groups
-import com.bupware.wedraw.android.data.tables.image.Image
+import com.bupware.wedraw.android.data.tables.group.Group
+import com.bupware.wedraw.android.data.tables.user.User
 import java.sql.Date
 
 
-@Entity(tableName = "message_table", foreignKeys = [
-    androidx.room.ForeignKey(
-        entity = Users_groups::class,
-        parentColumns = ["id"],
-        childColumns = ["user_groups_id"],
-        onDelete = androidx.room.ForeignKey.CASCADE
-    ),
-    androidx.room.ForeignKey(
-        entity = Image::class,
-        parentColumns = ["id"],
-        childColumns = ["bitmap_id"],
-        onDelete = androidx.room.ForeignKey.CASCADE
-    )
-])
+@Entity(tableName = "messages_table",foreignKeys =  [
+    ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["owner_group_Id"]),
+    ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
+]
+
+)
 data class Message(
-    @PrimaryKey val id: Long,
-    val user_groups_id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val owner_group_Id: Long,
+    val ownerId: String,
     val text: String,
-    val bitmap_id: Long,
-    val date: Date
+    val image_Id: Long?= null,
+    val date: Date?
 )

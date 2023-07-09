@@ -24,19 +24,23 @@ import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import androidx.glance.wear.tiles.action.actionRunCallback
+import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.ui.widget.callback.WDrawReverseLetterCallback
 
 @Composable
-fun WeDrawWidgetUI(Bitmap: Bitmap) {
+fun WeDrawWidgetUI(message: Message, bitmap: Bitmap) {
 
-    WeDrawWidget(bitmap = Bitmap)
+    WeDrawWidget(message, bitmap)
 
 //                val uri = Uri.parse(state.data.image)
 //                Log.i("ARM", "uri: $uri")
@@ -55,7 +59,7 @@ fun WeDrawWidgetUI(Bitmap: Bitmap) {
 
 @Composable
 
-private fun WeDrawWidget(bitmap: Bitmap) {
+private fun WeDrawWidget(message: Message, bitmap: Bitmap) {
     GlanceTheme {
 
         Column(
@@ -64,13 +68,14 @@ private fun WeDrawWidget(bitmap: Bitmap) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             val isreverse = currentState(WDrawReverseLetterCallback.IS_REVERSE) ?: false
-            Text(
-                "BUPWARE", modifier = GlanceModifier, style = TextStyle(
-                    color = GlanceTheme.colors.textColorPrimary,
-                    fontSize = 20.sp,
-                )
-            )
+
             if (!isreverse) {
+                Text(
+                    message.text, modifier = GlanceModifier, style = TextStyle(
+                        color = GlanceTheme.colors.textColorPrimary,
+                        fontSize = 20.sp,
+                    )
+                )
                 Box(modifier = GlanceModifier) {
                     Image(
                         provider = ImageProvider(
@@ -91,15 +96,41 @@ private fun WeDrawWidget(bitmap: Bitmap) {
 
             } else {
                 Box(
-                    modifier = GlanceModifier.fillMaxSize()
-                        .background(GlanceTheme.colors.background)
+                    modifier = GlanceModifier
+                        .background(ColorProvider(Color.LightGray))
                         .clickable(onClick = actionRunCallback(WDrawReverseLetterCallback::class.java))
                 ) {
-                    Text(text = "ESTA AL REVES")
+                    Column(modifier = GlanceModifier.fillMaxSize().padding(start = 10.dp, top = 20.dp)) {
+
+
+                        Text(
+                            message.text,
+                            modifier =GlanceModifier,
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onPrimary,
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Start
+                                )
+                        )
+                        Row(
+                            horizontalAlignment = Alignment.End,
+                            modifier = GlanceModifier.padding(top = 10.dp)
+                        ) {
+                            Text(
+                                text = message.ownerId,
+
+                                style = TextStyle(textAlign = TextAlign.Start,
+                                    color = GlanceTheme.colors.onPrimary)
+                            )
+                        }
+
+                    }
+
 
                 }
-            }
 
+
+            }
 
 
         }
