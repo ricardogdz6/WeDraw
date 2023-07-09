@@ -98,6 +98,7 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
                 message = repository.getMessageWithImage(1)
                 Log.i("ARM", "message: ${message.image.uri}")
 
+                //Todo: cambiar por un callback
                 updateAppWidgetState(localcontext, glanceId){
                     pref-> pref[stringPreferencesKey(WeDrawPreferences.WIMAGE_KEY)] = message.image.uri
                     WeDrawWidgetConsolidator().update(localcontext, glanceId)
