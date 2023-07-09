@@ -20,12 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bupware.wedraw.android.ui.chatScreen.MessageLocal
+import com.bupware.wedraw.android.logic.models.Message
 import com.checkinapp.ui.theme.blueVariant2WeDraw
 import com.checkinapp.ui.theme.redWeDraw
 
 @Composable
-fun MessageBubbleHost(message: MessageLocal, showTriangle:Boolean){
+fun MessageBubbleHost(message: Message, showTriangle:Boolean){
 
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
@@ -73,7 +73,7 @@ fun MessageBubbleHost(message: MessageLocal, showTriangle:Boolean){
 }
 
 @Composable
-fun MessageBubble(message: MessageLocal, showTriangle:Boolean){
+fun MessageBubble(message: Message, showTriangle:Boolean){
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) {if (showTriangle) 12.dp.toPx() else 0.dp.toPx()  }

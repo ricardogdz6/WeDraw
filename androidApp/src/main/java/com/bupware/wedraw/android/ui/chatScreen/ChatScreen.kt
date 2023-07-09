@@ -78,6 +78,10 @@ fun PreviewChatScreen(){
 @Composable
 fun ChatScreen(navController: NavController, groupId: Int, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    LaunchedEffect(Unit){
+        viewModel.loadMessages(groupId)
+    }
+
     BackHandler() {
         if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}
         else navController.popBackStack()
@@ -254,7 +258,10 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
             IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp, start = 2.dp),onClick = {
                 TODO()
             }) {
-                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp)).padding(5.dp)) {
+                Box(
+                    Modifier
+                        .background(Color.White, RoundedCornerShape(10.dp))
+                        .padding(5.dp)) {
                     Icon(
                         modifier = Modifier.size(35.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.people),

@@ -10,8 +10,10 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
+import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.checkinapp.ui.theme.greenAchieve
@@ -54,9 +56,26 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         }
 
         viewModelScope.launch {
-            getUserGroups()
+            withContext(Dispatchers.Default) {getUserGroups()}
             showGroups = true
+
+            //TODO MOVER ESTO?
+
+
+            groupList.forEach {
+                var messageList = listOf<Message>()
+
+                it.userGroups?.first()?.id?.let { it1 -> messageList =
+                    MessageRepository.getMessageByUserGroupId(it1)!!
+                }
+
+                sessionData.messageList.add(Pair(it.id ?: 0, messageList))
+
+            }
+            //
+
         }
+
 
     }
     fun expandButton(index:Int){
@@ -139,6 +158,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     suspend fun getUserGroups(){
+        Log.i("wawa","soy la primera bala")
         val userId = Firebase.auth.currentUser?.uid.toString()
         val group = withContext(Dispatchers.Default) { GroupRepository.getGroupByUserId(userId) } ?: emptyList()
         groupList = group
@@ -147,7 +167,6 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
 
 }
-
 
 suspend fun gestionLogin(askForUsername: () -> Unit){
 
