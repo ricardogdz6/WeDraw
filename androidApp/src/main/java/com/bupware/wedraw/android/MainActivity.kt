@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.bupware.wedraw.android.core.api.NotificationManager
 import com.bupware.wedraw.android.logic.firebase.FBAuth
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.logic.navigation.NavigationHost

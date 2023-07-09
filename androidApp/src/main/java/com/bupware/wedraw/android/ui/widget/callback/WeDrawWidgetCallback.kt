@@ -2,20 +2,23 @@ package com.bupware.wedraw.android.ui.widget.callback
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.state.updateAppWidgetState
 import com.bupware.wedraw.android.ui.widget.WeDrawWidgetConsolidator
 import com.bupware.wedraw.android.ui.widget.WeDrawWidgetReceiver
 
+
 class WeDrawWidgetCallback : ActionCallback {
 
 
     companion object {
-        const val UPDATE_ACTION = "updateAction"
+        const val UPDATE_ACTION = "APPWIDGET_UPDATE"
     }
 
     override suspend fun onAction(
@@ -30,8 +33,21 @@ class WeDrawWidgetCallback : ActionCallback {
     }
 }
 
-object WDrawReverseLetterCallback : ActionCallback {
-    val IS_REVERSE = booleanPreferencesKey("isReverse")
+class WDrawRefreshCallback : ActionCallback {
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters
+    ) {
+        WeDrawWidgetConsolidator().update(context, glanceId)
+    }
+}
+
+class WDrawReverseLetterCallback : ActionCallback {
+    companion object{
+        val IS_REVERSE = booleanPreferencesKey("isReverse")
+
+    }
 
     override suspend fun onAction(
         context: Context,
@@ -47,14 +63,3 @@ object WDrawReverseLetterCallback : ActionCallback {
         WeDrawWidgetConsolidator().update(context, glanceId)
     }
 }
-
-object WDrawUpdateUriCallback : ActionCallback {
-    override suspend fun onAction(
-        context: Context,
-        glanceId: GlanceId,
-        parameters: ActionParameters
-    ) {
-        WeDrawWidgetConsolidator().update(context, glanceId)
-    }
-}
-

@@ -24,6 +24,7 @@ import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
+import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.state.GlanceStateDefinition
@@ -35,7 +36,6 @@ import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageRepository
-import com.bupware.wedraw.android.ui.widget.callback.WDrawUpdateUriCallback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -71,7 +71,7 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
 
         val dataStore = WeDrawPreferences(context)
         provideContent {
-
+            Log.i("wawa", "actualizando")
             val localcontext = LocalContext.current
 
             val glanceId = LocalGlanceId.current
@@ -99,20 +99,23 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
                 Log.i("ARM", "message: ${message.image.uri}")
 
                 //Todo: cambiar por un callback
-                updateAppWidgetState(localcontext, glanceId){
-                    pref-> pref[stringPreferencesKey(WeDrawPreferences.WIMAGE_KEY)] = message.image.uri
+                updateAppWidgetState(localcontext, glanceId) { pref ->
+                    pref[stringPreferencesKey(WeDrawPreferences.WIMAGE_KEY)] = message.image.uri
                     WeDrawWidgetConsolidator().update(localcontext, glanceId)
                 }
 
             }
 
-
             var bitmap: Bitmap? = null
 
-            Log.i("ARM", "uri: $uri")
 
-
-            if (uri != "null" && uri != null) {
+            if (uri == "wimage_key" || uri == null) {
+                GlanceTheme {
+                    Column(modifier = GlanceModifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalAlignment = Alignment.CenterVertically) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else {
                 val uriParse = Uri.parse(uri)
                 Log.i("ARM", "uri: $uri")
                 val inputStream = context.contentResolver.openInputStream(uriParse)
@@ -175,12 +178,6 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
 
                     }
 
-                }
-            } else {
-                GlanceTheme {
-                    Column(modifier = GlanceModifier.fillMaxSize()) {
-                        CircularProgressIndicator()
-                    }
                 }
             }
 

@@ -17,6 +17,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.bupware.wedraw.android.core.api.NotificationManager
 import com.bupware.wedraw.android.data.WDDatabase
 import com.bupware.wedraw.android.data.tables.group.Group
 import com.bupware.wedraw.android.data.tables.group.GroupRepository
@@ -57,7 +58,6 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
         //message
 //        val mwimg = WDDatabase.getDatabase(context).messageWithImageDao()
 //        val repository: MessageWithImageRepository = MessageWithImageRepository(mwimg)
-
 
         //group
         val groupDao = WDDatabase.getDatabase(context).groupDao()

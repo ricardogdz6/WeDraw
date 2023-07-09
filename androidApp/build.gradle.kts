@@ -90,6 +90,10 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
 
+
+    //Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
     //Glance Widget
     // For Glance support
     implementation ("androidx.glance:glance:1.0.0-beta01")
@@ -119,6 +123,7 @@ dependencies {
 
     //Gson
     implementation ("com.google.code.gson:gson:2.9.0")
+
 
 
 }
