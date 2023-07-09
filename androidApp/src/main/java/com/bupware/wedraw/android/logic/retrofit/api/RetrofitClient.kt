@@ -18,6 +18,7 @@ object RetrofitClient {
     private const val BASE_URL = "http://192.168.1.126:8080/"
 
     var gson = GsonBuilder()
+        .setLenient()
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
         .registerTypeAdapter(Time::class.java, TimeDeserializer())
         .registerTypeAdapter(Time::class.java, TimeSerializer())

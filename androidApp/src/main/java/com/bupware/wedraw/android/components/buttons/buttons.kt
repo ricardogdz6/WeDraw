@@ -1,5 +1,6 @@
 package com.bupware.wedraw.android.components.buttons
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,7 +50,6 @@ import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
-import com.bupware.wedraw.android.components.textfields.TextFieldJoin
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
 import com.checkinapp.ui.theme.Lexend
@@ -177,15 +178,15 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
                                     .fillMaxWidth()
                                 , verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                                 Spacer(modifier = Modifier.height(20.dp))
-                                Text(text = stringResource(R.string.nombre_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
+                                Text(text = stringResource(R.string.nombre_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.Black)
                                 Spacer(modifier = Modifier.height(10.dp))
                                 if (viewModel.expandCreateGroup) Column(Modifier.padding(start = 10.dp, end = 10.dp)){CreateGroupTextfield(value = viewModel.groupName, onValueChange = {viewModel.groupName = it})}
                                 Spacer(modifier = Modifier.height(20.dp))
                                 Column(Modifier.padding(start = 10.dp, end = 10.dp)) {
-                                    PeopleLimitBar()
+                                    if (viewModel.expandCreateGroup) PeopleLimitBar()
                                 }
                                 Spacer(modifier = Modifier.height(20.dp))
-                                JoinGroupSubButton()
+                                if (viewModel.expandCreateGroup) CreateGroupSubButton(viewModel::createGroupButton)
                                 Spacer(modifier = Modifier.height(10.dp))
                             }
 
@@ -317,11 +318,11 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
                             .fillMaxWidth()
                         , verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Spacer(modifier = Modifier.height(20.dp))
-                        Text(text = stringResource(R.string.c_digo_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold)
+                        Text(text = stringResource(R.string.c_digo_del_grupo), fontSize = 20.sp,fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.Black)
                         Spacer(modifier = Modifier.height(10.dp))
                         if (viewModel.expandJoinGroup) Column(Modifier.padding(start = 10.dp, end = 10.dp)){JoinGroupTextfield(value = viewModel.joinCode, onValueChange = {viewModel.joinCode = it})}
                         Spacer(modifier = Modifier.height(20.dp))
-                        JoinGroupSubButton()
+                        if (viewModel.expandJoinGroup) JoinGroupSubButton(viewModel::joinGroupButton)
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 
@@ -364,15 +365,40 @@ fun PremiumInfoButton(){
             .fillMaxHeight()
             .padding(start = 10.dp, end = 10.dp)
             ,contentAlignment = Alignment.Center) {
-        Text(text = "?", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text(text = "?", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color.Black)
     }
 }
 
 @Composable
-fun JoinGroupSubButton() {
+fun JoinGroupSubButton(action: (Context) -> Unit) {
+
+    val context = LocalContext.current
 
     Box(Modifier
-        .clickable { /* TODO JOIN GRUPO */ }
+        .width(IntrinsicSize.Max)
+        .clickable { action(context) }
+    ) {
+
+        Column(
+            Modifier
+                .background(Color(0xFFAC2525), RoundedCornerShape(15.dp))
+                .fillMaxWidth()
+                .height(36.dp)
+        ) {
+            Text(text = " ")
+        }
+
+        SubButtonNoShadow(stringResource(R.string.unirse_a_grupo))
+    }
+}
+
+@Composable
+fun CreateGroupSubButton(action: (Context) -> Unit) {
+
+    val context = LocalContext.current
+
+    Box(Modifier
+        .clickable { action(context) }
         .width(IntrinsicSize.Max)
 
     ) {
@@ -386,18 +412,19 @@ fun JoinGroupSubButton() {
             Text(text = " ")
         }
 
-        JoinGroupSubButtonNoShadow()
+        SubButtonNoShadow(stringResource(R.string.crear_grupo))
     }
 }
+
 @Composable
-fun JoinGroupSubButtonNoShadow(){
+fun SubButtonNoShadow(text:String){
     Column(
         Modifier
             .height(IntrinsicSize.Max)
             .width(IntrinsicSize.Max)
             .background(Color(0xFFF53333), RoundedCornerShape(15.dp))
             .padding(start = 10.dp, end = 10.dp, top = 5.dp, bottom = 5.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = stringResource(R.string.unirse_a_grupo), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, fontFamily = Lexend)
+        Text(text = text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 15.sp, fontFamily = Lexend)
     }
 }
 
@@ -407,14 +434,14 @@ fun JoinGroupQRButton(){
 }
 
 @Composable
-fun GroupBar(index: Int,navController: NavController) {
+fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = colors.random()
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Box(Modifier.clickable { navController.navigate(route = Destinations.ChatScreen.ruta) }){
+        Box(Modifier.clickable{ navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
 
             Row(
                 Modifier
@@ -435,9 +462,10 @@ fun GroupBar(index: Int,navController: NavController) {
                 //TODO controlar que no se desborde el text este y poner ...
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
-                    text = "$index",
+                    text = nombre,
                     fontSize = 20.sp,
-                    fontFamily = Lexend
+                    fontFamily = Lexend,
+                    color = Color.Black
                 )
 
                 Column(Modifier.weight(1f)) {
@@ -452,7 +480,7 @@ fun GroupBar(index: Int,navController: NavController) {
                         .width(40.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         modifier = Modifier,
-                        text = "$index",
+                        text = nombre,
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,

@@ -20,8 +20,11 @@ interface GroupService {
     @GET("/weDraw/groups/id/{id}")
     fun getGroupById(@Path("id") id: Int): Call<List<Group>?>
 
-    @POST("/weDraw/groups/{name}/{leaderId}")
-    fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<Boolean>
+    @GET("/weDraw/groups/code/{code}")
+    fun getGroupByCode(@Path("code") code: String): Call<Group?>
+
+    @POST("/weDraw/groups/create/{name}/{leaderId}")
+    fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 
     @POST("/weDraw/groups/{userID}/{groupID}")
     fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Int): Call<Boolean>

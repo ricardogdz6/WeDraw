@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.bupware.wedraw.android.Login.LoginScreen
 import com.bupware.wedraw.android.ui.chatScreen.ChatScreen
 import com.bupware.wedraw.android.ui.drawingScreen.DrawingScreen
@@ -35,8 +37,9 @@ fun NavigationHost (navController: NavHostController,startDestination: String) {
         }
 
         //TODO NAVARGUMENTS
-        composable(Destinations.ChatScreen.ruta){
-            ChatScreen(navController = navController)
+        composable("${Destinations.ChatScreen.ruta}/{groupId}", arguments = listOf(navArgument("groupId"){type = NavType.IntType})){ backStackEntry ->
+            backStackEntry.arguments?.getInt("groupId")
+                ?.let { ChatScreen(navController=navController, groupId = it) }
         }
     }
 }

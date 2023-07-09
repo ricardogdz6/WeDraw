@@ -1,18 +1,12 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.EaseInOutElastic
-import androidx.compose.animation.core.EaseOut
-import androidx.compose.animation.core.EaseOutBounce
-import androidx.compose.animation.core.EaseOutElastic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
@@ -23,7 +17,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,41 +24,29 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,42 +58,37 @@ import com.bupware.wedraw.android.components.buttons.SwitchToDrawingButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.composables.MessageBubble
 import com.bupware.wedraw.android.components.composables.MessageBubbleHost
-import com.bupware.wedraw.android.components.composables.RightBubbleShape
-import com.bupware.wedraw.android.components.composables.TriangleShape
-import com.bupware.wedraw.android.components.composables.drawRightBubble
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
+import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.checkinapp.ui.theme.Lexend
 import com.checkinapp.ui.theme.blueVariant2WeDraw
-import com.checkinapp.ui.theme.blueWeDraw
-import com.checkinapp.ui.theme.greenWeDraw
 import com.checkinapp.ui.theme.redWeDraw
-import com.checkinapp.ui.theme.yellowWeDraw
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 @Preview
 @Composable
 fun PreviewChatScreen(){
-    ChatScreen(rememberNavController())
+    ChatScreen(rememberNavController(), 1)
 }
 
+
 @Composable
-fun ChatScreen(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ChatScreen(navController: NavController, groupId: Int, viewModel: ChatScreenViewModel = hiltViewModel()){
 
     BackHandler() {
         if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}
         else navController.popBackStack()
     }
 
-    ChatScreenBody(navController)
+    ChatScreenBody(navController, group = sessionData.groupList.first {it.id == groupId})
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ChatScreenBody(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ChatScreenBody(navController: NavController, group: Group ,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Body()
 

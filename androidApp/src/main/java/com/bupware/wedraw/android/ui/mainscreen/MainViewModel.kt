@@ -1,14 +1,21 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.bupware.wedraw.android.R
+import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.logic.sessionData.sessionData
+import com.checkinapp.ui.theme.greenAchieve
+import com.checkinapp.ui.theme.redWrong
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,8 +38,12 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var groupName by savedStateHandle.saveable { mutableStateOf("") }
     var joinCode by savedStateHandle.saveable { mutableStateOf("") }
 
+    var targetNavigation by savedStateHandle.saveable { mutableStateOf(0) }
+    var navigateToChat by savedStateHandle.saveable { mutableStateOf(false) }
+
     //Init
     var askForUsername by savedStateHandle.saveable { mutableStateOf(false) }
+    var groupList by savedStateHandle.saveable { mutableStateOf(listOf<Group>()) }
 
     //Username
     var username by savedStateHandle.saveable { mutableStateOf("") }
@@ -40,6 +51,11 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     init {
         viewModelScope.launch {
             gestionLogin { askForUsername = !askForUsername }
+        }
+
+        viewModelScope.launch {
+            getUserGroups()
+            showGroups = true
         }
 
     }
@@ -61,15 +77,77 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
 
-    fun launchUpdateUsername(){
+    fun launchUpdateUsername(context: Context){
         viewModelScope.launch {
-            if (updateUsername(username)) askForUsername = !askForUsername
-            else {Log.i("wawa","username existe")}/*TODO aqui lanzar un mensaje de error y arriba tambien uno de exito*/
+            if (updateUsername(username)) {
+                askForUsername = !askForUsername
+                SnackbarManager.newSnackbar(context.getString(R.string.usuario_elegido_con_xito), greenAchieve)
+            }
+            else {SnackbarManager.newSnackbar(context.getString(R.string.este_usuario_ya_est_cogido), redWrong)}
         }
+    }
+
+    fun createGroupButton(context: Context){
+
+        if (groupName.isBlank()){
+            SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_nombre_vac_o), redWrong)
+        }
+        else {
+            viewModelScope.launch {
+                val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
+                getUserGroups()
+                targetNavigation = groupList.first { it.code == returningCode }.id!!
+                moreOptionsEnabled = !moreOptionsEnabled
+                expandCreateGroup = false
+                groupName = ""
+                navigateToChat = true
+            }
+        }
+
+    }
+
+    fun joinGroupButton(context: Context){
+
+        if (joinCode.isBlank()){
+            SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_c_digo_vac_o), redWrong)
+        }
+        else {
+            viewModelScope.launch {
+
+                val groupId = withContext(Dispatchers.Default) { GroupRepository.getGroupByCode(joinCode)?.id }
+
+                if (groupId == null){
+                    SnackbarManager.newSnackbar(context.getString(R.string.codigo_invalido), redWrong)
+                }
+                else {
+                    withContext(Dispatchers.Default) {
+                        GroupRepository.insertUsertoUserGroup(
+                            userId = Firebase.auth.currentUser?.uid.toString(),
+                            groupId = groupId!!
+                        )
+                    }
+                    getUserGroups()
+                    targetNavigation = groupId!!
+                    moreOptionsEnabled = !moreOptionsEnabled
+                    expandJoinGroup = false
+                    joinCode = ""
+                    navigateToChat = true
+                }
+            }
+        }
+
+    }
+
+    suspend fun getUserGroups(){
+        val userId = Firebase.auth.currentUser?.uid.toString()
+        val group = withContext(Dispatchers.Default) { GroupRepository.getGroupByUserId(userId) } ?: emptyList()
+        groupList = group
+        sessionData.groupList = group
     }
 
 
 }
+
 
 suspend fun gestionLogin(askForUsername: () -> Unit){
 

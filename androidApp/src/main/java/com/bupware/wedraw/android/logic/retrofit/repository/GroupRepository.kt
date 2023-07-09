@@ -57,24 +57,33 @@ object GroupRepository {
         })
     }
 
-
-    suspend fun createGroup(name:String,userId:String): Boolean = suspendCancellableCoroutine { continuation ->
-        groupService.createGroup(name,userId).enqueue(object : Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+    suspend fun getGroupByCode(code:String): Group? = suspendCancellableCoroutine { continuation ->
+        groupService.getGroupByCode(code).enqueue(object : Callback<Group?> {
+            override fun onResponse(call: Call<Group?>, response: Response<Group?>) {
                 if (response.isSuccessful) {
-                    continuation.resume(true,null)
-                } else {
-                    continuation.resume(false,null)
+                    continuation.resume(response.body(),null)
                 }
             }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                if (t is java.io.EOFException) {
-                    continuation.resume(true,null)
-                } else {
-                    Log.i("error",t.toString())
-                    continuation.resume(false,null)
-                }
+            override fun onFailure(call: Call<Group?>, t: Throwable) {
+                continuation.cancel()
+            }
+        })
+    }
+
+
+    suspend fun createGroup(name:String,userId:String): String = suspendCancellableCoroutine { continuation ->
+        groupService.createGroup(name,userId).enqueue(object : Callback<String?> {
+            override fun onResponse(call: Call<String?>, response: Response<String?>) {
+                if (response.isSuccessful) {
+                    Log.i("wawa","${response.body()}")
+                    continuation.resume("${response.body()}",null)
+                } else Log.i("wawa","bbbbb")
+            }
+
+            override fun onFailure(call: Call<String?>, t: Throwable) {
+                Log.i("wawa",t.stackTraceToString())
+                continuation.cancel()
             }
         })
     }
@@ -95,7 +104,6 @@ object GroupRepository {
                 if (t is java.io.EOFException) {
                     continuation.resume(true,null)
                 } else {
-                    Log.i("error",t.toString())
                     continuation.resume(false,null)
                 }
             }

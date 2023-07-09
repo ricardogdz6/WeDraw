@@ -9,4 +9,10 @@
     <string name="limite_de_personas">"LIMITE DE PERSONAS: "</string>
     <string name="introduce_el_nombre_del_grupo">Introduce el nombre del grupo</string>
     <string name="introduce_el_c_digo">Introduce el código</string>
+    <string name="crea_o_nete_a_un_grupo">¡CREA O ÚNETE A UN GRUPO!</string>
+    <string name="no_dejes_el_nombre_vac_o">No dejes el nombre vacío</string>
+    <string name="este_usuario_ya_est_cogido">Este usuario ya está cogido</string>
+    <string name="usuario_elegido_con_xito">Usuario elegido con éxito</string>
+    <string name="no_dejes_el_c_digo_vac_o">No dejes el código vacío</string>
+    <string name="codigo_invalido">Código inválido</string>
 </resources>

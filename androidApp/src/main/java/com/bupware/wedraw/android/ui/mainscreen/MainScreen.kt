@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -36,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +58,8 @@ import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.checkinapp.ui.theme.Lexend
+import com.checkinapp.ui.theme.blueVariant2WeDraw
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
@@ -75,6 +81,8 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
     MainScreenBody(navController = navController)
     
     if (viewModel.askForUsername) UsernamePopUp()
+
+    if (viewModel.navigateToChat) {viewModel.navigateToChat = false;navController.navigate(route = "${Destinations.ChatScreen.ruta}/${viewModel.targetNavigation}")}
 }
 
 @Composable
@@ -166,6 +174,9 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 
 @Composable
 fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
+
+    val context = LocalContext.current
+
     Box(contentAlignment = Alignment.Center) {
         Column(
             Modifier
@@ -181,7 +192,7 @@ fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
                 .fillMaxWidth(0.9f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = "ELIGE NUEVO USERNAME")
             TextFieldUsername(viewModel.username,onValueChange = {viewModel.username = it})
-            Button(onClick = { if (viewModel.username.isNotBlank()) viewModel.launchUpdateUsername() }) {
+            Button(onClick = { if (viewModel.username.isNotBlank()) viewModel.launchUpdateUsername(context) }) {
                 Text(text = "VALIDAR")
             }
         }
@@ -222,31 +233,53 @@ fun UpperBackgroundContent(navController: NavController,viewModel: MainViewModel
 @Composable
 fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavController){
 
-    //TODO quitar este hardcode
-    LaunchedEffect(Unit){
-        viewModel.showGroups = true
+    if (!viewModel.showGroups){
+
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = blueVariant2WeDraw)
+        }
+
     }
+    else if (viewModel.showGroups && viewModel.groupList.isEmpty()) {
 
-    var animationLoading = true
+        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            //TODO ANIMACION VANISH?
+            Text(text = stringResource(R.string.crea_o_nete_a_un_grupo), fontFamily = Lexend, fontWeight = FontWeight.Bold)
+        }
 
-    //TODO quitar el hardcodeo de esto
-    LazyColumn(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally){
-        items(10) { index ->
+    }
+    else {
 
-            //region delay Incremental
-            var visible by remember { mutableStateOf(false) }
+        var animationLoading = true
 
-            if (animationLoading) {
-                LaunchedEffect(viewModel.showGroups) {
-                    delay((index + 1) * 100L) // Retraso incremental para cada elemento
-                    visible = true
-                    animationLoading = false
-                }
-            } else visible = true
-            //endregion
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items(viewModel.groupList.size) { index ->
 
-            ChipPop(content = { GroupBar(index,navController) }, show = visible)
-            Spacer(modifier = Modifier.height(25.dp))
+                //region delay Incremental
+                var visible by remember { mutableStateOf(false) }
+
+                if (animationLoading) {
+                    LaunchedEffect(viewModel.showGroups) {
+                        delay((index + 1) * 100L) // Retraso incremental para cada elemento
+                        visible = true
+                        animationLoading = false
+                    }
+                } else visible = true
+                //endregion
+
+
+                ChipPop(
+                    content = { GroupBar(viewModel.groupList[index].name, viewModel.groupList[index].id.toString() ,navController) },
+                    show = visible
+                )
+
+
+                Spacer(modifier = Modifier.height(25.dp))
+            }
         }
     }
 }
