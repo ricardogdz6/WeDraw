@@ -12,7 +12,7 @@ android {
     compileSdk = 33
     defaultConfig {
         applicationId = "com.bupware.wedraw.android"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -93,6 +93,40 @@ dependencies {
     //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+
+    //Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
+    //Glance Widget
+    // For Glance support
+    implementation ("androidx.glance:glance:1.0.0-beta01")
+    // For AppWidgets support
+    implementation ("androidx.glance:glance-appwidget:1.0.0-beta01")
+
+    // For Wear-Tiles support
+    implementation ("androidx.glance:glance-wear-tiles:1.0.0-alpha05")
+
+    //Room Components
+    implementation("androidx.room:room-ktx:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
+    implementation("androidx.room:room-runtime:2.5.2")
+
+
+    //Coil - AsyncImage
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+
+    //Corutines WorkManager
+    // Dependencia de WorkManager
+    implementation ("androidx.work:work-runtime-ktx:2.7.0")
+
+    // Dependencia de Kotlin Coroutines
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+
+
+    //Gson
+    implementation ("com.google.code.gson:gson:2.9.0")
 
 
 

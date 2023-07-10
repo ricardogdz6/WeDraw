@@ -50,7 +50,7 @@ android {
     namespace = "com.bupware.wedraw"
     compileSdk = 33
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
     }
 
     compileOptions {

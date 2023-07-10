@@ -43,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,7 +80,7 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
     SystemBarColor(color = Color(0xFF2C4560))
 
     MainScreenBody(navController = navController)
-    
+
     if (viewModel.askForUsername) UsernamePopUp()
 
     if (viewModel.navigateToChat) {viewModel.navigateToChat = false;navController.navigate(route = "${Destinations.ChatScreen.ruta}/${viewModel.targetNavigation}")}
@@ -109,10 +110,29 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Column(
         Modifier
             .fillMaxSize()
-            .padding(bottom = 30.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Bottom) {
-        Button(colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF3D6DA2)),onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled }, shape = CircleShape) {
-            Text(modifier = Modifier.padding(start = 8.dp, end = 8.dp),text = "+", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 40.sp)
+            .padding(bottom = 30.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Bottom
+    ) {
+        IconButton(
+            onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
+            modifier = Modifier
+                .size(70.dp)
+                .background(
+                    color = blueWeDraw,
+                    shape = CircleShape
+                )
+
+        ) {
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.add),
+                contentDescription = null,
+                tint = Color.White,
+
+
+            )
         }
+
     }
 
     //Logo
@@ -184,7 +204,7 @@ fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
                 .background(Color(0xD3000000))) {
             Text(text = " ")
         }
-        
+
         Column(
             Modifier
                 .background(Color.Red)
@@ -196,7 +216,7 @@ fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
                 Text(text = "VALIDAR")
             }
         }
-        
+
     }
 }
 
@@ -223,6 +243,7 @@ fun UpperBackgroundContent(navController: NavController,viewModel: MainViewModel
             true -> SettingsContent()
             false -> GroupContent(navController = navController)
         }
+
     }
 }
 //endregion

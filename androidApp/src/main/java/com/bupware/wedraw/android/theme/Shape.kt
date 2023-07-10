@@ -1,4 +1,4 @@
-package com.checkinapp.ui.theme
+package com.bupware.wedraw.android.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

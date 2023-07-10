@@ -1,4 +1,4 @@
-package com.checkinapp.ui.theme
+package com.bupware.wedraw.android.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
@@ -19,6 +19,8 @@ val Typography = Typography(
 val Lexend = FontFamily(
         Font(R.font.lexend_extralight)
     )
+
+
     /* Other default text styles to override
     button = TextStyle(
         fontFamily = FontFamily.Default,
