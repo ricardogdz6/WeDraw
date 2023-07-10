@@ -16,6 +16,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Date
 import java.util.TimeZone
@@ -84,5 +85,10 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     }
 
 
+}
+
+fun obtenerHoraMinuto(date: Date): String {
+    val sdf = SimpleDateFormat("HH:mm")
+    return sdf.format(date)
 }
 

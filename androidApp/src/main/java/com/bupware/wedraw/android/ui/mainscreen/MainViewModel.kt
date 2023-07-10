@@ -154,18 +154,28 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     SnackbarManager.newSnackbar(context.getString(R.string.codigo_invalido), redWrong)
                 }
                 else {
-                    withContext(Dispatchers.Default) {
-                        GroupRepository.insertUsertoUserGroup(
-                            userId = Firebase.auth.currentUser?.uid.toString(),
-                            groupId = groupId!!
-                        )
+
+                    //Compruebo que el grupo no esté lleno
+                    val isGroupFull = withContext(Dispatchers.Default) {GroupRepository.isGroupFull(groupId!!)}
+                    
+                    if (isGroupFull){
+                        SnackbarManager.newSnackbar(context.getString(R.string.el_grupo_est_lleno), redWrong)
                     }
-                    getUserGroups()
-                    targetNavigation = groupId!!
-                    moreOptionsEnabled = !moreOptionsEnabled
-                    expandJoinGroup = false
-                    joinCode = ""
-                    navigateToChat = true
+                    else {
+                        withContext(Dispatchers.Default) {
+                            GroupRepository.insertUsertoUserGroup(
+                                userId = Firebase.auth.currentUser?.uid.toString(),
+                                groupId = groupId!!
+                            )
+                        }
+                        getUserGroups()
+                        targetNavigation = groupId!!
+                        moreOptionsEnabled = !moreOptionsEnabled
+                        expandJoinGroup = false
+                        joinCode = ""
+                        navigateToChat = true
+                    }
+                    
                 }
             }
         }
