@@ -23,19 +23,18 @@ class WeDrawWidgetWorkManager(private val context: Context, params: WorkerParame
 
     //    val drawingImage = repository.getDrawingImage(0)
     override suspend fun doWork(): Result {
-        val drawingImage = repository.getDrawingImage(0)
-
-
+        updateWidgetData()
         return Result.success()
     }
 
 
-    private suspend fun updateWidgetData(image: Image) {
+    private suspend fun updateWidgetData() {
         GlanceAppWidgetManager(context = context).getGlanceIds(WeDrawWidgetConsolidator::class.java)
             .forEach { glanceId ->
                 updateAppWidgetState(context = context, glanceId = glanceId) { prefs ->
-                    Log.i("WeDrawWidgetWorkManager", "updateWidgetData: ${image.uri}")
-                    prefs.setImageData(image)
+//                    Log.i("WeDrawWidgetWorkManager", "updateWidgetData: ${image.uri}")
+//                    prefs.setImageData(image)
+                    Log.i("wawa", "updateWidgetData: $prefs")
                 }
 
                 WeDrawWidgetConsolidator().update(context, glanceId)
