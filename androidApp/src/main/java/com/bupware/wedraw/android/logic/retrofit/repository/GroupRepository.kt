@@ -71,14 +71,27 @@ object GroupRepository {
         })
     }
 
+    suspend fun isGroupFull(groupID:Int): Boolean = suspendCancellableCoroutine { continuation ->
+        groupService.isGroupFull(groupID).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body()!!,null)
+                }
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                continuation.cancel()
+            }
+        })
+    }
+
 
     suspend fun createGroup(name:String,userId:String): String = suspendCancellableCoroutine { continuation ->
         groupService.createGroup(name,userId).enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>, response: Response<String?>) {
                 if (response.isSuccessful) {
-                    Log.i("wawa","${response.body()}")
                     continuation.resume("${response.body()}",null)
-                } else Log.i("wawa","bbbbb")
+                }
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable) {

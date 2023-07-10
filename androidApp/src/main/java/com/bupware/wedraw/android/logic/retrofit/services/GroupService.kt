@@ -23,6 +23,9 @@ interface GroupService {
     @GET("/weDraw/groups/code/{code}")
     fun getGroupByCode(@Path("code") code: String): Call<Group?>
 
+    @GET("/weDraw/groups/isFull/{groupID}")
+    fun isGroupFull(@Path("groupID") groupID: Int): Call<Boolean>
+
     @POST("/weDraw/groups/create/{name}/{leaderId}")
     fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 

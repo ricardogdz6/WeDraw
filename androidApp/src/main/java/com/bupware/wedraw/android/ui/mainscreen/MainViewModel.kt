@@ -10,8 +10,10 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
+import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.checkinapp.ui.theme.greenAchieve
@@ -54,9 +56,26 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         }
 
         viewModelScope.launch {
-            getUserGroups()
+            withContext(Dispatchers.Default) {getUserGroups()}
             showGroups = true
+
+            //TODO MOVER ESTO?
+
+
+            groupList.forEach {
+                var messageList = listOf<Message>()
+
+                it.userGroups?.first()?.id?.let { it1 -> messageList =
+                    MessageRepository.getMessageByUserGroupId(it1)!!
+                }
+
+                sessionData.messageList.add(Pair(it.id ?: 0, messageList))
+
+            }
+            //
+
         }
+
 
     }
     fun expandButton(index:Int){
@@ -93,17 +112,32 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_nombre_vac_o), redWrong)
         }
         else {
-            viewModelScope.launch {
-                val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
-                getUserGroups()
-                targetNavigation = groupList.first { it.code == returningCode }.id!!
-                moreOptionsEnabled = !moreOptionsEnabled
-                expandCreateGroup = false
-                groupName = ""
-                navigateToChat = true
-            }
-        }
 
+            if(sessionData.user.premium){
+
+                if (groupList.size==10){
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                } else createGroupAction()
+
+            } else {
+                if (groupList.size==3){
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                } else createGroupAction()
+            }
+
+        }
+    }
+
+    fun createGroupAction(){
+        viewModelScope.launch {
+            val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
+            getUserGroups()
+            targetNavigation = groupList.first { it.code == returningCode }.id!!
+            moreOptionsEnabled = !moreOptionsEnabled
+            expandCreateGroup = false
+            groupName = ""
+            navigateToChat = true
+        }
     }
 
     fun joinGroupButton(context: Context){
@@ -120,18 +154,28 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     SnackbarManager.newSnackbar(context.getString(R.string.codigo_invalido), redWrong)
                 }
                 else {
-                    withContext(Dispatchers.Default) {
-                        GroupRepository.insertUsertoUserGroup(
-                            userId = Firebase.auth.currentUser?.uid.toString(),
-                            groupId = groupId!!
-                        )
+
+                    //Compruebo que el grupo no esté lleno
+                    val isGroupFull = withContext(Dispatchers.Default) {GroupRepository.isGroupFull(groupId!!)}
+                    
+                    if (isGroupFull){
+                        SnackbarManager.newSnackbar(context.getString(R.string.el_grupo_est_lleno), redWrong)
                     }
-                    getUserGroups()
-                    targetNavigation = groupId!!
-                    moreOptionsEnabled = !moreOptionsEnabled
-                    expandJoinGroup = false
-                    joinCode = ""
-                    navigateToChat = true
+                    else {
+                        withContext(Dispatchers.Default) {
+                            GroupRepository.insertUsertoUserGroup(
+                                userId = Firebase.auth.currentUser?.uid.toString(),
+                                groupId = groupId!!
+                            )
+                        }
+                        getUserGroups()
+                        targetNavigation = groupId!!
+                        moreOptionsEnabled = !moreOptionsEnabled
+                        expandJoinGroup = false
+                        joinCode = ""
+                        navigateToChat = true
+                    }
+                    
                 }
             }
         }
@@ -147,7 +191,6 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
 
 }
-
 
 suspend fun gestionLogin(askForUsername: () -> Unit){
 

@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -78,6 +79,11 @@ fun PreviewChatScreen(){
 @Composable
 fun ChatScreen(navController: NavController, groupId: Int, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    LaunchedEffect(Unit){
+        viewModel.groupId = groupId
+        viewModel.loadMessages(groupId)
+    }
+
     BackHandler() {
         if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}
         else navController.popBackStack()
@@ -154,7 +160,7 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
             TextFieldMessage(value = viewModel.writingMessage, onValueChange = {viewModel.writingMessage = it})
         }
         Spacer(modifier = Modifier.width(5.dp))
-        SendMessageButton()
+        SendMessageButton(viewModel::sendMessage)
 
     }
 }
@@ -254,7 +260,10 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
             IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp, start = 2.dp),onClick = {
                 TODO()
             }) {
-                Box(Modifier.background(Color.White, RoundedCornerShape(10.dp)).padding(5.dp)) {
+                Box(
+                    Modifier
+                        .background(Color.White, RoundedCornerShape(10.dp))
+                        .padding(5.dp)) {
                     Icon(
                         modifier = Modifier.size(35.dp),
                         imageVector = ImageVector.vectorResource(id = R.drawable.people),
@@ -341,7 +350,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
             }
 
             Box(modifier = Modifier
-                .offset(x = 7.dp, y = (-5).dp)
+                .offset(x = (-5).dp, y = (-5).dp)
                 .fillMaxHeight(0.8f)
                 .background(color = blueVariant2WeDraw, RoundedCornerShape(8.dp))
                 .clickable { TODO() }){
@@ -367,33 +376,36 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(viewModel.moveLazyToBottom) {
+        viewModel.moveLazyToBottom = false
         scope.launch {
             listState.scrollToItem(viewModel.messageList.size)
         }
     }
 
-    LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom){
-        items(viewModel.messageList.size){ index ->
+    LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom) {
+        items(viewModel.messageList.size) { index ->
 
-            val isIndexRestable = index!=0
-            val isMessageSenderSameThanLast = isIndexRestable && viewModel.messageList[index - 1].senderId == viewModel.messageList[index].senderId
-            val isMessageSenderDifferentThanLast = isIndexRestable && viewModel.messageList[index - 1].senderId != viewModel.messageList[index].senderId
+            val isIndexRestable = index != 0
+            val isMessageSenderSameThanLast =
+                isIndexRestable && viewModel.messageList[index - 1].senderId == viewModel.messageList[index].senderId
+            val isMessageSenderDifferentThanLast =
+                isIndexRestable && viewModel.messageList[index - 1].senderId != viewModel.messageList[index].senderId
 
-            when{
+            when {
 
                 //Si el siguiente mensaje es de la misma persona se pone el bubble sin arrow
-                 isMessageSenderSameThanLast -> {
+                isMessageSenderSameThanLast -> {
                     if (viewModel.messageList[index].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                             Spacer(modifier = Modifier.height(5.dp))
-                            MessageBubbleHost(viewModel.messageList[index],false)
+                            MessageBubbleHost(viewModel.messageList[index], false)
                         }
 
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                             Spacer(modifier = Modifier.height(5.dp))
-                            MessageBubble(viewModel.messageList[index],false)
+                            MessageBubble(viewModel.messageList[index], false)
                         }
                     }
                 }
@@ -403,12 +415,12 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
                     if (viewModel.messageList[index].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                             Spacer(modifier = Modifier.height(10.dp))
-                            MessageBubbleHost(viewModel.messageList[index],true)
+                            MessageBubbleHost(viewModel.messageList[index], true)
                         }
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                             Spacer(modifier = Modifier.height(10.dp))
-                            MessageBubble(viewModel.messageList[index],true)
+                            MessageBubble(viewModel.messageList[index], true)
 
                         }
                     }
@@ -418,11 +430,11 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
                 else -> {
                     if (viewModel.messageList[index].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                            MessageBubbleHost(viewModel.messageList[index],true)
+                            MessageBubbleHost(viewModel.messageList[index], true)
                         }
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                            MessageBubble(viewModel.messageList[index],true)
+                            MessageBubble(viewModel.messageList[index], true)
                         }
                     }
                 }

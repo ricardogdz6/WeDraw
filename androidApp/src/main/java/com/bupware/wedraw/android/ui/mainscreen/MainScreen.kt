@@ -293,13 +293,13 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
                 //endregion
 
 
-                ChipPop(
-                    content = { GroupBar(viewModel.groupList[index].name, viewModel.groupList[index].id.toString() ,navController) },
-                    show = visible
-                )
+                Column(Modifier.padding(bottom = 25.dp)) {
+                    ChipPop(
+                        content = { GroupBar(viewModel.groupList[index].name, viewModel.groupList[index].id.toString() ,navController) },
+                        show = visible
+                    )
+                }
 
-
-                Spacer(modifier = Modifier.height(25.dp))
             }
         }
     }
@@ -326,12 +326,19 @@ fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
         buttonDelay2 = true
     }
 
-    LazyColumn(modifier = Modifier.fillMaxWidth(),contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp), horizontalAlignment = Alignment.CenterHorizontally){
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(top = 70.dp, bottom = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         item {
-            ChipPop(content = { CreateGroupButton() }, show = buttonDelay)
-            Spacer(modifier = Modifier.height(25.dp))
-            ChipPop(content = { JoinGroupButton() }, show = buttonDelay2)
-            Spacer(modifier = Modifier.height(25.dp))
+            Column(Modifier.padding(bottom = 25.dp)) {
+                ChipPop(content = { CreateGroupButton() }, show = buttonDelay)
+            }
+            Column(Modifier.padding(bottom = 25.dp)) {
+                ChipPop(content = { JoinGroupButton() }, show = buttonDelay2)
+            }
+
         }
     }
 

@@ -1,8 +1,12 @@
 package com.bupware.wedraw.android.components.composables
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -20,12 +24,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bupware.wedraw.android.ui.chatScreen.MessageLocal
+import com.bupware.wedraw.android.logic.models.Message
+import com.bupware.wedraw.android.ui.chatScreen.obtenerHoraMinuto
 import com.checkinapp.ui.theme.blueVariant2WeDraw
 import com.checkinapp.ui.theme.redWeDraw
 
 @Composable
-fun MessageBubbleHost(message: MessageLocal, showTriangle:Boolean){
+fun MessageBubbleHost(message: Message, showTriangle:Boolean){
 
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
@@ -61,23 +66,49 @@ fun MessageBubbleHost(message: MessageLocal, showTriangle:Boolean){
                     )
             ) {
 
+                //TODO METER FECHA?
+
                 Text(
                     text = message.text,
                     modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
                     fontSize = 14.sp,
                     color = Color.Black
                 )
+                /*
+                Row() {
+                    Box(Modifier.weight(1f)) {
+                        Text(
+                            text = message.text,
+                            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+
+                    Box(Modifier.weight(0.2f).fillMaxHeight().background(Color.Red), contentAlignment = Alignment.BottomCenter) {
+                        Text(
+                            text = obtenerHoraMinuto(message.date!!),
+                            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+                            fontSize = 14.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+
+                 */
+
             }
         }
     }
 }
 
 @Composable
-fun MessageBubble(message: MessageLocal, showTriangle:Boolean){
+fun MessageBubble(message: Message, showTriangle:Boolean){
     val cornerShape = with(LocalDensity.current) { 16.dp.toPx() }
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) {if (showTriangle) 12.dp.toPx() else 0.dp.toPx()  }
 
+    Log.i("wawa",message.toString())
 
     Column(
         modifier = Modifier
@@ -128,7 +159,11 @@ fun MessageBubble(message: MessageLocal, showTriangle:Boolean){
                         text = message.text,
                         modifier = Modifier
                             .graphicsLayer(rotationY = 180f)
-                            .padding(top = if (showTriangle) {0.dp} else 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
+                            .padding(
+                                top = if (showTriangle) {
+                                    0.dp
+                                } else 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp
+                            ),
                         fontSize = 14.sp,
                         color = Color.Black
                     )

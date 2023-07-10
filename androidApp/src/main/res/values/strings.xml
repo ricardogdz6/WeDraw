@@ -17,4 +17,7 @@
     <string name="usuario_elegido_con_xito">Usuario elegido con éxito</string>
     <string name="no_dejes_el_c_digo_vac_o">No dejes el código vacío</string>
     <string name="codigo_invalido">Código inválido</string>
+    <string name="el_mensaje_no_puede_superar_los_1000_car_cteres">El mensaje no puede superar los 1000 carácteres</string>
+    <string name="ya_est_s_en_el_m_ximo_de_grupos_permitido">Ya estás en el máximo de grupos permitido</string>
+    <string name="el_grupo_est_lleno">El grupo está lleno</string>
 </resources>
