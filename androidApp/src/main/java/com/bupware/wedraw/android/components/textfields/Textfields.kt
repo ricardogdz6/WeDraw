@@ -31,7 +31,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.bupware.wedraw.android.R
-import com.checkinapp.ui.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 
 //region MainScreen
 //TODO gestionar inputs y esas cosas
