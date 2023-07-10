@@ -59,8 +59,9 @@ import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.navigation.Destinations
-import com.checkinapp.ui.theme.Lexend
-import com.checkinapp.ui.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.Lexend
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.blueWeDraw
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay

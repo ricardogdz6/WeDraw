@@ -16,8 +16,8 @@ import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.logic.sessionData.sessionData
-import com.checkinapp.ui.theme.greenAchieve
-import com.checkinapp.ui.theme.redWrong
+import com.bupware.wedraw.android.theme.greenAchieve
+import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel

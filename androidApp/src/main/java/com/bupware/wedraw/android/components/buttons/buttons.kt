@@ -51,14 +51,14 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
 import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.bupware.wedraw.android.theme.blueWeDraw
+import com.bupware.wedraw.android.theme.Lexend
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.blueVariantWeDraw
+import com.bupware.wedraw.android.theme.greenWeDraw
+import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.theme.yellowWeDraw
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
-import com.checkinapp.ui.theme.Lexend
-import com.checkinapp.ui.theme.blueVariant2WeDraw
-import com.checkinapp.ui.theme.blueVariantWeDraw
-import com.checkinapp.ui.theme.blueWeDraw
-import com.checkinapp.ui.theme.greenWeDraw
-import com.checkinapp.ui.theme.redWeDraw
-import com.checkinapp.ui.theme.yellowWeDraw
 
 //region MainScreen
 @OptIn(ExperimentalAnimationApi::class)

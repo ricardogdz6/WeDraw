@@ -26,8 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.ui.chatScreen.obtenerHoraMinuto
-import com.checkinapp.ui.theme.blueVariant2WeDraw
-import com.checkinapp.ui.theme.redWeDraw
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 
 @Composable
 fun MessageBubbleHost(message: Message, showTriangle:Boolean){

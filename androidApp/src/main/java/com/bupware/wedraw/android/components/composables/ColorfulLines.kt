@@ -9,10 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.checkinapp.ui.theme.blueWeDraw
-import com.checkinapp.ui.theme.greenWeDraw
-import com.checkinapp.ui.theme.redWeDraw
-import com.checkinapp.ui.theme.yellowWeDraw
+import com.bupware.wedraw.android.theme.blueWeDraw
+import com.bupware.wedraw.android.theme.greenWeDraw
+import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.theme.yellowWeDraw
 
 @Composable
 fun ColorfulLines(height: Dp = 13.dp){

@@ -64,9 +64,9 @@ import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.sessionData.sessionData
-import com.checkinapp.ui.theme.Lexend
-import com.checkinapp.ui.theme.blueVariant2WeDraw
-import com.checkinapp.ui.theme.redWeDraw
+import com.bupware.wedraw.android.theme.Lexend
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.redWeDraw
 import kotlinx.coroutines.launch
 
 @Preview
