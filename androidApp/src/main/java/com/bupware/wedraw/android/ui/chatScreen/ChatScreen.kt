@@ -350,7 +350,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
             }
 
             Box(modifier = Modifier
-                .offset(x = 7.dp, y = (-5).dp)
+                .offset(x = (-5).dp, y = (-5).dp)
                 .fillMaxHeight(0.8f)
                 .background(color = blueVariant2WeDraw, RoundedCornerShape(8.dp))
                 .clickable { TODO() }){
