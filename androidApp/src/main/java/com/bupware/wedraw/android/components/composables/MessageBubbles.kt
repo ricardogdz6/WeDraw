@@ -1,5 +1,6 @@
 package com.bupware.wedraw.android.components.composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -78,6 +79,7 @@ fun MessageBubble(message: Message, showTriangle:Boolean){
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) {if (showTriangle) 12.dp.toPx() else 0.dp.toPx()  }
 
+    Log.i("wawa",message.toString())
 
     Column(
         modifier = Modifier

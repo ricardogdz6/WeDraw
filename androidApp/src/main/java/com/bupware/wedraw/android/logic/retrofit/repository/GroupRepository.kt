@@ -76,9 +76,8 @@ object GroupRepository {
         groupService.createGroup(name,userId).enqueue(object : Callback<String?> {
             override fun onResponse(call: Call<String?>, response: Response<String?>) {
                 if (response.isSuccessful) {
-                    Log.i("wawa","${response.body()}")
                     continuation.resume("${response.body()}",null)
-                } else Log.i("wawa","bbbbb")
+                }
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable) {

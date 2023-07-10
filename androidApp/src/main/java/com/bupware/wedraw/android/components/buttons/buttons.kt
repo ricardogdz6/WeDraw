@@ -516,8 +516,11 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
 //region chatscreen
 @Composable
-fun SendMessageButton(){
-    Button(onClick = { /*TODO*/ }, shape = CircleShape,
+fun SendMessageButton(action: (Context) -> Unit){
+
+    val context = LocalContext.current
+
+    Button(onClick = { action(context) }, shape = CircleShape,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = blueVariant2WeDraw
     ), modifier = Modifier.size(45.dp)) {

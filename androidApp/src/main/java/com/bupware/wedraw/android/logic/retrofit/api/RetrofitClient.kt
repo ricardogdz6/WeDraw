@@ -22,6 +22,7 @@ object RetrofitClient {
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
         .registerTypeAdapter(Time::class.java, TimeDeserializer())
         .registerTypeAdapter(Time::class.java, TimeSerializer())
+        .registerTypeAdapter(TimeZone::class.java, TimeZoneAdapter())
         .create()
 
     //private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -65,5 +66,15 @@ class TimeSerializer : JsonSerializer<Time> {
         context: JsonSerializationContext?
     ): JsonElement {
         return JsonPrimitive(formatter.format(src))
+    }
+}
+
+class TimeZoneAdapter : JsonSerializer<TimeZone>, JsonDeserializer<TimeZone> {
+    override fun serialize(src: TimeZone?, typeOfSrc: Type?, context: JsonSerializationContext?): JsonElement {
+        return JsonPrimitive(src?.id)
+    }
+
+    override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): TimeZone {
+        return TimeZone.getTimeZone(json?.asString)
     }
 }

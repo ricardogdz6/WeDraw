@@ -112,17 +112,32 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_nombre_vac_o), redWrong)
         }
         else {
-            viewModelScope.launch {
-                val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
-                getUserGroups()
-                targetNavigation = groupList.first { it.code == returningCode }.id!!
-                moreOptionsEnabled = !moreOptionsEnabled
-                expandCreateGroup = false
-                groupName = ""
-                navigateToChat = true
-            }
-        }
 
+            if(sessionData.user.premium){
+
+                if (groupList.size==10){
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                } else createGroupAction()
+
+            } else {
+                if (groupList.size==3){
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                } else createGroupAction()
+            }
+
+        }
+    }
+
+    fun createGroupAction(){
+        viewModelScope.launch {
+            val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
+            getUserGroups()
+            targetNavigation = groupList.first { it.code == returningCode }.id!!
+            moreOptionsEnabled = !moreOptionsEnabled
+            expandCreateGroup = false
+            groupName = ""
+            navigateToChat = true
+        }
     }
 
     fun joinGroupButton(context: Context){
@@ -158,7 +173,6 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     suspend fun getUserGroups(){
-        Log.i("wawa","soy la primera bala")
         val userId = Firebase.auth.currentUser?.uid.toString()
         val group = withContext(Dispatchers.Default) { GroupRepository.getGroupByUserId(userId) } ?: emptyList()
         groupList = group
