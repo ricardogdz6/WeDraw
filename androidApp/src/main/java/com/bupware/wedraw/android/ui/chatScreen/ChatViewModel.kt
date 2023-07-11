@@ -29,12 +29,12 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     var moveLazyToBottom by savedStateHandle.saveable { mutableStateOf(true) }
 
-    var groupId = 0
+    var groupId = 0L
     var userID: String = Firebase.auth.currentUser?.uid.toString()
 
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
 
-    fun loadMessages(groupId:Int){
+    fun loadMessages(groupId:Long){
         messageList = sessionData.messageList.first { it.first == groupId }.second
     }
 

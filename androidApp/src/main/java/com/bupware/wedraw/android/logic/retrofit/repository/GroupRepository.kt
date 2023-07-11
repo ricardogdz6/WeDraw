@@ -2,15 +2,12 @@ package com.bupware.wedraw.android.logic.retrofit.repository
 
 import android.util.Log
 import com.bupware.wedraw.android.logic.models.Group
-import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.api.RetrofitClient
 import com.bupware.wedraw.android.logic.retrofit.services.GroupService
-import com.bupware.wedraw.android.logic.retrofit.services.UserService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.EOFException
 
 object GroupRepository {
     private val groupService = RetrofitClient.getRetrofit().create(GroupService::class.java)
@@ -52,7 +49,7 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<List<Group>?>, t: Throwable) {
-                continuation.cancel()
+                continuation.resume(null,null)
             }
         })
     }
@@ -71,7 +68,7 @@ object GroupRepository {
         })
     }
 
-    suspend fun isGroupFull(groupID:Int): Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun isGroupFull(groupID: Long): Boolean = suspendCancellableCoroutine { continuation ->
         groupService.isGroupFull(groupID).enqueue(object : Callback<Boolean> {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
@@ -103,7 +100,7 @@ object GroupRepository {
 
 
 
-    suspend fun insertUsertoUserGroup(userId:String,groupId:Int): Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun insertUsertoUserGroup(userId:String,groupId:Long): Boolean = suspendCancellableCoroutine { continuation ->
         groupService.insertUsertoUserGroup(userId, groupId).enqueue(object : Callback<Boolean> {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {

@@ -14,4 +14,7 @@ interface GroupDao {
     @Query("SELECT * FROM groups_table ORDER BY groupId ASC")
     fun readAllData(): Flow<List<Group>>
 
+    @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
+    fun getGroupByGroupId(groupId: Long): Flow<Group>
+
 }

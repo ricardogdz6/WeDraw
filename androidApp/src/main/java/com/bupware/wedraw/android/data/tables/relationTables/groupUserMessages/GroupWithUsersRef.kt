@@ -15,8 +15,7 @@ import com.bupware.wedraw.android.data.tables.user.User
 data class GroupUserCrossRef(
     val groupId: Long,
     val userId: String,
-    val isAdmin:Boolean
-)
+    val isAdmin: Boolean = false,)
 
 
 data class GroupWithUsers(
@@ -39,3 +38,4 @@ data class UsersWithGroup(
     )
     val groups: List<Group>
 )
+

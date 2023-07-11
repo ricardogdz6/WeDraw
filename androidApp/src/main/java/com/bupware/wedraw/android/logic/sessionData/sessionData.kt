@@ -12,7 +12,7 @@ object sessionData{
     lateinit var groupList: List<Group>
 
     //El pair es de IDGrupo y sus mensajes
-    var messageList = mutableListOf<Pair<Int,List<Message>>>()
+    var messageList = mutableListOf<Pair<Long,List<Message>>>()
 
 }
 

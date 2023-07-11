@@ -5,11 +5,11 @@ import java.util.Date
 import java.util.TimeZone
 
 data class Message(
-    var id:Int?,
+    var id:Long?,
     val text: String,
     var timeZone: TimeZone?,
     var senderId: String,
-    var groupId: Int,
+    var groupId: Long,
     var date: Date?
 ): java.io.Serializable
 

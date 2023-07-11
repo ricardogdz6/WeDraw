@@ -79,8 +79,8 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
                 message = Message(
                     id = 0,
                     text = "error",
-                    senderID = "s",
-                    messageGroupID = 0,
+                    ownerId = "s",
+                    owner_group_Id = 0,
                     date = null
                 )
             )

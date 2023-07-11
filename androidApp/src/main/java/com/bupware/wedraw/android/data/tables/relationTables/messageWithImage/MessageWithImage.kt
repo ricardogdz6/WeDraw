@@ -12,7 +12,7 @@ data class MessageWithImage(
     @Embedded val image: Image,
     @Relation(
         parentColumn = "id",
-        entityColumn = "imageID"
+        entityColumn = "image_Id"
     )
     val message: Message
 )

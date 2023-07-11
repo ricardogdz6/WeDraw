@@ -25,6 +25,8 @@ import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.image.ImageRepository
 import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.data.tables.message.MessageRepository
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupUserCrossRef
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupWithUsers
 import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageRepository
@@ -73,19 +75,20 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
         val urisaved = saveImageToCache(context, bitmap, fileName)
 
 
-        //insert user
+//        insert user
 //        userRepository.insert(User(userId = "testuid", name = "test"))
 //
 //        userRepository.readAllData.collect { ist ->
 //            ist.forEach {
 //
-//                Log.i("database", it.userId)            }
+//                Log.i("database", it.userId)
+//            }
 //        }
 //        Log.i("database", "try")
 
         //insert group
-//        val gid = groupRepository.insert(Group(name = "testgroup", leader_ID = "testuid"))
-
+//        val gid = groupRepository.insert(Group(name = "testgroup", code = "testcode"))
+//
 //        Log.i("database", "try")
 //        val group = groupRepository.readAllData
 //        group.collect { ist ->
@@ -100,7 +103,15 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
             GroupWithUsersRepository(groupWithUsers)
 
 //        insert group with user
-//        groupWithUserRepository.crossGroupWithLeader(1, "testuid")
+
+//            groupWithUserRepository.insert(
+//                GroupUserCrossRef(
+//                    1,
+//                    "testuid"
+//                )
+//            )
+
+
 //
 //
 //
@@ -126,13 +137,13 @@ class DrawingScreenViewModel @Inject constructor(savedStateHandle: SavedStateHan
 //            .launchIn(viewModelScope)
 //        groupRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
 //            .launchIn(viewModelScope)
-//        groupWithUserRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
-//            .launchIn(viewModelScope)
+        groupWithUserRepository.getAllUserCrossRefByGroupID(1).onEach { ist -> Log.i("database", ist.toString()) }
+            .launchIn(viewModelScope)
 //        messageRepository.readAllData.onEach { ist -> Log.i("database", ist.toString()) }
 //            .launchIn(viewModelScope)
 
 //        dataStore.getUri.collect { ist -> Log.i("database", ist) }
-        
+
     }
 
     fun insertDataTest(context: Context) {

@@ -105,7 +105,7 @@ private fun WeDrawWidget(message: Message, bitmap: Bitmap) {
                             modifier = GlanceModifier.padding(top = 10.dp)
                         ) {
                             Text(
-                                text = message.senderID,
+                                text = message.ownerId,
 
                                 style = TextStyle(textAlign = TextAlign.Start,
                                     color = GlanceTheme.colors.onPrimary)

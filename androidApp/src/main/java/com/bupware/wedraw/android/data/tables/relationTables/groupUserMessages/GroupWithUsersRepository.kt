@@ -9,12 +9,7 @@ class GroupWithUsersRepository(private val groupWithUsersDao: GroupWithUsersDao)
         groupWithUsersDao.insertGroupWithUser(groupUserCrossRef)
     }
 
-    /*
-    suspend fun crossGroupWithLeader(group: Long, leader: String) {
-        groupWithUsersDao.crossGroupWithLeader(group, leader)
-    }
-
-     */
+    fun getAllUserCrossRefByGroupID(groupID : Long) : Flow<List<GroupUserCrossRef>> = groupWithUsersDao.getSetOfUsersGroupByGroupID(groupID)
 
     val readAllData : Flow<List<GroupUserCrossRef>> = groupWithUsersDao.readAllData()
 

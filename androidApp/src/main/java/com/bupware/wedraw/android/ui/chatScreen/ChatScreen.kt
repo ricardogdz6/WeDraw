@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -77,7 +76,7 @@ fun PreviewChatScreen(){
 
 
 @Composable
-fun ChatScreen(navController: NavController, groupId: Int, viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
     LaunchedEffect(Unit){
         viewModel.groupId = groupId
