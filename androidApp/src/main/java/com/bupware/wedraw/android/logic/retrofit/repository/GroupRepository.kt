@@ -66,7 +66,7 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<Group?>, t: Throwable) {
-                continuation.cancel()
+                continuation.resume(null,null)
             }
         })
     }

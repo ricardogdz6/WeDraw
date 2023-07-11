@@ -36,7 +36,11 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
 
     fun loadMessages(groupId:Int){
-        messageList = sessionData.messageList.first { it.first == groupId }.second
+        try {
+            messageList = sessionData.messageList.first { it.first == groupId }.second
+        }catch (e:Exception){
+            //Se acaba de unir al grupo y por tanto no hay historial
+        }
     }
 
     fun sendMessage(context: Context){
@@ -80,6 +84,14 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         val newMessage = Message(id = null, text = writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId,date = Date())
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
+
+        //LO GUARDO EN MEMORIA
+        var entry = sessionData.messageList.first { it.first == groupId }
+        val indexEntry = sessionData.messageList.indexOf(entry)
+        var newEntry = Pair(groupId,oldList)
+
+        sessionData.messageList[indexEntry] = newEntry
+
         messageList = emptyList()
         messageList = oldList
     }

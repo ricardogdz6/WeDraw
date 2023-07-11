@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.components.buttons
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -437,11 +438,13 @@ fun JoinGroupQRButton(){
 fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
+    val hashCode = nombre.hashCode()
+    val selectedIndex = Math.abs(hashCode) % colors.size
+    val selectedColor = colors[selectedIndex]
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Box(Modifier.clickable{ navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
+        Box(Modifier.clickable{navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
 
             Row(
                 Modifier

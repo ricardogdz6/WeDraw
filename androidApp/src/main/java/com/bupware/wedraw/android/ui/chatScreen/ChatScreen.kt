@@ -98,16 +98,16 @@ fun ChatScreenBody(navController: NavController, group: Group ,viewModel: ChatSc
 
     Body()
 
-    TopBar(navController = navController)
+    TopBar(navController = navController, code = group.code, groupName = group.name, people = group.userGroups!!.size)
 
 }
 
 @Composable
-fun TopBar(navController: NavController){
+fun TopBar(navController: NavController, code:String,groupName:String,people:Int){
     //Topbar
     Column() {
-        ChatTopBar(navController)
-        DrawingCanvas()
+        ChatTopBar(navController, code = code, groupName = groupName)
+        DrawingCanvas(people = people)
     }
 }
 
@@ -167,7 +167,7 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
+fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Box() {
 
@@ -250,7 +250,7 @@ fun DrawingCanvas(viewModel: ChatScreenViewModel = hiltViewModel()){
 
             Text(
                 modifier = Modifier.padding(end = 5.dp),
-                text = "2", //TODO DESHARDCODEAR
+                text = people.toString(),
                 fontSize = 30.sp,
                 fontFamily = Lexend,
                 fontWeight = FontWeight.Bold,
@@ -286,7 +286,7 @@ fun CanvasContent(){
 }
 
 @Composable
-fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ChatTopBar(navController: NavController, groupName:String ,code:String ,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Box() {
 
@@ -326,7 +326,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
             //Titulo
             //TODO DESHARDCODEAR
             Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                Text(modifier = Modifier.fillMaxWidth(), text = "GRUPO DE PRUEBA", fontFamily = Lexend, fontSize = 25.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                Text(modifier = Modifier.fillMaxWidth(), text = groupName, fontFamily = Lexend, fontSize = 25.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
 
             }
         }
@@ -345,7 +345,7 @@ fun ChatTopBar(navController: NavController, viewModel: ChatScreenViewModel = hi
                     .offset(x = 7.dp, y = (-5).dp)
                     .border(1.dp, blueVariant2WeDraw, shape = RoundedCornerShape(8.dp))
                     .padding(4.dp)) {
-                Text(text = "CODIGO: 23FDSJD", color = blueVariant2WeDraw ,fontFamily = Lexend, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 15.dp))
+                Text(text = "CODIGO: $code", color = blueVariant2WeDraw ,fontFamily = Lexend, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end = 15.dp))
 
             }
 

@@ -116,12 +116,12 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             if(sessionData.user.premium){
 
                 if (groupList.size==10){
-                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), redWrong)
                 } else createGroupAction()
 
             } else {
                 if (groupList.size==3){
-                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), redWrong)
                 } else createGroupAction()
             }
 
@@ -147,6 +147,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         }
         else {
             viewModelScope.launch {
+
 
                 val groupId = withContext(Dispatchers.Default) { GroupRepository.getGroupByCode(joinCode)?.id }
 
