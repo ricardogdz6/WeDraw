@@ -1,4 +1,4 @@
-package com.bupware.wedraw.android.Login
+package com.bupware.wedraw.android.ui.login
 
 import android.util.Log
 import androidx.activity.compose.BackHandler

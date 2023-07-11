@@ -257,7 +257,7 @@ suspend fun localInit(context: Context) {
     val groupListLocal = mutableListOf<Group>()
     val allUserGroupLocal = mutableSetOf<UserGroup>()
     val userGroup = instance.groupWithUsersDao()
-    
+
     userGroup.readAllData()
         .collect { crossRefs ->
             crossRefs.forEach { userGroup ->

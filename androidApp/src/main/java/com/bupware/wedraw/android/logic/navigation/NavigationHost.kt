@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.bupware.wedraw.android.Login.LoginScreen
+import com.bupware.wedraw.android.ui.login.LoginScreen
 import com.bupware.wedraw.android.ui.chatScreen.ChatScreen
 import com.bupware.wedraw.android.ui.drawingScreen.DrawingScreen
 import com.bupware.wedraw.android.ui.mainscreen.MainScreen
