@@ -11,9 +11,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GroupWithUsersDao  {
 
+    //@Transaction
+   // @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
+    //fun getGroupWithUsersByGroupId(groupId: Long): GroupWithUsers?
+
     @Transaction
     @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
-    fun getGroupWithUsersByGroupId(groupId: Long): GroupWithUsers?
+        fun getGroupWithUsersByGroupId(groupId: Long): List<GroupUserCrossRef>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertGroupWithUser(groupWithUser :GroupUserCrossRef)

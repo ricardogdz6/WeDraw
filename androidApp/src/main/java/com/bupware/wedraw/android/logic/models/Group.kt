@@ -13,8 +13,8 @@ data class Group(
 
 data class UserGroup(
     val id: Int?,
-    val userID: User,
-    val groupID: Group,
+    val userID: String,
+    val groupID: Int,
     //val messages: Set<Message>?,
     val isAdmin: Boolean = false
 ): java.io.Serializable

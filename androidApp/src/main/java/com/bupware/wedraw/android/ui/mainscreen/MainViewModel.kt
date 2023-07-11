@@ -10,6 +10,7 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.data.WDDatabase
+import com.bupware.wedraw.android.data.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
@@ -205,25 +206,13 @@ suspend fun localInit(context: Context){
 
     val instance = WDDatabase.getDatabase(context)
 
-    /*    //region INIT GRUPOS
+    //region INIT GRUPOS
 
     val groupListLocal = mutableListOf<Group>()
 
-    instance.groupDao().readAllData().collect {it.forEach { group->
-
-        //Obtengo userGroups
-        val userGroup = instance.groupWithUsersDao().getGroupWithUsersByGroupId(group.groupId)
-
-        groupListLocal.add(Group(
-            id = group.groupId.toInt(),
-            code = group.code,
-            name = group.name,
-            userGroups = UserGroup(id = null, userID = , isAdmin = , groupID = )
-        ))
-    }}
     //endregion
 
-     */
+
 
 
     /*
@@ -302,4 +291,5 @@ suspend fun updateUsername(newUsername:String):Boolean{
     }
 
 }
+
 
