@@ -5,14 +5,14 @@ import java.util.Date
 
 
 data class Group(
-    var id:Int?,
+    var id:Long?,
     val name: String,
     var code: String,
     val userGroups: Set<UserGroup>?
 ): java.io.Serializable
 
 data class UserGroup(
-    val id: Int?,
+    val id: Long?,
     val userID: User,
     //val groupID: Group,
     //val messages: Set<Message>?,

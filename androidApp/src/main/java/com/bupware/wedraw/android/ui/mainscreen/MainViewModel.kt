@@ -9,13 +9,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.gestionLogin
+import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.updateUsername
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
-import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
@@ -40,7 +42,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var groupName by savedStateHandle.saveable { mutableStateOf("") }
     var joinCode by savedStateHandle.saveable { mutableStateOf("") }
 
-    var targetNavigation by savedStateHandle.saveable { mutableStateOf(0) }
+    var targetNavigation by savedStateHandle.saveable { mutableStateOf(0L) }
     var navigateToChat by savedStateHandle.saveable { mutableStateOf(false) }
 
     //Init
@@ -61,8 +63,6 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
             //TODO MOVER ESTO?
 
-
-
             groupList.forEach {
                 var messageList = listOf<Message>()
 
@@ -70,7 +70,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     MessageRepository.getMessageByUserGroupId(it1)!!
                 }
 
-                sessionData.messageList.add(Pair(it.id ?: 0, messageList))
+                DataHandler.messageList[it.id!!] = messageList.toMutableList()
 
             }
             //
@@ -80,21 +80,16 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
     fun expandButton(index:Int){
-
-        when(index){
-
+        when(index) {
             1 -> {
                 expandCreateGroup = !expandCreateGroup
                 expandJoinGroup = false
             }
-
             2 -> {
                 expandCreateGroup = false
                 expandJoinGroup = !expandJoinGroup
             }
-
         }
-
     }
 
     fun launchUpdateUsername(context: Context){
@@ -108,13 +103,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     fun createGroupButton(context: Context){
-
+        //TODO METER RESTRICCION EN LA API
         if (groupName.isBlank()){
             SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_nombre_vac_o), redWrong)
         }
         else {
 
-            if(sessionData.user.premium){
+            if(DataHandler.user.premium){
 
                 if (groupList.size==10){
                     SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), redWrong)
@@ -188,68 +183,12 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         val userId = Firebase.auth.currentUser?.uid.toString()
         val group = withContext(Dispatchers.Default) { GroupRepository.getGroupByUserId(userId) } ?: emptyList()
         groupList = group
-        sessionData.groupList = group
+        DataHandler.groupList = group
+        //TODO DATAHANDLER SAVE LOCAL GROUP
     }
 
 
 }
 
-suspend fun gestionLogin(askForUsername: () -> Unit){
 
-    val userEmail = Firebase.auth.currentUser?.email.toString()
-
-    //Primero obtengo la información de la sesión en la BBDD
-    val user = withContext(Dispatchers.Default) { UserRepository.getUserByEmail(userEmail)?.firstOrNull() }
-
-    if (user == null){
-        //Si no existe creamos el usuario
-        withContext(Dispatchers.Default) {UserRepository.createUser(User(
-            id = Firebase.auth.currentUser?.uid,
-            email = userEmail,
-            premium = false,
-            username = "",
-            expireDate = null
-        ))}
-        //Acto seguido preguntamos por el username
-        askForUsername()
-
-    } else {
-        //Si existe pero no tiene campo username, le pedimos que ponga un username
-        if (user.username!!.isEmpty())
-            askForUsername()
-        else sessionData.user = user
-    }
-
-}
-
-suspend fun updateUsername(newUsername:String):Boolean{
-
-    var usernameExists = withContext(Dispatchers.Default) { UserRepository.getUserByUsername(newUsername)?.firstOrNull() }
-
-    if (usernameExists != null){
-        return false
-    } else {
-
-        val userEmail = Firebase.auth.currentUser?.email.toString()
-        var user = withContext(Dispatchers.Default) {
-            UserRepository.getUserByEmail(userEmail)?.firstOrNull()
-        }
-        user!!.username = newUsername
-
-        if (user != null) {
-            withContext(Dispatchers.Default) {
-                UserRepository.updateUser(
-                    email = userEmail,
-                    user = user
-                )
-            }
-            sessionData.user = user
-            return true
-        } else {
-            Log.e("Error", "Usuario no existe, no puede actualizarse")
-            return false
-        }
-    }
-
-}
 

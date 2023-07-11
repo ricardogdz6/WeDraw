@@ -12,7 +12,7 @@ import retrofit2.Response
 object MessageRepository {
     private val messageService = RetrofitClient.getRetrofit().create(MessageService::class.java)
 
-    suspend fun getMessageById(id:Int): List<Message>? = suspendCancellableCoroutine { continuation ->
+    suspend fun getMessageById(id:Long): List<Message>? = suspendCancellableCoroutine { continuation ->
         messageService.getMessageById(id).enqueue(object : Callback<List<Message>?> {
             override fun onResponse(call: Call<List<Message>?>, response: Response<List<Message>?>) {
                 if (response.isSuccessful) {
@@ -26,7 +26,7 @@ object MessageRepository {
         })
     }
 
-    suspend fun getMessageByUserGroupId(id:Int): List<Message>? = suspendCancellableCoroutine { continuation ->
+    suspend fun getMessageByUserGroupId(id:Long): List<Message>? = suspendCancellableCoroutine { continuation ->
         messageService.getMessageByUserGroupId(id).enqueue(object : Callback<List<Message>?> {
             override fun onResponse(call: Call<List<Message>?>, response: Response<List<Message>?>) {
                 if (response.isSuccessful) {
@@ -40,28 +40,21 @@ object MessageRepository {
         })
     }
 
-    suspend fun createMessage(message: Message): Boolean = suspendCancellableCoroutine { continuation ->
-        messageService.createMessage(message).enqueue(object : Callback<Boolean> {
-            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+    suspend fun createMessage(message: Message): Long? = suspendCancellableCoroutine { continuation ->
+        messageService.createMessage(message).enqueue(object : Callback<Long> {
+            override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 if (response.isSuccessful) {
-                    continuation.resume(true,null)
-                } else {
-                    continuation.resume(false,null)
+                    continuation.resume(response.body(),null)
                 }
             }
 
-            override fun onFailure(call: Call<Boolean>, t: Throwable) {
-                if (t is java.io.EOFException) {
-                    continuation.resume(true,null)
-                } else {
-                    Log.i("error",t.toString())
-                    continuation.resume(false,null)
-                }
+            override fun onFailure(call: Call<Long>, t: Throwable) {
+                continuation.cancel()
             }
         })
     }
 
-    suspend fun updateMessageStatus(messageId:Int,userId: String):Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun updateMessageStatus(messageId:Long,userId: String):Boolean = suspendCancellableCoroutine { continuation ->
 
         messageService.updateMessageStatus(messageId,userId).enqueue(object:Callback<Boolean>{
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {

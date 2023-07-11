@@ -18,22 +18,22 @@ interface GroupService {
     fun getGroupByUserId(@Path("userID") userID: String): Call<List<Group>?>
 
     @GET("/weDraw/groups/id/{id}")
-    fun getGroupById(@Path("id") id: Int): Call<List<Group>?>
+    fun getGroupById(@Path("id") id: Long): Call<List<Group>?>
 
     @GET("/weDraw/groups/code/{code}")
     fun getGroupByCode(@Path("code") code: String): Call<Group?>
 
     @GET("/weDraw/groups/isFull/{groupID}")
-    fun isGroupFull(@Path("groupID") groupID: Int): Call<Boolean>
+    fun isGroupFull(@Path("groupID") groupID: Long): Call<Boolean>
 
     @POST("/weDraw/groups/create/{name}/{leaderId}")
     fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 
     @POST("/weDraw/groups/{userID}/{groupID}")
-    fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Int): Call<Boolean>
+    fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Long): Call<Boolean>
 
     @PUT("/weDraw/groups/{id}")
-    fun updateGroup(@Path("id") id: Int,@Body group: Group): Call<Boolean>
+    fun updateGroup(@Path("id") id: Long,@Body group: Group): Call<Boolean>
 
 
 }

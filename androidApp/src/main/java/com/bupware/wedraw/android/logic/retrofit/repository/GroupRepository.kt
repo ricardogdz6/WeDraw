@@ -29,7 +29,7 @@ object GroupRepository {
         })
     }
 
-    suspend fun getGroupById(id:Int): List<Group>? = suspendCancellableCoroutine { continuation ->
+    suspend fun getGroupById(id:Long): List<Group>? = suspendCancellableCoroutine { continuation ->
         groupService.getGroupById(id).enqueue(object : Callback<List<Group>?> {
             override fun onResponse(call: Call<List<Group>?>, response: Response<List<Group>?>) {
                 if (response.isSuccessful) {
@@ -71,7 +71,7 @@ object GroupRepository {
         })
     }
 
-    suspend fun isGroupFull(groupID:Int): Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun isGroupFull(groupID:Long): Boolean = suspendCancellableCoroutine { continuation ->
         groupService.isGroupFull(groupID).enqueue(object : Callback<Boolean> {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
@@ -103,7 +103,7 @@ object GroupRepository {
 
 
 
-    suspend fun insertUsertoUserGroup(userId:String,groupId:Int): Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun insertUsertoUserGroup(userId:String,groupId:Long): Boolean = suspendCancellableCoroutine { continuation ->
         groupService.insertUsertoUserGroup(userId, groupId).enqueue(object : Callback<Boolean> {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
@@ -123,7 +123,7 @@ object GroupRepository {
         })
     }
 
-    suspend fun updateGroup(id:Int,group: Group):Boolean = suspendCancellableCoroutine { continuation ->
+    suspend fun updateGroup(id:Long,group: Group):Boolean = suspendCancellableCoroutine { continuation ->
 
         groupService.updateGroup(id,group).enqueue(object:Callback<Boolean>{
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {

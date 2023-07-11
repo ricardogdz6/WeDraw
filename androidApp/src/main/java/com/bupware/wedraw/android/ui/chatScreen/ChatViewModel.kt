@@ -8,16 +8,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
-import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
@@ -30,14 +29,14 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     var moveLazyToBottom by savedStateHandle.saveable { mutableStateOf(true) }
 
-    var groupId = 0
+    var groupId = 0L
     var userID: String = Firebase.auth.currentUser?.uid.toString()
 
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
 
-    fun loadMessages(groupId:Int){
+    fun loadMessages(groupId:Long){
         try {
-            messageList = sessionData.messageList.first { it.first == groupId }.second
+            messageList = DataHandler.messageList[groupId]!!
         }catch (e:Exception){
             //Se acaba de unir al grupo y por tanto no hay historial
         }
@@ -51,46 +50,47 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
             if (writingMessage.isNotBlank()) {
 
+                //Añado el mensaje a este viewModel para que aparezca instantaneamente
+                //Además, guardo en memoria y local el mensaje con el id returneado de la API
                 addMessageLocal()
 
                 viewModelScope.launch {
-                    if (MessageRepository.createMessage(
+                    val idNewMessage = MessageRepository.createMessage(
                             Message(
                                 id = null,
                                 text = writingMessage,
                                 timeZone = TimeZone.getDefault(),
                                 senderId = userID,
                                 groupId = groupId,
+                                imageId = null,
                                 date = null
                             )
                         )
-                    ) {
-                        //TODO()
-                    }
+
+                     //RECIBO EL ID DEL MESSAGE Y LO MANDO
+                    DataHandler(context).saveMessage(idGroup = groupId,message = Message(
+                        id = idNewMessage!!,
+                        text = writingMessage,
+                        timeZone = TimeZone.getDefault(),
+                        senderId = userID,
+                        imageId = null,
+                        groupId = groupId,
+                        date = Date() //TODO Está bien así?
+                    ))
+
                 }
 
                 writingMessage = ""
 
                 moveLazyToBottom = true
-                //TODO
-
             }
         }
     }
 
-
     fun addMessageLocal(){
-        //TODO GUARDAR ESTO EN ROOM QUE SOLO ESTÁ EN MEMORIA AHORA MISMO
-        val newMessage = Message(id = null, text = writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId,date = Date())
+        val newMessage = Message(id = null, text = writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date())
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
-
-        //LO GUARDO EN MEMORIA
-        var entry = sessionData.messageList.first { it.first == groupId }
-        val indexEntry = sessionData.messageList.indexOf(entry)
-        var newEntry = Pair(groupId,oldList)
-
-        sessionData.messageList[indexEntry] = newEntry
 
         messageList = emptyList()
         messageList = oldList
