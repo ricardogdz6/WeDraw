@@ -22,9 +22,9 @@ interface GroupWithUsersDao  {
 
 
     @Transaction
-    suspend fun crossGroupWithLeader(groupId: Long, leaderId: String) {
+    suspend fun crossGroupWithLeader(groupId: Long, userId: String,isAdmin: Boolean) {
 
-        insertGroupWithUser(GroupUserCrossRef(groupId, leaderId))
+        insertGroupWithUser(GroupUserCrossRef(groupId = groupId, userId = userId ,isAdmin= isAdmin))
 
     }
 

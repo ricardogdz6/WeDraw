@@ -9,9 +9,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.data.WDDatabase
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
@@ -22,6 +24,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -50,7 +53,11 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     //Username
     var username by savedStateHandle.saveable { mutableStateOf("") }
 
-    init {
+    fun initValues(context: Context){
+        viewModelScope.launch {
+            localInit(context)
+        }
+
         viewModelScope.launch {
             gestionLogin { askForUsername = !askForUsername }
         }
@@ -59,9 +66,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             withContext(Dispatchers.Default) {getUserGroups()}
             showGroups = true
 
+            /*
             //TODO MOVER ESTO?
-
-
+            //TODO Que esto complimente a los mensajes en caché y se calculen las notificaciones
             groupList.forEach {
                 var messageList = listOf<Message>()
 
@@ -74,9 +81,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             }
             //
 
+             */
+
         }
-
-
     }
     fun expandButton(index:Int){
 
@@ -128,7 +135,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         }
     }
 
-    fun createGroupAction(){
+    private fun createGroupAction(){
         viewModelScope.launch {
             val returningCode = withContext(Dispatchers.Default) {GroupRepository.createGroup(groupName,Firebase.auth.currentUser!!.uid)}
             getUserGroups()
@@ -189,6 +196,51 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         sessionData.groupList = group
     }
 
+
+
+
+}
+
+suspend fun localInit(context: Context){
+
+    val instance = WDDatabase.getDatabase(context)
+
+    /*    //region INIT GRUPOS
+
+    val groupListLocal = mutableListOf<Group>()
+
+    instance.groupDao().readAllData().collect {it.forEach { group->
+
+        //Obtengo userGroups
+        val userGroup = instance.groupWithUsersDao().getGroupWithUsersByGroupId(group.groupId)
+
+        groupListLocal.add(Group(
+            id = group.groupId.toInt(),
+            code = group.code,
+            name = group.name,
+            userGroups = UserGroup(id = null, userID = , isAdmin = , groupID = )
+        ))
+    }}
+    //endregion
+
+     */
+
+
+    /*
+    //region INIT Messages
+    var messageListLocal = mutableListOf<Message>()
+    instance.messageDao().readAllDataMessage().collect {it.forEach {message ->
+        messageListLocal.add(Message(
+            id = null,
+            text = ,
+            timeZone = null,
+            senderId = ,
+            groupId = ,
+            date = null
+        ))
+    }}
+    //endregion
+     */
 
 }
 

@@ -1,23 +1,14 @@
 package com.bupware.wedraw.android.ui.widget
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.glance.Button
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.action.clickable
-import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.background
 import androidx.glance.currentState
@@ -26,14 +17,11 @@ import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
-import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
-import androidx.glance.layout.size
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
-import androidx.glance.wear.tiles.action.actionRunCallback
 import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.ui.widget.callback.WDrawReverseLetterCallback
 
@@ -117,7 +105,7 @@ private fun WeDrawWidget(message: Message, bitmap: Bitmap) {
                             modifier = GlanceModifier.padding(top = 10.dp)
                         ) {
                             Text(
-                                text = message.ownerId,
+                                text = message.senderID,
 
                                 style = TextStyle(textAlign = TextAlign.Start,
                                     color = GlanceTheme.colors.onPrimary)

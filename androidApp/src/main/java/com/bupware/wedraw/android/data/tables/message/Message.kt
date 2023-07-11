@@ -9,17 +9,19 @@ import java.sql.Date
 
 
 @Entity(tableName = "messages_table",foreignKeys =  [
-    ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["owner_group_Id"]),
-    ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
+    ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["messageGroupID"]),
+    ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["senderID"])
 ]
 
 )
 data class Message(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val owner_group_Id: Long,
-    val ownerId: String,
+    val messageGroupID: Long,
+    val senderID: String,
     val text: String,
-    val image_Id: Long?= null,
+    val imageID: Long?= null,
     val date: Date?
 )
+
+

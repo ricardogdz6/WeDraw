@@ -14,7 +14,8 @@ import com.bupware.wedraw.android.data.tables.user.User
 @Entity(primaryKeys = ["groupId", "userId"])
 data class GroupUserCrossRef(
     val groupId: Long,
-    val userId: String
+    val userId: String,
+    val isAdmin:Boolean
 )
 
 

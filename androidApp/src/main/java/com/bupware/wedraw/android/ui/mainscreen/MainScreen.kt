@@ -75,6 +75,12 @@ fun PreviewMain(){
 @Composable
 fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
 
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit){
+        viewModel.initValues(context)
+    }
+
     //TODO QUITAR ESTE FIX
     BackHandler() {}
 

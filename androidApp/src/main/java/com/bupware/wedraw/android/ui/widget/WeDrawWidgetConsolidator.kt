@@ -6,11 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -20,7 +18,6 @@ import androidx.glance.LocalSize
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.SizeMode
-import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.currentState
@@ -37,7 +34,6 @@ import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
 import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class WeDrawWidgetConsolidator : GlanceAppWidget() {
@@ -83,8 +79,8 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
                 message = Message(
                     id = 0,
                     text = "error",
-                    ownerId = "s",
-                    owner_group_Id = 0,
+                    senderID = "s",
+                    messageGroupID = 0,
                     date = null
                 )
             )

@@ -1,15 +1,11 @@
 package com.bupware.wedraw.android.data.tables.relationTables.messageWithImage
 
-import android.provider.MediaStore.Images.Media.insertImage
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.bupware.wedraw.android.data.tables.cacheUtils.cacheUtils
-import com.bupware.wedraw.android.data.tables.image.Image
 import com.bupware.wedraw.android.data.tables.image.ImageDao
 import com.bupware.wedraw.android.data.tables.message.Message
 import com.bupware.wedraw.android.data.tables.message.MessageDao
-import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
 
 @Dao
 interface MessageWithImageDao : MessageDao, ImageDao {
@@ -20,7 +16,7 @@ interface MessageWithImageDao : MessageDao, ImageDao {
     @Transaction
     suspend fun insertMessageWithImage(messageWithImage: MessageWithImage) {
         val imgId = insertImage(messageWithImage.image)
-        val message = Message(owner_group_Id = messageWithImage.message.owner_group_Id, image_Id = imgId, text = messageWithImage.message.text, date = messageWithImage.message.date, ownerId = messageWithImage.message.ownerId)
+        val message = Message(messageGroupID = messageWithImage.message.messageGroupID, imageID = imgId, text = messageWithImage.message.text, date = messageWithImage.message.date, senderID = messageWithImage.message.senderID)
         insertMessage(message)
     }
 
