@@ -206,8 +206,6 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
 @Composable
 fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
 
-    //TODO Hacer eso random tambien o no?
-    //val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = redWeDraw
     
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -462,7 +460,6 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
                     .background(Color.White, RoundedCornerShape(10.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //TODO controlar que no se desborde el text este y poner ...
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = nombre,
@@ -475,7 +472,6 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                //TODO cambiar este width por una intrinsic con un minimo
                 Column(
                     Modifier
                         .background(Color.Red, RoundedCornerShape(10.dp))

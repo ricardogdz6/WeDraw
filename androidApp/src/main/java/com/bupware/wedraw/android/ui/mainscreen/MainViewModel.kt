@@ -62,6 +62,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             //TODO MOVER ESTO?
 
 
+
             groupList.forEach {
                 var messageList = listOf<Message>()
 
