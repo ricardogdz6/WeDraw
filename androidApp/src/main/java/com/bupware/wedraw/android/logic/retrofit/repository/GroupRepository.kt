@@ -52,7 +52,8 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<List<Group>?>, t: Throwable) {
-                continuation.cancel()
+                Log.i("wawa",t.stackTraceToString())
+                continuation.resume(null,null)
             }
         })
     }

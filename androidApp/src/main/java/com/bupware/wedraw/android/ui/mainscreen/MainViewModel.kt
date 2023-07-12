@@ -67,45 +67,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             gestionLogin { askForUsername = !askForUsername }
         }
 
+
         viewModelScope.launch {
-            val connectivityManager =
-                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val network = connectivityManager.activeNetwork
-            val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-
-            showGroups = if (networkCapabilities != null && networkCapabilities.hasCapability(
-                    NetworkCapabilities.NET_CAPABILITY_INTERNET
-                )
-            ) {
-                withContext(Dispatchers.Default) {
-                    getUserGroups()
-                }
-
-                true
-            } else {
-                true
-
-                // No hay conexión a Internet
-                // Realiza alguna acción o muestra un mensaje de error
-            }
-
-
-            //TODO MOVER ESTO?
-            //TODO GET MESSAGES FROM DATE DE LOCAL
-
-            groupList.forEach {
-                var messageList = listOf<Message>()
-
-                it.userGroups?.first()?.id?.let { it1 ->
-                    messageList =
-                        MessageRepository.getMessageByUserGroupId(it1)!!
-                }
-
-                DataHandler.messageList[it.id!!] = messageList.toMutableList()
-
-            }
-            //
-
+            loadGroupsAndMessages(context)
         }
 
 
@@ -160,7 +124,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                         context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido),
                         greenAchieve
                     )
-                } else createGroupAction()
+                } else createGroupAction(context)
 
             } else {
                 if (groupList.size == 3) {
@@ -168,13 +132,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                         context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido),
                         greenAchieve
                     )
-                } else createGroupAction()
+                } else createGroupAction(context)
             }
 
         }
     }
 
-    private fun createGroupAction() {
+    private fun createGroupAction(context: Context) {
         viewModelScope.launch {
             val returningCode = withContext(Dispatchers.Default) {
                 GroupRepository.createGroup(
@@ -182,7 +146,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     Firebase.auth.currentUser!!.uid
                 )
             }
-            getUserGroups()
+            getUserGroups(context)
             targetNavigation = groupList.first { it.code == returningCode }.id!!
             moreOptionsEnabled = !moreOptionsEnabled
             expandCreateGroup = false
@@ -227,7 +191,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                                 groupId = groupId!!
                             )
                         }
-                        getUserGroups()
+                        getUserGroups(context)
                         targetNavigation = groupId!!
                         moreOptionsEnabled = !moreOptionsEnabled
                         expandJoinGroup = false
@@ -241,18 +205,52 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
 
-    suspend fun getUserGroups() {
-        //FIXME
+    suspend fun getUserGroups(context: Context) {
         val userId = Firebase.auth.currentUser?.uid.toString()
+
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
-        }
-            ?: emptyList()
+        }?: emptyList()
+
         groupList = group
-        DataHandler.groupList = group
-        //TODO DATAHANDLER SAVE LOCAL GROUP
+
+        DataHandler(context).saveGroups(group)
     }
+
+    private suspend fun loadGroupsAndMessages(context: Context){
+
+
+        //region Obtener grupos de internet
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+        //Si tiene internet
+        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)){
+            withContext(Dispatchers.Default) {getUserGroups(context)}
+            showGroups = true
+        } else{
+            //region Obtener grupos localmente
+            val localGroups = DataHandler(context).loadGroups()
+            localGroups.collect {
+                groupList = it
+                if (groupList.isNotEmpty()) showGroups = true
+                DataHandler(context).loadMessages()
+            }
+
+            //endregion
+        }
+
+        //endregion
+
+
+    }
+
+
 }
+
+
 
 suspend fun localInit(context: Context) {
 
