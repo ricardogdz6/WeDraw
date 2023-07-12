@@ -7,6 +7,10 @@ import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
+import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
+import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsers
+import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
+import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.UsersWithGroup
 import java.sql.Date
 
 class DataHandler(context: Context) {
@@ -32,17 +36,20 @@ class DataHandler(context: Context) {
 
     }
 
-    suspend fun saveGroups(groups:List<Group>){
+    suspend fun saveGroups(groups: List<Group>) {
 
-        //Vacío el estado de los grupos en la sesión anterior
-        //TODO
+        //AÑADO LOS NUEVOS GRUPOS Y USERGROUPS
+        groups.forEach { group ->
 
-        groups.forEach { group->
             val roomGroup = com.bupware.wedraw.android.roomData.tables.group.Group(
-                groupId = group.id!!,
-                name = group.name,
-                leader_ID = group.userGroups?.first { it.isAdmin }?.userID?.id
+                groupId = group.id!!, name = group.name, code = group.code
             )
+
+            group.userGroups.forEach {userGroup ->
+                val roomUserGroup = GroupUserCrossRef(groupId = group.id!!, userId = userGroup.userID, isAdmin = userGroup.isAdmin)
+                GroupWithUsersRepository(room.groupWithUsersDao()).insert(roomUserGroup)
+            }
+
 
             GroupRepository(room.groupDao()).insert(roomGroup)
 

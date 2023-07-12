@@ -1,6 +1,8 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -15,10 +17,11 @@ import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.updateUs
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
-import com.bupware.wedraw.android.logic.sessionData.sessionData
+import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
@@ -54,9 +57,11 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var username by savedStateHandle.saveable { mutableStateOf("") }
 
     fun initValues(context: Context) {
+
         viewModelScope.launch {
             localInit(context)
         }
+
 
         viewModelScope.launch {
             gestionLogin { askForUsername = !askForUsername }
@@ -75,6 +80,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 withContext(Dispatchers.Default) {
                     getUserGroups()
                 }
+
                 true
             } else {
                 true
@@ -82,14 +88,17 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 // No hay conexión a Internet
                 // Realiza alguna acción o muestra un mensaje de error
             }
-            /*
+
+
             //TODO MOVER ESTO?
+            //TODO GET MESSAGES FROM DATE DE LOCAL
 
             groupList.forEach {
                 var messageList = listOf<Message>()
 
-                it.userGroups?.first()?.id?.let { it1 -> messageList =
-                    MessageRepository.getMessageByUserGroupId(it1)!!
+                it.userGroups?.first()?.id?.let { it1 ->
+                    messageList =
+                        MessageRepository.getMessageByUserGroupId(it1)!!
                 }
 
                 DataHandler.messageList[it.id!!] = messageList.toMutableList()
@@ -101,8 +110,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
 
     }
-    fun expandButton(index:Int){
-        when(index) {
+
+    fun expandButton(index: Int) {
+        when (index) {
             1 -> {
                 expandCreateGroup = !expandCreateGroup
                 expandJoinGroup = false
@@ -117,7 +127,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
 
-    fun launchUpdateUsername(context: Context){
+    fun launchUpdateUsername(context: Context) {
         viewModelScope.launch {
             if (updateUsername(username)) {
                 askForUsername = !askForUsername
@@ -131,26 +141,33 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     redWrong
                 )
             }
-            else {SnackbarManager.newSnackbar(context.getString(R.string.este_usuario_ya_est_cogido), redWrong)}
         }
     }
 
-    fun createGroupButton(context: Context){
+    fun createGroupButton(context: Context) {
         //TODO METER RESTRICCION EN LA API
-        if (groupName.isBlank()){
-            SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_nombre_vac_o), redWrong)
-        }
-        else {
+        if (groupName.isBlank()) {
+            SnackbarManager.newSnackbar(
+                context.getString(R.string.no_dejes_el_nombre_vac_o),
+                redWrong
+            )
+        } else {
 
-            if(sessionData.user.premium){
+            if (DataHandler.user.premium) {
 
-                if (groupList.size==10){
-                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                if (groupList.size == 10) {
+                    SnackbarManager.newSnackbar(
+                        context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido),
+                        greenAchieve
+                    )
                 } else createGroupAction()
 
             } else {
-                if (groupList.size==3){
-                    SnackbarManager.newSnackbar(context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido), greenAchieve)
+                if (groupList.size == 3) {
+                    SnackbarManager.newSnackbar(
+                        context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido),
+                        greenAchieve
+                    )
                 } else createGroupAction()
             }
 
@@ -174,28 +191,36 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         }
     }
 
-    fun joinGroupButton(context: Context){
+    fun joinGroupButton(context: Context) {
 
-        if (joinCode.isBlank()){
-            SnackbarManager.newSnackbar(context.getString(R.string.no_dejes_el_c_digo_vac_o), redWrong)
-        }
-        else {
+        if (joinCode.isBlank()) {
+            SnackbarManager.newSnackbar(
+                context.getString(R.string.no_dejes_el_c_digo_vac_o),
+                redWrong
+            )
+        } else {
             viewModelScope.launch {
 
-                val groupId = withContext(Dispatchers.Default) { GroupRepository.getGroupByCode(joinCode)?.id }
+                val groupId =
+                    withContext(Dispatchers.Default) { GroupRepository.getGroupByCode(joinCode)?.id }
 
-                if (groupId == null){
-                    SnackbarManager.newSnackbar(context.getString(R.string.codigo_invalido), redWrong)
-                }
-                else {
+                if (groupId == null) {
+                    SnackbarManager.newSnackbar(
+                        context.getString(R.string.codigo_invalido),
+                        redWrong
+                    )
+                } else {
 
                     //Compruebo que el grupo no esté lleno
-                    val isGroupFull = withContext(Dispatchers.Default) {GroupRepository.isGroupFull(groupId!!)}
-                    
-                    if (isGroupFull){
-                        SnackbarManager.newSnackbar(context.getString(R.string.el_grupo_est_lleno), redWrong)
-                    }
-                    else {
+                    val isGroupFull =
+                        withContext(Dispatchers.Default) { GroupRepository.isGroupFull(groupId!!) }
+
+                    if (isGroupFull) {
+                        SnackbarManager.newSnackbar(
+                            context.getString(R.string.el_grupo_est_lleno),
+                            redWrong
+                        )
+                    } else {
                         withContext(Dispatchers.Default) {
                             GroupRepository.insertUsertoUserGroup(
                                 userId = Firebase.auth.currentUser?.uid.toString(),
@@ -209,7 +234,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                         joinCode = ""
                         navigateToChat = true
                     }
-                    
+
                 }
             }
         }
@@ -217,6 +242,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     suspend fun getUserGroups() {
+        //FIXME
         val userId = Firebase.auth.currentUser?.uid.toString()
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
@@ -226,13 +252,14 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         DataHandler.groupList = group
         //TODO DATAHANDLER SAVE LOCAL GROUP
     }
+}
 
 suspend fun localInit(context: Context) {
 
     val instance = WDDatabase.getDatabase(context)
 
     //region INIT GRUPOS
-    Log.i("wowo", "INIT GRUPOS")
+
     val groupListLocal = mutableListOf<Group>()
     val allUserGroupLocal = mutableSetOf<UserGroup>()
     val userGroup = instance.groupWithUsersDao()
@@ -293,65 +320,6 @@ suspend fun localInit(context: Context) {
     }}
     //endregion
      */
-
-}
-
-suspend fun gestionLogin(askForUsername: () -> Unit){
-
-    val userEmail = Firebase.auth.currentUser?.email.toString()
-
-    //Primero obtengo la información de la sesión en la BBDD
-    val user = withContext(Dispatchers.Default) { UserRepository.getUserByEmail(userEmail)?.firstOrNull() }
-
-    if (user == null){
-        //Si no existe creamos el usuario
-        withContext(Dispatchers.Default) {UserRepository.createUser(User(
-            id = Firebase.auth.currentUser?.uid,
-            email = userEmail,
-            premium = false,
-            username = "",
-            expireDate = null
-        ))}
-        //Acto seguido preguntamos por el username
-        askForUsername()
-
-    } else {
-        //Si existe pero no tiene campo username, le pedimos que ponga un username
-        if (user.username!!.isEmpty())
-            askForUsername()
-        else sessionData.user = user
-    }
-
-}
-
-suspend fun updateUsername(newUsername:String):Boolean{
-
-    var usernameExists = withContext(Dispatchers.Default) { UserRepository.getUserByUsername(newUsername)?.firstOrNull() }
-
-    if (usernameExists != null){
-        return false
-    } else {
-
-        val userEmail = Firebase.auth.currentUser?.email.toString()
-        var user = withContext(Dispatchers.Default) {
-            UserRepository.getUserByEmail(userEmail)?.firstOrNull()
-        }
-        user!!.username = newUsername
-
-        if (user != null) {
-            withContext(Dispatchers.Default) {
-                UserRepository.updateUser(
-                    email = userEmail,
-                    user = user
-                )
-            }
-            sessionData.user = user
-            return true
-        } else {
-            Log.e("Error", "Usuario no existe, no puede actualizarse")
-            return false
-        }
-    }
 
 }
 

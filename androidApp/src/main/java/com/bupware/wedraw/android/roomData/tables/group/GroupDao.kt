@@ -8,11 +8,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GroupDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(group : Group):  Long
 
     @Query("SELECT * FROM groups_table ORDER BY groupId ASC")
     fun readAllData(): Flow<List<Group>>
+
+    @Query("DELETE FROM groups_table")
+    fun deleteAll()
 
     @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
     fun getGroupByGroupId(groupId: Long): Flow<Group>

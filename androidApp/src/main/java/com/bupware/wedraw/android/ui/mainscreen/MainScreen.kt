@@ -58,7 +58,6 @@ import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
-import com.bupware.wedraw.android.data.WDDatabase
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
@@ -180,6 +179,8 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     //TODO ELIMINAR
     Column() {
     Button(onClick = {
+
+
         Firebase.auth.signOut();
 
         navController.navigate(Destinations.LoginScreen.ruta) {
@@ -187,7 +188,6 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
                 inclusive = true
             }
         }
-
 
 
     }) {

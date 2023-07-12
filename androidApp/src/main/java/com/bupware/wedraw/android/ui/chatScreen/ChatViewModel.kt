@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.theme.redWrong
@@ -28,7 +29,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     var moveLazyToBottom by savedStateHandle.saveable { mutableStateOf(true) }
 
-    var groupId = 0
+    var groupId = 0L
     var userID: String = Firebase.auth.currentUser?.uid.toString()
 
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
@@ -61,7 +62,8 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 timeZone = TimeZone.getDefault(),
                                 senderId = userID,
                                 groupId = groupId,
-                                date = null
+                                date = null,
+                                imageId = null
                             )
                         )
 

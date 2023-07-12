@@ -18,13 +18,13 @@ interface GroupWithUsersDao  {
     @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
     fun getGroupWithUsersByGroupId(groupId: Long): GroupWithUsers?
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Query("DELETE FROM GroupUserCrossRef")
+    fun deleteAll()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroupWithUser(groupWithUser :GroupUserCrossRef)
 
     @Query("SELECT * FROM GroupUserCrossRef WHERE groupId = :groupId")
     fun getSetOfUsersGroupByGroupID(groupId: Long): Flow<List<GroupUserCrossRef>>
-
-
 
 
     @Query("SELECT * FROM GroupUserCrossRef order by groupId ASC")
