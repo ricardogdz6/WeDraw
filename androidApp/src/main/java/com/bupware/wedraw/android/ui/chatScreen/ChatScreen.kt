@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -382,8 +383,10 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
         }
     }
 
+
     LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom) {
         items(viewModel.messageList.size) { index ->
+
 
             val isIndexRestable = index != 0
             val isMessageSenderSameThanLast =

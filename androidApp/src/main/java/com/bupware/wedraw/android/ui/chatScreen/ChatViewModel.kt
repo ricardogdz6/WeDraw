@@ -42,13 +42,13 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         }
     }
 
-    fun sendMessage(context: Context){
+    fun sendMessage(text:String,context: Context){
 
-        if (writingMessage.length >= 1000){
+        if (text.length >= 1000){
             SnackbarManager.newSnackbar(context.getString(R.string.el_mensaje_no_puede_superar_los_1000_car_cteres), redWrong)
         } else {
 
-            if (writingMessage.isNotBlank()) {
+            if (text.isNotBlank()) {
 
                 //Añado el mensaje a este viewModel para que aparezca instantaneamente
                 //Además, guardo en memoria y local el mensaje con el id returneado de la API
@@ -58,7 +58,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                     val idNewMessage = MessageRepository.createMessage(
                             Message(
                                 id = null,
-                                text = writingMessage,
+                                text = text,
                                 timeZone = TimeZone.getDefault(),
                                 senderId = userID,
                                 groupId = groupId,
@@ -70,7 +70,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                      //RECIBO EL ID DEL MESSAGE Y LO MANDO
                     DataHandler(context).saveMessage(idGroup = groupId,message = Message(
                         id = idNewMessage!!,
-                        text = writingMessage,
+                        text = text,
                         timeZone = TimeZone.getDefault(),
                         senderId = userID,
                         imageId = null,

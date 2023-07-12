@@ -11,6 +11,7 @@ import com.bupware.wedraw.android.roomData.tables.group.GroupRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
+import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
@@ -19,6 +20,17 @@ import java.sql.Date
 class DataHandler(context: Context) {
 
     val room = WDDatabase.getDatabase(context = context)
+
+    suspend fun saveUser(user:User){
+
+        val userRoom = com.bupware.wedraw.android.roomData.tables.user.User(
+            userId = user.id.toString(),
+            name = user.username.toString()
+        )
+
+        UserRepository(room.userDao()).insert(userRoom)
+
+    }
 
     suspend fun saveMessage(message: Message, idGroup:Long){
 
@@ -55,27 +67,42 @@ class DataHandler(context: Context) {
 
             //Ahora que he cargado todo en local y memoría lo complimento con los mensajes restantes online si hay
 
-            /*
-
             //region Obtener mensajes de internet
-            //TODO()
-            //TODO GET MESSAGES FROM DATE DE LOCAL
-            groupList.forEach {
-                var messageList = listOf<Message>()
 
-                it.userGroups?.first()?.id?.let { it1 ->
-                    messageList =
-                        MessageRepository.getMessageByUserGroupId(it1)!!
+            groupList.forEach { group ->
+                val newMessages = com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository.getMessagesFromDate(groupId = group.id!!, messageId = messages.filter { it.groupId==group.id!! }.maxByOrNull { it.id!! }?.id!!)
+                var memoryMessages = DataHandler.messageList[group.id!!]
+
+
+                newMessages?.forEach {
+                    memoryMessages?.add(
+                        Message(id = it.id, text = it.text, timeZone = null, senderId = it.senderId, imageId = it.imageId, groupId = it.groupId,date = it.date )
+                    )
                 }
 
-                DataHandler.messageList[it.id!!] = messageList.toMutableList()
+                //Actualizo en memoria
+                DataHandler.messageList[group.id!!] = memoryMessages!!.toMutableList()
+
+                //Actualizo en local
+                val roomMessageList = mutableListOf<com.bupware.wedraw.android.roomData.tables.message.Message>()
+
+                memoryMessages.forEach {
+                    roomMessageList.add(
+                    com.bupware.wedraw.android.roomData.tables.message.Message(
+                        id = it.id!!,
+                        owner_group_Id = it.groupId,
+                        ownerId = it.senderId,
+                        text = it.text,
+                        image_Id = it.imageId,
+                        date = it.date?.let { it1 -> Date(it1.time) }
+                    ))
+                }
+
+                //TODO HACER UN INSERT TODO EN VEZ DE 1 EN 1
+                roomMessageList.forEach { MessageRepository(room.messageDao()).insert(it) }
 
             }
-            //endregion
-
-             */
         }
-
     }
 
     suspend fun saveGroups(groups: List<Group>) {

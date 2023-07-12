@@ -40,6 +40,20 @@ object MessageRepository {
         })
     }
 
+    suspend fun getMessagesFromDate(messageId:Long,groupId:Long): List<Message>? = suspendCancellableCoroutine { continuation ->
+        messageService.getMessagesFromDate(groupId,messageId).enqueue(object : Callback<List<Message>?> {
+            override fun onResponse(call: Call<List<Message>?>, response: Response<List<Message>?>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body(),null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<Message>?>, t: Throwable) {
+                continuation.resume(null,null)
+            }
+        })
+    }
+
     suspend fun createMessage(message: Message): Long? = suspendCancellableCoroutine { continuation ->
         messageService.createMessage(message).enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {

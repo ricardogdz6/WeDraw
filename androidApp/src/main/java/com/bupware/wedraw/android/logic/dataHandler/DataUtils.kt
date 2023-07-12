@@ -1,5 +1,6 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
+import android.content.Context
 import android.util.Log
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
@@ -11,12 +12,16 @@ import kotlinx.coroutines.withContext
 class DataUtils {
 
     companion object{
-        suspend fun gestionLogin(askForUsername: () -> Unit){
+        suspend fun gestionLogin(askForUsername: () -> Unit, context: Context){
 
             val userEmail = Firebase.auth.currentUser?.email.toString()
 
             //Primero obtengo la información de la sesión en la BBDD
             val user = withContext(Dispatchers.Default) { UserRepository.getUserByEmail(userEmail)?.firstOrNull() }
+
+            if (user != null) {
+                DataHandler(context).saveUser(user)
+            }
 
             if (user == null){
                 //Si no existe creamos el usuario

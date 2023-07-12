@@ -59,6 +59,7 @@ import com.bupware.wedraw.android.theme.blueVariantWeDraw
 import com.bupware.wedraw.android.theme.greenWeDraw
 import com.bupware.wedraw.android.theme.redWeDraw
 import com.bupware.wedraw.android.theme.yellowWeDraw
+import com.bupware.wedraw.android.ui.chatScreen.ChatScreenViewModel
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
 
 //region MainScreen
@@ -373,9 +374,10 @@ fun JoinGroupSubButton(action: (Context) -> Unit) {
 
     val context = LocalContext.current
 
-    Box(Modifier
-        .width(IntrinsicSize.Max)
-        .clickable { action(context) }
+    Box(
+        Modifier
+            .width(IntrinsicSize.Max)
+            .clickable { action(context) }
     ) {
 
         Column(
@@ -515,11 +517,11 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
 //region chatscreen
 @Composable
-fun SendMessageButton(action: (Context) -> Unit){
+fun SendMessageButton(action: (String,Context) -> Unit, viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val context = LocalContext.current
 
-    Button(onClick = { action(context) }, shape = CircleShape,
+    Button(onClick = { action(viewModel.writingMessage,context) }, shape = CircleShape,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = blueVariant2WeDraw
     ), modifier = Modifier.size(45.dp)) {

@@ -18,6 +18,9 @@ interface MessageService {
     @GET("/weDraw/messages/userGroupId/{id}")
     fun getMessageByUserGroupId(@Path("id") id: Long): Call<List<Message>?>
 
+    @GET("/weDraw/messages/messagesFrom/{messageId}/{groupId}")
+    fun getMessagesFromDate(@Path("groupId") groupID: Long,@Path("messageId") messageId: Long): Call<List<Message>?>
+
     @POST("/weDraw/messages")
     fun createMessage(@Body message: Message): Call<Long>
 

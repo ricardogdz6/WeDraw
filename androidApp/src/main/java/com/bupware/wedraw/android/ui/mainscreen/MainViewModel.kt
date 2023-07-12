@@ -64,7 +64,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
 
         viewModelScope.launch {
-            gestionLogin { askForUsername = !askForUsername }
+            gestionLogin(context = context, askForUsername = { askForUsername = !askForUsername })
         }
 
 
@@ -230,6 +230,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)){
             withContext(Dispatchers.Default) {getUserGroups(context)}
             showGroups = true
+            DataHandler(context).loadMessages()
         } else{
             //region Obtener grupos localmente
             val localGroups = DataHandler(context).loadGroups()
