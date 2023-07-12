@@ -61,8 +61,8 @@ import com.bupware.wedraw.android.components.composables.MessageBubbleHost
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Group
-import com.bupware.wedraw.android.logic.memoryData.sessionData
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.theme.redWeDraw
@@ -88,7 +88,7 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
         else navController.popBackStack()
     }
 
-    ChatScreenBody(navController, group = sessionData.groupList.first {it.id == groupId})
+    ChatScreenBody(navController, group = DataHandler.groupList.first {it.id == groupId})
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
