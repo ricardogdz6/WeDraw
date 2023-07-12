@@ -28,5 +28,6 @@ This README would normally document whatever steps are necessary to get your app
 * Repo owner or admin
 * Other community or team contact
 * Parra 5%
-* Naim %
-* 
+* Naim 40%
+* Ricardo 40%
+* El chaval q diseña 15%
