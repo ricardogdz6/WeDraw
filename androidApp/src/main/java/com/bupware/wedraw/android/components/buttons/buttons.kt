@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.components.buttons
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -205,8 +206,6 @@ fun CreateGroupButton(viewModel: MainViewModel = hiltViewModel()){
 @Composable
 fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
 
-    //TODO Hacer eso random tambien o no?
-    //val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
     val selectedColor = redWeDraw
     
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -437,11 +436,13 @@ fun JoinGroupQRButton(){
 fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
     val colors = listOf<Color>(blueWeDraw, greenWeDraw, yellowWeDraw, redWeDraw)
-    val selectedColor = colors.random()
+    val hashCode = nombre.hashCode()
+    val selectedIndex = Math.abs(hashCode) % colors.size
+    val selectedColor = colors[selectedIndex]
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Box(Modifier.clickable{ navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
+        Box(Modifier.clickable{navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
 
             Row(
                 Modifier
@@ -459,7 +460,6 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
                     .background(Color.White, RoundedCornerShape(10.dp)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //TODO controlar que no se desborde el text este y poner ...
                 Text(
                     modifier = Modifier.padding(start = 10.dp),
                     text = nombre,
@@ -472,7 +472,6 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                //TODO cambiar este width por una intrinsic con un minimo
                 Column(
                     Modifier
                         .background(Color.Red, RoundedCornerShape(10.dp))

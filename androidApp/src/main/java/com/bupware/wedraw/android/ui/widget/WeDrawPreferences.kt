@@ -1,15 +1,13 @@
 package com.bupware.wedraw.android.ui.widget
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.bupware.wedraw.android.data.tables.image.Image
+import com.bupware.wedraw.android.roomData.tables.image.Image
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.components.composables.SnackbarWrapper
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.logic.navigation.NavigationHost
 import com.google.firebase.FirebaseApp

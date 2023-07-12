@@ -10,9 +10,8 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.bupware.wedraw.android.data.WDDatabase
-import com.bupware.wedraw.android.data.tables.image.Image
-import com.bupware.wedraw.android.data.tables.image.ImageRepository
+import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.image.ImageRepository
 import java.time.Duration
 
 class WeDrawWidgetWorkManager(private val context: Context, params: WorkerParameters) :

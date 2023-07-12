@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.logic.retrofit.services
 
 import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.models.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -17,7 +18,7 @@ interface GroupService {
     fun getGroupByUserId(@Path("userID") userID: String): Call<List<Group>?>
 
     @GET("/weDraw/groups/id/{id}")
-    fun getGroupById(@Path("id") id: Int): Call<List<Group>?>
+    fun getGroupById(@Path("id") id: Long): Call<List<Group>?>
 
     @GET("/weDraw/groups/code/{code}")
     fun getGroupByCode(@Path("code") code: String): Call<Group?>
@@ -29,10 +30,10 @@ interface GroupService {
     fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 
     @POST("/weDraw/groups/{userID}/{groupID}")
-    fun insertUsertoUserGroup(@Path("userID") userID: String, @Body groupID: Long): Call<Boolean>
+    fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Long): Call<Boolean>
 
     @PUT("/weDraw/groups/{id}")
-    fun updateGroup(@Path("id") id: Int,@Body group: Group): Call<Boolean>
+    fun updateGroup(@Path("id") id: Long,@Body group: Group): Call<Boolean>
 
 
 }

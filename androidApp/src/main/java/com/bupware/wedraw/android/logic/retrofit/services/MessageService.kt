@@ -13,15 +13,15 @@ import retrofit2.http.Path
 interface MessageService {
 
     @GET("/weDraw/messages/id/{id}")
-    fun getMessageById(@Path("id") id: Int): Call<List<Message>>
+    fun getMessageById(@Path("id") id: Long): Call<List<Message>>
 
     @GET("/weDraw/messages/userGroupId/{id}")
-    fun getMessageByUserGroupId(@Path("id") id: Int): Call<List<Message>?>
+    fun getMessageByUserGroupId(@Path("id") id: Long): Call<List<Message>?>
 
     @POST("/weDraw/messages")
-    fun createMessage(@Body message: Message): Call<Boolean>
+    fun createMessage(@Body message: Message): Call<Long>
 
     @PUT("/weDraw/messages/{messageId}/{userID}")
-    fun updateMessageStatus(@Path("messageId") messageId: Int,@Path("userID") userID: String): Call<Boolean>
+    fun updateMessageStatus(@Path("messageId") messageId: Long,@Path("userID") userID: String): Call<Boolean>
 
 }

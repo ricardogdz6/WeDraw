@@ -10,7 +10,6 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
-import com.bupware.wedraw.android.logic.sessionData.sessionData
 import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -29,13 +28,17 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     var moveLazyToBottom by savedStateHandle.saveable { mutableStateOf(true) }
 
-    var groupId = 0L
+    var groupId = 0
     var userID: String = Firebase.auth.currentUser?.uid.toString()
 
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
 
     fun loadMessages(groupId:Long){
-        messageList = sessionData.messageList.first { it.first == groupId }.second
+        try {
+            messageList = DataHandler.messageList[groupId]!!
+        }catch (e:Exception){
+            //Se acaba de unir al grupo y por tanto no hay historial
+        }
     }
 
     fun sendMessage(context: Context){
@@ -46,10 +49,12 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
             if (writingMessage.isNotBlank()) {
 
+                //Añado el mensaje a este viewModel para que aparezca instantaneamente
+                //Además, guardo en memoria y local el mensaje con el id returneado de la API
                 addMessageLocal()
 
                 viewModelScope.launch {
-                    if (MessageRepository.createMessage(
+                    val idNewMessage = MessageRepository.createMessage(
                             Message(
                                 id = null,
                                 text = writingMessage,
@@ -59,9 +64,18 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 date = null
                             )
                         )
-                    ) {
-                        //TODO()
-                    }
+
+                     //RECIBO EL ID DEL MESSAGE Y LO MANDO
+                    DataHandler(context).saveMessage(idGroup = groupId,message = Message(
+                        id = idNewMessage!!,
+                        text = writingMessage,
+                        timeZone = TimeZone.getDefault(),
+                        senderId = userID,
+                        imageId = null,
+                        groupId = groupId,
+                        date = Date() //TODO Está bien así?
+                    ))
+
                 }
 
                 writingMessage = ""
@@ -75,10 +89,10 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
 
     fun addMessageLocal(){
-        //TODO GUARDAR ESTO EN ROOM QUE SOLO ESTÁ EN MEMORIA AHORA MISMO
-        val newMessage = Message(id = null, text = writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId,date = Date())
+        val newMessage = Message(id = null, text = writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date())
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
+
         messageList = emptyList()
         messageList = oldList
     }

@@ -28,11 +28,11 @@ import androidx.glance.state.GlanceStateDefinition
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.bupware.wedraw.android.data.WDDatabase
-import com.bupware.wedraw.android.data.tables.image.Image
-import com.bupware.wedraw.android.data.tables.message.Message
-import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImage
-import com.bupware.wedraw.android.data.tables.relationTables.messageWithImage.MessageWithImageRepository
+import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.image.Image
+import com.bupware.wedraw.android.roomData.tables.message.Message
+import com.bupware.wedraw.android.roomData.tables.relationTables.messageWithImage.MessageWithImage
+import com.bupware.wedraw.android.roomData.tables.relationTables.messageWithImage.MessageWithImageRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

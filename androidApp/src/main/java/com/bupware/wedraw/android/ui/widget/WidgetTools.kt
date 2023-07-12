@@ -8,35 +8,12 @@ import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.datastore.preferences.core.MutablePreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import com.bupware.wedraw.android.R
-import com.bupware.wedraw.android.data.WDDatabase
-import com.bupware.wedraw.android.data.tables.image.Image
-import com.bupware.wedraw.android.data.tables.image.ImageRepository
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.withContext
 import java.io.IOException
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @Composable
 fun BitmapImageWG(draw: Bitmap) {
