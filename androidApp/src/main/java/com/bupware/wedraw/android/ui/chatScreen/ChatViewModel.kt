@@ -36,7 +36,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     fun loadMessages(groupId:Long){
         try {
-            messageList = DataHandler.messageList[groupId]!!
+            messageList = DataHandler.messageList[groupId]!!.sortedBy { it.date }
         }catch (e:Exception){
             //Se acaba de unir al grupo y por tanto no hay historial
         }
