@@ -77,6 +77,7 @@ class DataHandler(context: Context) {
         }
 
         // Obtener mensajes de internet
+        /*
         DataHandler.groupList.forEach { group ->
             val latestMessageId = messages.filter { it.groupId == group.id!! }
                 .maxByOrNull { it.id!! }?.id ?: 0L
@@ -116,6 +117,8 @@ class DataHandler(context: Context) {
             Log.i("DataHandler", "roomMessageList: $roomMessageList")
             MessageRepository(room.messageDao()).insertMessagesList(roomMessageList as List<com.bupware.wedraw.android.roomData.tables.message.Message>)
         }
+
+         */
     }
 
 
