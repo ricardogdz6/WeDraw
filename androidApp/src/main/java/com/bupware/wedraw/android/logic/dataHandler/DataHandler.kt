@@ -12,13 +12,9 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import java.sql.Date
 
 class DataHandler(context: Context) {
@@ -58,10 +54,10 @@ class DataHandler(context: Context) {
     suspend fun loadMessages() {
         val messages = mutableListOf<Message>()
 //        MessageRepository(room.messageDao()).deleteAll()
-        val messageList = MessageRepository(room.messageDao()).readAllData.first()
+        val messageEntities = MessageRepository(room.messageDao()).readAllData.first()
 
 
-        messageList.forEach {
+        messageEntities.forEach {
             messages.add(
                 Message(
                     id = it.id,
@@ -81,7 +77,6 @@ class DataHandler(context: Context) {
         }
 
         // Obtener mensajes de internet
-
         DataHandler.groupList.forEach { group ->
             val latestMessageId = messages.filter { it.groupId == group.id!! }
                 .maxByOrNull { it.id!! }?.id ?: 0L
@@ -153,13 +148,17 @@ class DataHandler(context: Context) {
     }
 
     fun loadGroups(): Flow<List<Group>> = flow {
+
+        //REPOSITORIOS
         val groupRepository = GroupRepository(room.groupDao())
         val userGroupRepository = GroupWithUsersRepository(room.groupWithUsersDao())
         val userRepository = UserRepository(room.userDao())
 
+        //LISTAS
         val groupList = groupRepository.readAllData.first()
         val userGroupList = userGroupRepository.readAllData.first()
 
+        //A DEVOLVER
         val listaFinalGrupos = mutableListOf<Group>()
 
         for (group in groupList) {

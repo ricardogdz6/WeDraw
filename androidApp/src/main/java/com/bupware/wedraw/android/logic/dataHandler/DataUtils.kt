@@ -2,7 +2,9 @@ package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
 import android.util.Log
+import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -12,6 +14,27 @@ import kotlinx.coroutines.withContext
 class DataUtils {
 
     companion object{
+
+        /*TODO BORRAR?
+        fun InitData(context: Context){
+
+            CoroutineScope(Dispatchers.IO).launch {
+                gestionLogin(context = context)
+                DataHandler(context).loadGroups()
+            }
+
+        }
+
+         */
+        suspend fun getUserGroups():List<Group>{
+
+            val userId = Firebase.auth.currentUser?.uid.toString()
+            val group = withContext(Dispatchers.Default) { GroupRepository.getGroupByUserId(userId)} ?: emptyList()
+
+            return group
+        }
+
+
         suspend fun gestionLogin(askForUsername: () -> Unit, context: Context){
 
             val userEmail = Firebase.auth.currentUser?.email.toString()

@@ -13,14 +13,13 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.getUserGroups
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.gestionLogin
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.updateUsername
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
-import com.bupware.wedraw.android.roomData.tables.message.Message
-import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWrong
@@ -28,12 +27,10 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.concurrent.thread
 
 @HiltViewModel
 class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -59,24 +56,25 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     //Username
     var username by savedStateHandle.saveable { mutableStateOf("") }
 
-    fun initValues(context: Context) {
-
-        viewModelScope.launch {
-            localInit(context)
-        }
-
+    fun initValues(context:Context){
 
         viewModelScope.launch {
             gestionLogin(context = context, askForUsername = { askForUsername = !askForUsername })
         }
 
+        /*
+        viewModelScope.launch {
+            localInit(context)
+        }
+
+         */
 
         viewModelScope.launch {
             loadGroupsAndMessages(context)
         }
 
-
     }
+
 
     fun expandButton(index: Int) {
         when (index) {
@@ -149,7 +147,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     Firebase.auth.currentUser!!.uid
                 )
             }
-            getUserGroups(context)
+            getUserGroupsAndSave(context)
             targetNavigation = groupList.first { it.code == returningCode }.id!!
             moreOptionsEnabled = !moreOptionsEnabled
             expandCreateGroup = false
@@ -194,7 +192,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                                 groupId = groupId!!
                             )
                         }
-                        getUserGroups(context)
+                        getUserGroupsAndSave(context)
                         targetNavigation = groupId!!
                         moreOptionsEnabled = !moreOptionsEnabled
                         expandJoinGroup = false
@@ -208,27 +206,27 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
 
-    //obtiene todos los grupos del usuario y los guarda en la base de datos local
-    private suspend fun getUserGroups(context: Context) {
-        val userId = Firebase.auth.currentUser?.uid.toString()
-        Log.i("hilos","getUserGroups")
-        val group = withContext(Dispatchers.Default) {
-            GroupRepository.getGroupByUserId(userId)
-        } ?: emptyList()
-        group.forEach { it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) } }
-        groupList = group
+    //Obtiene todos los grupos del usuario y los guarda en la base de datos local y en memoria
+    private suspend fun getUserGroupsAndSave(context: Context) {
 
-        DataHandler(context).saveGroups(group)
+        val groups = getUserGroups()
+
+        //Actualizo la variable del viewModel
+        groupList = groups
+
+        DataHandler(context).saveGroups(groups)
+
+        showGroups = true
     }
 
     private suspend fun getUsersAndSaveInLocal(context: Context) {
         val database = WDDatabase.getDatabase(context)
         val userRepository = UserRepository(database.userDao())
-        Log.i("hilos","getUsersAndSaveInLocal")
+        //Log.i("hilos","getUsersAndSaveInLocal")
 
         groupList.forEach {
             it.userGroups?.forEach { userGroup ->
-                Log.i("wawa", userGroup.userID.toString())
+                //Log.i("wawa", userGroup.userID.toString())
                 Converter.converterUserToUserEntity(userGroup.userID)
                     ?.let { user -> userRepository.insert(user) }
             }
@@ -236,24 +234,20 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
 
-    suspend fun loadGroupsAndMessages(context: Context) {
+    private suspend fun loadGroupsAndMessages(context: Context) {
 
-
-        //region Obtener grupos de internet
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
 
-        //Si tiene internet
+        //Si hay internet que cargue de internet sino localmente
         if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
 
 
             withContext(Dispatchers.Default) {
-                getUserGroups(context)
+                getUserGroupsAndSave(context)
             }
-
-            showGroups = true
 
             withContext(Dispatchers.Default) {
                 getUsersAndSaveInLocal(context)
@@ -274,15 +268,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             //endregion
         }
 
-        //endregion
-
-
     }
 
 
 }
 
 
+//TODO BORRAR?
 suspend fun localInit(context: Context) {
 
     val localDatabase = WDDatabase.getDatabase(context)
