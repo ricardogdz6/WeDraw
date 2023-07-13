@@ -11,23 +11,25 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
+import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.gestionLogin
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.updateUsername
 import com.bupware.wedraw.android.logic.models.Group
-import com.bupware.wedraw.android.logic.models.Message
-import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
-import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
-import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.message.Message
+import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
+import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWrong
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -117,7 +119,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             )
         } else {
 
-            if (DataHandler.user.premium) {
+            if (DataHandler.user.premium == true) {
 
                 if (groupList.size == 10) {
                     SnackbarManager.newSnackbar(
@@ -205,19 +207,34 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     }
 
-    suspend fun getUserGroups(context: Context) {
+    //obtiene todos los grupos del usuario y los guarda en la base de datos local
+    private suspend fun getUserGroups(context: Context) {
         val userId = Firebase.auth.currentUser?.uid.toString()
 
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
-        }?: emptyList()
-
+        } ?: emptyList()
+        group.forEach{it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) }}
         groupList = group
 
         DataHandler(context).saveGroups(group)
     }
 
-    private suspend fun loadGroupsAndMessages(context: Context){
+    private suspend fun getUsersAndSaveInLocal(context: Context) {
+        val database = WDDatabase.getDatabase(context)
+        val userRepository = UserRepository(database.userDao())
+
+        groupList.forEach {
+            it.userGroups?.forEach { userGroup ->
+                Log.i("wawa", userGroup.userID.toString())
+                Converter.converterUserToUserEntity(userGroup.userID)
+                    ?.let { user -> userRepository.insert(user) }
+            }
+        }
+    }
+
+
+    suspend fun loadGroupsAndMessages(context: Context) {
 
 
         //region Obtener grupos de internet
@@ -227,11 +244,12 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
 
         //Si tiene internet
-        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)){
-            withContext(Dispatchers.Default) {getUserGroups(context)}
+        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+            withContext(Dispatchers.Default) { getUserGroups(context) }
             showGroups = true
+            getUsersAndSaveInLocal(context)
             DataHandler(context).loadMessages()
-        } else{
+        } else {
             //region Obtener grupos localmente
             val localGroups = DataHandler(context).loadGroups()
             localGroups.collect {
@@ -252,36 +270,47 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 }
 
 
-
 suspend fun localInit(context: Context) {
 
-    val instance = WDDatabase.getDatabase(context)
+    val localDatabase = WDDatabase.getDatabase(context)
 
     //region INIT GRUPOS
 
     val groupListLocal = mutableListOf<Group>()
     val allUserGroupLocal = mutableSetOf<UserGroup>()
-    val userGroup = instance.groupWithUsersDao()
+    val userGroup = localDatabase.groupWithUsersDao()
+    val userDatabase = UserRepository(localDatabase.userDao())
+    val groupDatabase =
+        com.bupware.wedraw.android.roomData.tables.group.GroupRepository(localDatabase.groupDao())
 
     userGroup.readAllData()
         .collect { crossRefs ->
             crossRefs.forEach { userGroup ->
                 allUserGroupLocal.add(
+
                     UserGroup(
                         id = null,
-                        userID = userGroup.userId,
-                        groupID = userGroup.groupId,
+                        userID = Converter.convertUserEntityToUser(
+                            userDatabase.getUserByID(
+                                userGroup.userId
+                            ).first()
+                        ),
+                        groupID = Converter.convertGroupEntityToGroup(
+                            groupDatabase.getGroupByGroupId(
+                                userGroup.groupId
+                            ).first()
+                        ),
                         isAdmin = userGroup.isAdmin
                     )
                 )
             }
 
-            instance.groupDao().readAllData().collect { groups ->
+            localDatabase.groupDao().readAllData().collect { groups ->
                 groups.forEach { group ->
                     Log.i("wowo", group.toString())
 
                     //Obtengo userGroups
-                    val userGroupList = allUserGroupLocal.filter { it.groupID == group.groupId }
+                    val userGroupList = allUserGroupLocal.filter { it.groupID.id == group.groupId }
 
 
                     groupListLocal.add(
@@ -321,4 +350,6 @@ suspend fun localInit(context: Context) {
      */
 
 }
+
+
 

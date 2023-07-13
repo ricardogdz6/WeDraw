@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 
 interface MessageDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessage(message: Message)
 
     @Query("SELECT * FROM messages_table ORDER BY id ASC")

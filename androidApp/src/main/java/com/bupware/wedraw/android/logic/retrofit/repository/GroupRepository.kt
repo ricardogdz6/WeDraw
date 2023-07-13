@@ -47,6 +47,7 @@ object GroupRepository {
         groupService.getGroupByUserId(userId).enqueue(object : Callback<List<Group>?> {
             override fun onResponse(call: Call<List<Group>?>, response: Response<List<Group>?>) {
                 if (response.isSuccessful) {
+                    Log.i("wawa",response.body().toString())
                     continuation.resume(response.body(),null)
                 }
             }

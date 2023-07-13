@@ -9,4 +9,6 @@ class UserRepository(private val userDao: UserDao) {
 
     val readAllData : Flow<List<User>> = userDao.readAllData()
 
+    fun getUserByID(userID : String) : Flow<User> = userDao.getUserByID(userID)
+
 }

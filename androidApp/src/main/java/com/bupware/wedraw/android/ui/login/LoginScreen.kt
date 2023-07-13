@@ -40,12 +40,12 @@ import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 @Preview
-fun PreviewLogin(){
+fun PreviewLogin() {
     LoginScreen(rememberNavController())
 }
 
 @Composable
-fun LoginScreen(navController: NavController){
+fun LoginScreen(navController: NavController) {
     //TODO QUITAR ESTE FIX
     BackHandler() {}
 
@@ -53,14 +53,19 @@ fun LoginScreen(navController: NavController){
 }
 
 @Composable
-fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hiltViewModel()){
+fun LoginScreenBody(navController: NavController, viewModel: LoginViewModel = hiltViewModel()) {
 
     //Background
     Column(
         Modifier
-        .fillMaxSize()
+            .fillMaxSize()
     ) {
-        Image(painter = painterResource(R.drawable.mainbackground), contentDescription = "background", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxSize())
+        Image(
+            painter = painterResource(R.drawable.mainbackground),
+            contentDescription = "background",
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 
 
@@ -70,16 +75,18 @@ fun LoginScreenBody(navController: NavController,viewModel: LoginViewModel = hil
     }
 
 
-
 }
 
 @Composable
-fun TransparentBackground(navController: NavController){
+fun TransparentBackground(navController: NavController) {
     Column(
         Modifier
             .height(IntrinsicSize.Max)
             .fillMaxWidth()
-            .background(Color.Black.copy(0.4f), RoundedCornerShape(10.dp)), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            .background(Color.Black.copy(0.4f), RoundedCornerShape(10.dp)),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         //TODO CAMBIAR ESTE BOTON DEFINTIVAMENTE
         LogWithGoogle(navController = navController)
 
@@ -87,11 +94,12 @@ fun TransparentBackground(navController: NavController){
 }
 
 @Composable
-fun Logo(){
+fun Logo() {
     Box(
         Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min), contentAlignment = Alignment.Center) {
+            .height(IntrinsicSize.Min), contentAlignment = Alignment.Center
+    ) {
         Image(
             painter = painterResource(R.drawable.logo),
             contentDescription = "background",
@@ -104,10 +112,10 @@ fun Logo(){
 }
 
 @Composable
-fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: NavController){
+fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: NavController) {
 
     val context = LocalContext.current
-
+    Log.i("Auth", "LogWithGoogle")
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -117,7 +125,8 @@ fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: Na
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
             viewModel.signInWithGoogleCredential(credential) {
-                navController.navigate(route =Destinations.MainScreen.ruta){navController.popBackStack()}}
+                navController.navigate(route = Destinations.MainScreen.ruta) { navController.popBackStack() }
+            }
 
         } catch (e: Exception) {
             Log.e("Auth", "GoogleSignIn Failed!")

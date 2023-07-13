@@ -13,4 +13,8 @@ interface UserDao {
 
     @Query("SELECT * FROM users_table ORDER BY userId ASC")
     fun readAllData(): Flow<List<User>>
+
+
+    @Query("SELECT * FROM users_table WHERE userId = :userID")
+    fun getUserByID(userID : String) : Flow<User>
 }
