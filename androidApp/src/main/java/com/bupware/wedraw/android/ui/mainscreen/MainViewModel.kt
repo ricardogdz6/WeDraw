@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.concurrent.thread
 
 @HiltViewModel
 class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -210,11 +211,11 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     //obtiene todos los grupos del usuario y los guarda en la base de datos local
     private suspend fun getUserGroups(context: Context) {
         val userId = Firebase.auth.currentUser?.uid.toString()
-
+        Log.i("hilos","getUserGroups")
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
         } ?: emptyList()
-        group.forEach{it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) }}
+        group.forEach { it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) } }
         groupList = group
 
         DataHandler(context).saveGroups(group)
@@ -223,6 +224,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     private suspend fun getUsersAndSaveInLocal(context: Context) {
         val database = WDDatabase.getDatabase(context)
         val userRepository = UserRepository(database.userDao())
+        Log.i("hilos","getUsersAndSaveInLocal")
 
         groupList.forEach {
             it.userGroups?.forEach { userGroup ->
@@ -245,10 +247,21 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
         //Si tiene internet
         if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-            withContext(Dispatchers.Default) { getUserGroups(context) }
+
+
+            withContext(Dispatchers.Default) {
+                getUserGroups(context)
+            }
+
             showGroups = true
-            getUsersAndSaveInLocal(context)
-            DataHandler(context).loadMessages()
+
+            withContext(Dispatchers.Default) {
+                getUsersAndSaveInLocal(context)
+            }
+
+            withContext(Dispatchers.Default) {
+                DataHandler(context).loadMessages()
+            }
         } else {
             //region Obtener grupos localmente
             val localGroups = DataHandler(context).loadGroups()
