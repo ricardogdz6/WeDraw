@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.logic.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -40,7 +41,9 @@ fun NavigationHost (navController: NavHostController,startDestination: String) {
         //TODO NAVARGUMENTS
         composable("${Destinations.ChatScreen.ruta}/{groupId}", arguments = listOf(navArgument("groupId"){type = NavType.LongType})){ backStackEntry ->
             backStackEntry.arguments?.getLong("groupId")
-                ?.let { ChatScreen(navController =navController, groupId = it) }
+                ?.let {
+                    ChatScreen(navController =navController, groupId = it)
+                }
         }
     }
 }

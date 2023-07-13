@@ -98,7 +98,7 @@ fun ChatScreenBody(navController: NavController, group: Group ,viewModel: ChatSc
 
     Body()
 
-    TopBar(navController = navController, code = group.code, groupName = group.name, people = group.userGroups!!.size)
+    TopBar(navController = navController, code = group.code, groupName = group.name, people = group.userGroups?.size ?:0)
 
 }
 

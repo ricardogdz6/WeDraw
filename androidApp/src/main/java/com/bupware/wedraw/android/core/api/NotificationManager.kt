@@ -17,7 +17,7 @@ class NotificationManager : FirebaseMessagingService() {
         val messageBody = message.data
         Log.i("wawa", "Message body: $messageBody")
 
-        actionRunCallback(WDrawReverseLetterCallback::class.java)
+//        actionRunCallback(WDrawReverseLetterCallback::class.java)
 
     }
 

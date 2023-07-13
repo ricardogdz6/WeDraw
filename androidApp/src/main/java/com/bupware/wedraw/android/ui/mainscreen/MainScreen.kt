@@ -180,7 +180,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Column() {
     Button(onClick = {
 
-
+        Log.i("wawa", viewModel.groupList.toString())
         Firebase.auth.signOut();
 
         navController.navigate(Destinations.LoginScreen.ruta) {
@@ -262,7 +262,7 @@ fun UpperBackgroundContent(navController: NavController,viewModel: MainViewModel
 @Composable
 fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavController){
 
-    if (!viewModel.showGroups){
+    if (false){
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = blueVariant2WeDraw)
@@ -303,7 +303,7 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
 
                 Column(Modifier.padding(bottom = 25.dp)) {
                     ChipPop(
-                        content = { GroupBar(viewModel.groupList[index].name, viewModel.groupList[index].id.toString() ,navController) },
+                        content = { GroupBar(viewModel.groupList.toList()[index].name, viewModel.groupList.toList()[index].id.toString() ,navController) },
                         show = visible
                     )
                 }

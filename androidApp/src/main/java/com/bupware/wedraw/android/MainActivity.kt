@@ -9,6 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.components.composables.SnackbarWrapper
@@ -20,6 +22,10 @@ import com.bupware.wedraw.android.logic.navigation.NavigationHost
 import com.google.firebase.FirebaseApp
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -49,11 +55,19 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun StartingPoint(){
 
-    /* TODO BORRAR?
-    val context = LocalContext.current
-    DataUtils.InitData(context)
 
-     */
+    val context = LocalContext.current
+    val dataUtils = DataUtils()
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            dataUtils.initData(context)
+        }
+    }
+
+
+
 
     NavigationHost(navController = rememberNavController(), startDestination = Destinations.SplashScreen.ruta )
 }
