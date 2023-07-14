@@ -71,9 +71,6 @@ fun StartingPoint(){
 
     }
 
-
-
-
     NavigationHost(navController = rememberNavController(), startDestination = Destinations.SplashScreen.ruta )
 }
 

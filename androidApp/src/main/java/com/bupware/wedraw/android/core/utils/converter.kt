@@ -3,8 +3,10 @@ package com.bupware.wedraw.android.core.utils
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.roomData.tables.message.Message
+import com.bupware.wedraw.android.roomData.tables.message.MessageFailed
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.user.User
+import java.util.TimeZone
 import com.bupware.wedraw.android.logic.models.User as UserDTO
 import com.bupware.wedraw.android.logic.models.Group as GroupDTO
 import com.bupware.wedraw.android.roomData.tables.user.User as UserRoom
@@ -67,6 +69,17 @@ object Converter {
         return messages
     }
 
+    fun convertMessageFailedToMessageEntity(message:MessageFailed, optionalId:Long?):Message{
+        return Message(
+            id = optionalId ?: message.id,
+            owner_group_Id = message.owner_group_Id,
+            ownerId = message.ownerId,
+            text = message.text,
+            image_Id = message.image_Id,
+            date = message.date
+        )
+    }
+
     fun convertMessageEntityToMessage(messageEntity:Message):MessageDTO{
         return MessageDTO(
             id = messageEntity.id,
@@ -75,7 +88,7 @@ object Converter {
             senderId = messageEntity.ownerId,
             groupId = messageEntity.owner_group_Id,
             imageId = messageEntity.image_Id,
-            timeZone = null //Todo: No se si el timezone aqui deberia ser null.
+            timeZone = TimeZone.getDefault()
         )
     }
 

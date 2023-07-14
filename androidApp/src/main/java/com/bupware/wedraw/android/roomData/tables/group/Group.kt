@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.roomData.tables.group
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "groups_table")
 data class Group(

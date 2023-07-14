@@ -54,7 +54,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     var dataHandler by savedStateHandle.saveable { mutableStateOf(DataHandler) }
     //Init
     var askForUsername by savedStateHandle.saveable { mutableStateOf(false) }
-    var groupList by savedStateHandle.saveable { mutableStateOf(dataHandler.groupList?: emptyList()) }
+    var groupList by savedStateHandle.saveable { mutableStateOf(dataHandler.groupList) }
 
     //Username
     var username by savedStateHandle.saveable { mutableStateOf("") }

@@ -11,19 +11,22 @@ import com.bupware.wedraw.android.roomData.tables.group.Group
 import com.bupware.wedraw.android.roomData.tables.group.GroupDao
 import com.bupware.wedraw.android.roomData.tables.image.Image
 import com.bupware.wedraw.android.roomData.tables.image.ImageDao
+import com.bupware.wedraw.android.roomData.tables.message.MessageFailed
+import com.bupware.wedraw.android.roomData.tables.message.MessageFailedDao
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersDao
 import com.bupware.wedraw.android.roomData.tables.relationTables.messageWithImage.MessageWithImageDao
 import com.bupware.wedraw.android.roomData.tables.user.User
 import com.bupware.wedraw.android.roomData.tables.user.UserDao
 
-@Database(entities = [User::class, Group::class, Image::class, Message::class, GroupUserCrossRef::class], version = 1)
+@Database(entities = [User::class, Group::class, Image::class, Message::class, GroupUserCrossRef::class, MessageFailed::class], version = 1)
 @TypeConverters(DataConverter::class)
 abstract class WDDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun groupDao(): GroupDao
     abstract fun imageDao(): ImageDao
     abstract fun messageDao(): MessageDao
+    abstract fun messageFailedDao(): MessageFailedDao
     abstract fun groupWithUsersDao(): GroupWithUsersDao
 
     abstract fun messageWithImageDao(): MessageWithImageDao

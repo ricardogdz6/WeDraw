@@ -20,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
-    var gameList by savedStateHandle.saveable { mutableStateOf("") }
     var initNContinue by savedStateHandle.saveable { mutableStateOf(false) }
 
     fun signInWithGoogleCredential(credential: AuthCredential, returningLambda:()->Unit) = viewModelScope.launch {

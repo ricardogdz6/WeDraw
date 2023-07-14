@@ -9,10 +9,12 @@ import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
@@ -64,28 +66,25 @@ class DataUtils {
         }
 
 
-
-//        withContext(Dispatchers.Default) {
-//            DataHandler(context).saveGroups(getUserGroups(context))
-//            getUsersAndSaveInLocal(context)
-//        }
     }
 
-    private suspend fun sendPendingMessages(context: Context){
+    private suspend fun sendPendingMessages(context: Context) {
+        val room = WDDatabase.getDatabase(context)
+        val pendingMessages = withContext(Dispatchers.Default) { MessageFailedRepository(room.messageFailedDao()).readAllData.first().toMutableList() }
 
-        val room = WDDatabase.getDatabase(context = context)
-        val pendingMessages = withContext(Dispatchers.Default) { MessageRepository(room.messageDao()).readAllData.first().filter { it.id == null }.toMutableList()}
-
-        Log.i("wowo",pendingMessages.toString())
-
-        while (pendingMessages.isNotEmpty()){
-            pendingMessages.forEach { pendingMessage -> if (sendPendingMessage(pendingMessage) != null) {
-                pendingMessages.remove(pendingMessage)
-                MessageRepository(room.messageDao()).deleteMessage(pendingMessage)
-                }
+        var index = 0
+        while (index < pendingMessages.size) {
+            val pendingMessage = pendingMessages[index]
+            val returningId = sendPendingMessage(Converter.convertMessageFailedToMessageEntity(pendingMessage, null))
+            if (returningId != null) {
+                pendingMessages.removeAt(index)
+                MessageFailedRepository(room.messageFailedDao()).deleteMessage(pendingMessage)
+                MessageRepository(room.messageDao()).insert(Converter.convertMessageFailedToMessageEntity(pendingMessage, returningId))
+            } else {
+                index++
             }
+            delay(5000)
         }
-
     }
 
     private suspend fun sendPendingMessage(message: MessageEntity):Long?{
