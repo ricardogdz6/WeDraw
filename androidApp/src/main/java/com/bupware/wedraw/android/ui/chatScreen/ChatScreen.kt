@@ -160,7 +160,10 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
             TextFieldMessage(value = viewModel.writingMessage, onValueChange = {viewModel.writingMessage = it})
         }
         Spacer(modifier = Modifier.width(5.dp))
-        SendMessageButton(viewModel::sendMessage)
+
+
+            SendMessageButton(viewModel::sendMessage)
+
 
     }
 }

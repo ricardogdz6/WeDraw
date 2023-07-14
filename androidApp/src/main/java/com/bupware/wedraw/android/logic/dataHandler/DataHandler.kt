@@ -131,7 +131,7 @@ class DataHandler(context: Context) {
 
 
         //Guardo en memoria
-        groupList = groups.toSet()
+        groupList = groups.toMutableList()
         //AÑADO LOS NUEVOS GRUPOS Y USERGROUPS A LOCAL
         groups.forEach { group ->
 
@@ -214,14 +214,14 @@ class DataHandler(context: Context) {
 
         lateinit var user: User
 
-        lateinit var userList : Set<User>
+        lateinit var userList : MutableSet<User>
 
-        lateinit var groupList: Set<Group>
+        lateinit var groupList: MutableList<Group>
 
-        lateinit var userGroupList: Set<UserGroup>
+        lateinit var userGroupList: MutableSet<UserGroup>
 
         //Map de idGrupo y los mensajes correspondientes
-        var messageList = mutableMapOf<Long, MutableSet<Message>>()
+        var messageList = mutableMapOf<Long, MutableList<Message>>()
 
 
     }

@@ -212,16 +212,15 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     //obtiene todos los grupos del usuario y los guarda en la base de datos local
-    private suspend fun getUserGroups(context: Context) : List<Group>{
+    private suspend fun getUserGroups(context: Context) : MutableList<Group>{
         val userId = Firebase.auth.currentUser?.uid.toString()
         Log.i("hilos","getUserGroups")
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
         } ?: emptyList()
         group.forEach { it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) } }
-        groupList = group.toSet()
 
-        return group
+        return group.toMutableList()
     }
 
     private suspend fun getUsersAndSaveInLocal(context: Context) {

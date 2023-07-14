@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.group.Group as GroupRoom
 
-import com.bupware.wedraw.android.roomData.tables.message.MessageRepository as MessageRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.message.Message as MessageRoom
 import com.bupware.wedraw.android.roomData.tables.user.User as UserRoom
 
@@ -30,15 +29,31 @@ class DataUtils {
             DataHandler.groupList = Converter.converterGroupsEntityToGroupsList(
                 getGroupsLocal(context) ?: emptyList()
             )
+
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
             DataHandler.userList =
                 Converter.convertUsersEntityToUsersList(getUsersLocal(context) ?: emptySet())
             Log.i("DataUtils", "initData: ${DataHandler.userList}")
 
-            DataHandler.messageList= getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
+            DataHandler.messageList =
+                getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
             Log.i("DataUtils", "initData: ${DataHandler.messageList}")
 
 
+            /**
+             * Obtengo los grupos en remoto los paso a local y los meto en memoria.
+             * Si no hay grupos en remoto no hago nada.
+             * */
+            getGroupsRemote(context).also {
+                if (it != null) {
+                    remoteGroupsToLocal(it, context)
+                }
+            }?.let {
+
+                    DataHandler.groupList = it.toMutableList()
+
+            }
+            Log.i("DataUtils", "initData: ${DataHandler.groupList}")
         }
 
 
@@ -48,19 +63,27 @@ class DataUtils {
 //        }
     }
 
-    private suspend fun getMapOfMessageByGroup(group: Set<Group>, context: Context): Map<Long, MutableSet<Message>> {
+    private suspend fun getMapOfMessageByGroup(
+        group: MutableList<Group>,
+        context: Context
+    ): Map<Long, MutableList<Message>> {
 
-        val map = mutableMapOf<Long, MutableSet<Message>>()
+        val map = mutableMapOf<Long, MutableList<Message>>()
 
         group.forEach { group ->
             val groupId = group.id ?: 0L // Conversión explícita de Long? a Long
             val messages = getMessagesLocalByGroupId(context, groupId)
-            map[groupId] = messages?.let { Converter.convertMessagesEntityToMessagesList(it).toMutableSet() }!!
+            map[groupId] =
+                messages?.let { Converter.convertMessagesEntityToMessagesList(it).toMutableList() }!!
         }
 
         return map
     }
-    private suspend fun getMessagesLocalByGroupId(context: Context, idGroup: Long): Set<MessageRoom>? {
+
+    private suspend fun getMessagesLocalByGroupId(
+        context: Context,
+        idGroup: Long
+    ): Set<MessageRoom>? {
 
         val database = WDDatabase.getDatabase(context)
         val messageRepository =
@@ -68,6 +91,30 @@ class DataUtils {
 
         return messageRepository.getMessagesByGroupId(idGroup).first().toSet()
     }
+
+    private suspend fun getGroupsRemote(context: Context): List<Group>? {
+
+        val userId = Firebase.auth.currentUser?.uid.toString()
+        val groups = withContext(Dispatchers.Default) {
+            GroupRepository.getGroupByUserId(userId)
+        }
+        return groups
+    }
+
+    private suspend fun remoteGroupsToLocal(groups: List<Group>, context: Context): Boolean {
+
+        val database = WDDatabase.getDatabase(context)
+        val groupRepository =
+            GroupRepositoryRoom(database.groupDao())
+        try {
+            groupRepository.insertAll(Converter.converterGroupsToGroupEntityList(groups))
+
+        } catch (e: Exception) {
+            return false
+        }
+        return true
+    }
+
     private suspend fun getGroupsLocal(context: Context): List<GroupRoom>? {
 
         val database = WDDatabase.getDatabase(context)

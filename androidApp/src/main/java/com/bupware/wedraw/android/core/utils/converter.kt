@@ -22,8 +22,8 @@ object Converter {
         )
     }
 
-    fun converterGroupsEntityToGroupsList(groupsEntity: List<GroupRoom>): Set<Group> {
-        val groups = mutableSetOf<GroupDTO>()
+    fun converterGroupsEntityToGroupsList(groupsEntity: List<GroupRoom>): MutableList<Group> {
+        val groups = mutableListOf<GroupDTO>()
         groupsEntity.forEach { group ->
             groups.add(convertGroupEntityToGroup(group))
         }
@@ -66,6 +66,7 @@ object Converter {
         }
         return messages
     }
+
     fun convertUserGroupEntityToUserGroup(
         userGroupEntity: GroupUserCrossRef,
         user: UserRoom,
@@ -79,8 +80,18 @@ object Converter {
         )
     }
 
-    fun converterGroupToGroupEntity() {
-        TODO("Terminar de implementar el convertidor de Group a GroupEntity")
+    fun converterGroupsToGroupEntityList(groupDTO: List<GroupDTO>): List<GroupRoom> {
+        val groups = mutableListOf<GroupRoom>()
+        groupDTO.forEach { group ->
+            groups.add(
+                GroupRoom(
+                    groupId = group.id ?: 0L,
+                    name = group.name,
+                    code = group.code
+                )
+            )
+        }
+        return groups
     }
 
     fun converterUserToUserEntity(UserDTO: UserDTO): User? {

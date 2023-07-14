@@ -67,6 +67,19 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             )
                         )
 
+                        MessageRepository.createMessage(
+                            Message(
+                                id = null,
+                                text = text,
+                                timeZone = TimeZone.getDefault(),
+                                senderId = userID,
+                                groupId = groupId,
+                                date = null,
+                                imageId = null
+                            )
+                        )
+
+
                      //RECIBO EL ID DEL MESSAGE Y LO MANDO
                     DataHandler(context).saveMessage(idGroup = groupId,message = Message(
                         id = idNewMessage!!,

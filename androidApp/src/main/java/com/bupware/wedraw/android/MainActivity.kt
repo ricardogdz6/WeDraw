@@ -20,6 +20,8 @@ import com.bupware.wedraw.android.logic.dataHandler.DataUtils
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.logic.navigation.NavigationHost
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
@@ -61,9 +63,12 @@ fun StartingPoint(){
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        scope.launch {
-            dataUtils.initData(context)
+        if (Firebase.auth.currentUser != null) {
+            scope.launch {
+                dataUtils.initData(context)
+            }
         }
+
     }
 
 

@@ -11,6 +11,9 @@ interface GroupDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(group : Group):  Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(groups : List<Group>):  List<Long>
+
     @Query("SELECT * FROM groups_table ORDER BY groupId ASC")
     fun readAllData(): Flow<List<Group>>
 
