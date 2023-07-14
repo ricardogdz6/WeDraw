@@ -17,6 +17,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -57,7 +58,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                 //Además, guardo en memoria y local el mensaje con el id returneado de la API
                 addMessageLocal()
 
-                viewModelScope.launch {
+                GlobalScope.launch(Dispatchers.Default) {
                     withContext(Dispatchers.IO) {
                         val idNewMessage = MessageRepository.createMessage(
                             Message(

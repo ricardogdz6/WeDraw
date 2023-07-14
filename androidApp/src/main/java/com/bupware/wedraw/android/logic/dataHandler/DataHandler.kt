@@ -13,11 +13,13 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
 import java.sql.Date
 
-class DataHandler(context: Context) {
+class DataHandler(val context: Context) {
 
     val room = WDDatabase.getDatabase(context = context)
     private val _groupListFlow: MutableStateFlow<Set<Group>> = MutableStateFlow(emptySet())
@@ -51,6 +53,10 @@ class DataHandler(context: Context) {
 
             //Guardo el mensaje en local [ROOM]
             MessageFailedRepository(room.messageFailedDao()).insert(roomMessageFailed)
+
+            //Además, trato de enviarlo activamente
+            val dataUtils = DataUtils()
+            dataUtils.sendSinglePendingMessage(context = context,message = roomMessageFailed)
 
         } else {
 

@@ -121,6 +121,49 @@ class DataUtils {
         //MessageFailedRepository(room.messageFailedDao()).deleteAll()
     }
 
+    suspend fun sendSinglePendingMessage(context: Context, message:MessageFailed) {
+        val room = WDDatabase.getDatabase(context)
+        val pendingMessages = listOf<MessageFailed>(message)
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        var index = 0
+        while (index < pendingMessages.size) {
+            val pendingMessage : MessageFailed = pendingMessages[index]
+            val network = connectivityManager.activeNetwork
+            Log.i("DataUtilsSendOffline", "1sendPendingMessages: $network")
+            if (network != null) {
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+                Log.i("DataUtilsSendOffline", "2sendPendingMessages: $networkCapabilities")
+                if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+                    val returningId = sendPendingMessage(
+                        pendingMessage.toMessage()
+                    )
+                    Log.i("DataUtilsSendOffline", "3sendPendingMessages: $returningId")
+                    if (returningId != null) {
+                        Log.i("DataUtilsSendOffline", "4sendPendingMessages: $returningId")
+                        MessageFailedRepository(room.messageFailedDao()).deleteMessage(
+                            pendingMessage
+                        )
+                        MessageRepository(room.messageDao()).insert(
+                            Converter.convertMessageFailedToMessageEntity(
+                                pendingMessage,
+                                returningId
+                            )
+                        )
+                        // Incrementa el índice solo si se elimina el mensaje
+                        index++
+                    }
+                }
+            }
+
+            // Espera antes de la siguiente iteración del bucle
+            delay(5000)
+        }
+        //MessageFailedRepository(room.messageFailedDao()).deleteAll()
+    }
+
     private suspend fun sendPendingMessage(message: MessageRoom): Long? {
         return MessageRepositoryRetrofit.createMessage(
             Converter.convertMessageEntityToMessage(
