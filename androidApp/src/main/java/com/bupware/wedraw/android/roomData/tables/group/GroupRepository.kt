@@ -8,6 +8,7 @@ class GroupRepository (private val groupDao: GroupDao) {
 
     suspend fun insertAll(groups: List<Group>) = groupDao.insertAll(groups)
 
+    fun deleteAll() = groupDao.deleteAll()
 
     val readAllData : Flow<List<Group>> = groupDao.readAllData()
 
