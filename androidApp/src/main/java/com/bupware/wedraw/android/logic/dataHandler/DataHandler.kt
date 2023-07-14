@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
@@ -211,6 +212,8 @@ class DataHandler(context: Context) {
 //    }
 
     companion object {
+
+        var forceUpdate = mutableStateOf(false)
 
         lateinit var user: User
 

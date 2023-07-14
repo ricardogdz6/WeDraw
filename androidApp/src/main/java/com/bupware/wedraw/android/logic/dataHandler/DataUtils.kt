@@ -49,9 +49,8 @@ class DataUtils {
                     remoteGroupsToLocal(it, context)
                 }
             }?.let {
-
                     DataHandler.groupList = it.toMutableList()
-
+                    DataHandler.forceUpdate.value = true
             }
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
         }
