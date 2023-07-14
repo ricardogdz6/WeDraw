@@ -11,7 +11,7 @@ import java.sql.Date
 @Dao
 
 interface MessageDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertMessage(message: Message)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessagesList(messages: List<Message>)

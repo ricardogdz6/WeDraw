@@ -273,7 +273,7 @@ fun UpperBackgroundContent(navController: NavController,viewModel: MainViewModel
 @Composable
 fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavController){
 
-    if (viewModel.showGroups){
+    if (!viewModel.showGroups){
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = blueVariant2WeDraw)

@@ -63,7 +63,7 @@ object MessageRepository {
             }
 
             override fun onFailure(call: Call<Long>, t: Throwable) {
-                continuation.cancel()
+                continuation.resume(null,null)
             }
         })
     }

@@ -17,7 +17,7 @@ import com.bupware.wedraw.android.roomData.tables.relationTables.messageWithImag
 import com.bupware.wedraw.android.roomData.tables.user.User
 import com.bupware.wedraw.android.roomData.tables.user.UserDao
 
-@Database(entities = [User::class, Group::class, Image::class, Message::class, GroupUserCrossRef::class], version = 2)
+@Database(entities = [User::class, Group::class, Image::class, Message::class, GroupUserCrossRef::class], version = 1)
 @TypeConverters(DataConverter::class)
 abstract class WDDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

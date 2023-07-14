@@ -76,6 +76,8 @@ class DataUtils {
         val room = WDDatabase.getDatabase(context = context)
         val pendingMessages = withContext(Dispatchers.Default) { MessageRepository(room.messageDao()).readAllData.first().filter { it.id == null }.toMutableList()}
 
+        Log.i("wowo",pendingMessages.toString())
+
         while (pendingMessages.isNotEmpty()){
             pendingMessages.forEach { pendingMessage -> if (sendPendingMessage(pendingMessage) != null) {
                 pendingMessages.remove(pendingMessage)

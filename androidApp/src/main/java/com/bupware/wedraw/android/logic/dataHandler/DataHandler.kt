@@ -43,7 +43,7 @@ class DataHandler(context: Context) {
     suspend fun saveMessage(message: Message, idGroup: Long) {
 
         val roomMessage = com.bupware.wedraw.android.roomData.tables.message.Message(
-            id = message.id!!,
+            id = message.id,
             owner_group_Id = message.groupId,
             ownerId = message.senderId,
             text = message.text,
@@ -56,6 +56,9 @@ class DataHandler(context: Context) {
 
         //Guardo el mensaje en local [ROOM]
         MessageRepository(room.messageDao()).insert(roomMessage)
+
+        //TODO COMO
+        MessageRepository(room.messageDao()).readAllData.first().also { Log.i("wowo",it.filter { it.id == null }.toString()) }
 
     }
 
@@ -219,7 +222,7 @@ class DataHandler(context: Context) {
 
         lateinit var userList : MutableSet<User>
 
-        lateinit var groupList: MutableList<Group>
+        var groupList = mutableListOf<Group>()
 
         lateinit var userGroupList: MutableSet<UserGroup>
 

@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -56,39 +57,38 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
                 viewModelScope.launch {
                     val idNewMessage = MessageRepository.createMessage(
-                            Message(
-                                id = null,
-                                text = text,
-                                timeZone = TimeZone.getDefault(),
-                                senderId = userID,
-                                groupId = groupId,
-                                date = null,
-                                imageId = null
-                            )
+                        Message(
+                            id = null,
+                            text = text,
+                            timeZone = TimeZone.getDefault(),
+                            senderId = userID,
+                            groupId = groupId,
+                            date = null,
+                            imageId = null
                         )
+                    )
 
-                        MessageRepository.createMessage(
-                            Message(
-                                id = null,
-                                text = text,
-                                timeZone = TimeZone.getDefault(),
-                                senderId = userID,
-                                groupId = groupId,
-                                date = null,
-                                imageId = null
-                            )
+                    MessageRepository.createMessage(
+                        Message(
+                            id = null,
+                            text = text,
+                            timeZone = TimeZone.getDefault(),
+                            senderId = userID,
+                            groupId = groupId,
+                            date = null,
+                            imageId = null
                         )
-
+                    )
 
                      //RECIBO EL ID DEL MESSAGE Y LO MANDO
                     DataHandler(context).saveMessage(idGroup = groupId,message = Message(
-                        id = idNewMessage!!,
+                        id = idNewMessage,
                         text = text,
                         timeZone = TimeZone.getDefault(),
                         senderId = userID,
                         imageId = null,
                         groupId = groupId,
-                        date = Date() //TODO Está bien así?
+                        date = Date()
                     ))
 
                 }
@@ -96,8 +96,6 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                 writingMessage = ""
 
                 moveLazyToBottom = true
-                //TODO
-
             }
         }
     }
