@@ -33,15 +33,15 @@ interface MessageFailedDao {
     suspend fun insertMessage(message: MessageFailed)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessagesList(messages: List<MessageFailed>)
-    @Query("SELECT * FROM messages_table ORDER BY id ASC")
+    @Query("SELECT * FROM messagesFailed_table ORDER BY id ASC")
     fun readAllDataMessage(): Flow<List<MessageFailed>>
 
-    @Query("DELETE FROM messages_table WHERE id IS NULL AND date = :date")
+    @Query("DELETE FROM messagesFailed_table WHERE date = :date")
     suspend fun deleteMessage(date: Date)
-    @Query("SELECT * FROM messages_table WHERE owner_group_Id = :groupId")
+    @Query("SELECT * FROM messagesFailed_table WHERE owner_group_Id = :groupId")
     fun getMessagesByGroupId(groupId: Long): Flow<List<MessageFailed>>
 
-    @Query("DELETE FROM messages_table")
+    @Query("DELETE FROM messagesFailed_table")
     suspend fun deleteAll()
 
 }

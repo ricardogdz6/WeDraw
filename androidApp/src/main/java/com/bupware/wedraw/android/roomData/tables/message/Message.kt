@@ -8,10 +8,16 @@ import com.bupware.wedraw.android.roomData.tables.user.User
 import java.sql.Date
 
 
-@Entity(tableName = "messages_table",foreignKeys =  [
-    ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["owner_group_Id"]),
-    ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
-])
+@Entity(
+    tableName = "messages_table", foreignKeys = [
+        ForeignKey(
+            entity = Group::class,
+            parentColumns = ["groupId"],
+            childColumns = ["owner_group_Id"]
+        ),
+        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
+    ]
+)
 
 data class Message(
     @PrimaryKey(autoGenerate = false)
@@ -19,23 +25,41 @@ data class Message(
     val owner_group_Id: Long,
     val ownerId: String,
     val text: String,
-    val image_Id: Long?= null,
+    val image_Id: Long? = null,
     val date: Date?
 )
 
-@Entity(tableName = "messagesFailed_table",foreignKeys =  [
-    ForeignKey(entity = Group::class, parentColumns = ["groupId"], childColumns = ["owner_group_Id"]),
-    ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
-])
+@Entity(
+    tableName = "messagesFailed_table", foreignKeys = [
+        ForeignKey(
+            entity = Group::class,
+            parentColumns = ["groupId"],
+            childColumns = ["owner_group_Id"]
+        ),
+        ForeignKey(entity = User::class, parentColumns = ["userId"], childColumns = ["ownerId"])
+    ]
+)
 data class MessageFailed(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val owner_group_Id: Long,
     val ownerId: String,
     val text: String,
-    val image_Id: Long?= null,
+    val image_Id: Long? = null,
     val date: Date?
-)
+) {
+    fun toMessage(): Message {
+
+        return Message(
+            id = this.id,
+            owner_group_Id = this.owner_group_Id,
+            ownerId = this.ownerId,
+            text = this.text,
+            image_Id = this.image_Id,
+            date = this.date
+        )
+    }
+}
 
 
 

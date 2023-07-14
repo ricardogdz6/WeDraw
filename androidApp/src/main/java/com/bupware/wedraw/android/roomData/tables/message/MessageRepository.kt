@@ -1,6 +1,5 @@
 package com.bupware.wedraw.android.roomData.tables.message
 
-import android.util.Log
 import kotlinx.coroutines.flow.Flow
 
 class MessageRepository(private val messageDao: MessageDao) {
@@ -23,22 +22,22 @@ class MessageRepository(private val messageDao: MessageDao) {
 
 }
 
-class MessageFailedRepository(private val messageDao: MessageFailedDao) {
+class MessageFailedRepository(private val messageFailedDao: MessageFailedDao) {
     suspend fun insert(message: MessageFailed) {
-        messageDao.insertMessage(message)
+        messageFailedDao.insertMessage(message)
     }
 
     suspend fun insertMessagesList(messages: List<MessageFailed>) {
-        messageDao.insertMessagesList(messages)
+        messageFailedDao.insertMessagesList(messages)
     }
 
-    val readAllData: Flow<List<MessageFailed>> = messageDao.readAllDataMessage()
+    val readAllData: Flow<List<MessageFailed>> = messageFailedDao.readAllDataMessage()
 
-    suspend fun deleteAll() = messageDao.deleteAll()
+    suspend fun deleteAll() = messageFailedDao.deleteAll()
 
-    suspend fun deleteMessage(message: MessageFailed) = messageDao.deleteMessage(message.date!!)
+    suspend fun deleteMessage(message: MessageFailed) = messageFailedDao.deleteMessage(message.date!!)
 
-    suspend fun getMessagesByGroupId(groupId: Long): Flow<List<MessageFailed>> = messageDao.getMessagesByGroupId(groupId)
+    suspend fun getMessagesByGroupId(groupId: Long): Flow<List<MessageFailed>> = messageFailedDao.getMessagesByGroupId(groupId)
 
 
 }

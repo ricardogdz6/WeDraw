@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -14,14 +13,8 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
 import java.sql.Date
 
 class DataHandler(context: Context) {
@@ -45,7 +38,7 @@ class DataHandler(context: Context) {
 
         if (message.id == null){
 
-            val roomMessage = com.bupware.wedraw.android.roomData.tables.message.MessageFailed(
+            val roomMessageFailed = com.bupware.wedraw.android.roomData.tables.message.MessageFailed(
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
@@ -57,7 +50,7 @@ class DataHandler(context: Context) {
             messageList[idGroup]?.add(message)
 
             //Guardo el mensaje en local [ROOM]
-            MessageFailedRepository(room.messageFailedDao()).insert(roomMessage)
+            MessageFailedRepository(room.messageFailedDao()).insert(roomMessageFailed)
 
         } else {
 

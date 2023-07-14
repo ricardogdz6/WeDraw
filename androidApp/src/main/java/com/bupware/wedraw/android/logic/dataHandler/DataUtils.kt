@@ -1,6 +1,9 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.provider.Telephony.MmsSms.PendingMessages
 import android.util.Log
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
@@ -9,6 +12,7 @@ import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.message.MessageFailed
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.ktx.auth
@@ -55,40 +59,74 @@ class DataUtils {
                 }
             }?.let {
 
-                    DataHandler.groupList = it.toMutableList()
-                    DataHandler.forceUpdate.value = true
+                DataHandler.groupList = it.toMutableList()
+                DataHandler.forceUpdate.value = true
             }
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
 
 
-            sendPendingMessages(context)
+
 
         }
+        sendPendingMessages(context)
 
 
     }
 
     private suspend fun sendPendingMessages(context: Context) {
         val room = WDDatabase.getDatabase(context)
-        val pendingMessages = withContext(Dispatchers.Default) { MessageFailedRepository(room.messageFailedDao()).readAllData.first().toMutableList() }
+        val pendingMessages = withContext(Dispatchers.Default) {
+            MessageFailedRepository(room.messageFailedDao()).readAllData.first().toMutableList()
+        }
+
+
+        Log.i("DataUtilsSendOffline", "0sendPendingMessages: $pendingMessages")
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         var index = 0
         while (index < pendingMessages.size) {
-            val pendingMessage = pendingMessages[index]
-            val returningId = sendPendingMessage(Converter.convertMessageFailedToMessageEntity(pendingMessage, null))
-            if (returningId != null) {
-                pendingMessages.removeAt(index)
-                MessageFailedRepository(room.messageFailedDao()).deleteMessage(pendingMessage)
-                MessageRepository(room.messageDao()).insert(Converter.convertMessageFailedToMessageEntity(pendingMessage, returningId))
-            } else {
-                index++
+            val pendingMessage : MessageFailed = pendingMessages[index]
+            val network = connectivityManager.activeNetwork
+            Log.i("DataUtilsSendOffline", "1sendPendingMessages: $network")
+            if (network != null) {
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+                Log.i("DataUtilsSendOffline", "2sendPendingMessages: $networkCapabilities")
+                if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+                    val returningId = sendPendingMessage(
+                            pendingMessage.toMessage()
+                    )
+                    Log.i("DataUtilsSendOffline", "3sendPendingMessages: $returningId")
+                    if (returningId != null) {
+                        Log.i("DataUtilsSendOffline", "4sendPendingMessages: $returningId")
+                        MessageFailedRepository(room.messageFailedDao()).deleteMessage(
+                            pendingMessage
+                        )
+                        MessageRepository(room.messageDao()).insert(
+                            Converter.convertMessageFailedToMessageEntity(
+                                pendingMessage,
+                                returningId
+                            )
+                        )
+                        // Incrementa el índice solo si se elimina el mensaje
+                        index++
+                    }
+                }
             }
+
+            // Espera antes de la siguiente iteración del bucle
             delay(5000)
         }
+        //MessageFailedRepository(room.messageFailedDao()).deleteAll()
     }
 
-    private suspend fun sendPendingMessage(message: MessageEntity):Long?{
-        return MessageRepositoryRetrofit.createMessage(Converter.convertMessageEntityToMessage(message))
+    private suspend fun sendPendingMessage(message: MessageRoom): Long? {
+        return MessageRepositoryRetrofit.createMessage(
+            Converter.convertMessageEntityToMessage(
+                message
+            )
+        )
     }
 
     private suspend fun getMapOfMessageByGroup(
@@ -102,7 +140,9 @@ class DataUtils {
             val groupId = group.id ?: 0L // Conversión explícita de Long? a Long
             val messages = getMessagesLocalByGroupId(context, groupId)
             map[groupId] =
-                messages?.let { Converter.convertMessagesEntityToMessagesList(it).toMutableList() }!!
+                messages?.let {
+                    Converter.convertMessagesEntityToMessagesList(it).toMutableList()
+                }!!
         }
 
         return map
