@@ -58,8 +58,6 @@ import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
-import com.bupware.wedraw.android.logic.dataHandler.DataHandler
-import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
@@ -78,15 +76,6 @@ fun PreviewMain(){
 fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
 
     val context = LocalContext.current
-
-    //region Forzar update de grupos de internet
-    if (DataHandler.forceUpdate.value){
-        DataHandler.forceUpdate.value = false
-        viewModel.groupList = emptyList<Group>().toMutableList()
-        Log.i("wawaa",DataHandler.groupList.toString())
-        viewModel.groupList = DataHandler.groupList
-    }
-    //endregion
 
     LaunchedEffect(Unit){
         viewModel.initValues(context)
