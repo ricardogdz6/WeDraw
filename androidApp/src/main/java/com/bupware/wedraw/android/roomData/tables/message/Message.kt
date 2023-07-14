@@ -15,8 +15,8 @@ import java.sql.Date
 
 )
 data class Message(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = false)
+    val id: Long?,
     val owner_group_Id: Long,
     val ownerId: String,
     val text: String,

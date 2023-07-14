@@ -67,6 +67,18 @@ object Converter {
         return messages
     }
 
+    fun convertMessageEntityToMessage(messageEntity:Message):MessageDTO{
+        return MessageDTO(
+            id = messageEntity.id,
+            text = messageEntity.text,
+            date = messageEntity.date,
+            senderId = messageEntity.ownerId,
+            groupId = messageEntity.owner_group_Id,
+            imageId = messageEntity.image_Id,
+            timeZone = null //Todo: No se si el timezone aqui deberia ser null.
+        )
+    }
+
     fun convertUserGroupEntityToUserGroup(
         userGroupEntity: GroupUserCrossRef,
         user: UserRoom,

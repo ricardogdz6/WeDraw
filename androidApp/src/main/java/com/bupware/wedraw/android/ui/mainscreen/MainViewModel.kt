@@ -64,21 +64,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     fun initValues(context: Context) {
 
-//        viewModelScope.launch {
-//            localInit(context)
-//        }
-
-
         viewModelScope.launch {
             gestionLogin(context = context, askForUsername = { askForUsername = !askForUsername })
         }
-
-
-//        viewModelScope.launch {
-//            loadGroupsAndMessages(context)
-//        }
-
-
     }
 
     fun expandButton(index: Int) {

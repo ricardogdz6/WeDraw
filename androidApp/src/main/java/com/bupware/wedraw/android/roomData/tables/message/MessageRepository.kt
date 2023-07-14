@@ -15,6 +15,8 @@ class MessageRepository(private val messageDao: MessageDao) {
 
     suspend fun deleteAll() = messageDao.deleteAll()
 
+    suspend fun deleteMessage(message: Message) = messageDao.deleteMessage(message.date!!)
+
     suspend fun getMessagesByGroupId(groupId: Long): Flow<List<Message>> = messageDao.getMessagesByGroupId(groupId)
 
 

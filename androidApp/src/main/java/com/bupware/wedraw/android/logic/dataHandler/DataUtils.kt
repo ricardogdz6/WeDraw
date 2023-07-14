@@ -9,6 +9,7 @@ import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ import com.bupware.wedraw.android.roomData.tables.group.Group as GroupRoom
 
 import com.bupware.wedraw.android.roomData.tables.message.Message as MessageRoom
 import com.bupware.wedraw.android.roomData.tables.user.User as UserRoom
+import com.bupware.wedraw.android.roomData.tables.message.Message as MessageEntity
+import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
 class DataUtils {
     suspend fun initData(context: Context) {
@@ -53,13 +56,37 @@ class DataUtils {
                     DataHandler.forceUpdate.value = true
             }
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
+
+
+            sendPendingMessages(context)
+
         }
+
 
 
 //        withContext(Dispatchers.Default) {
 //            DataHandler(context).saveGroups(getUserGroups(context))
 //            getUsersAndSaveInLocal(context)
 //        }
+    }
+
+    private suspend fun sendPendingMessages(context: Context){
+
+        val room = WDDatabase.getDatabase(context = context)
+        val pendingMessages = withContext(Dispatchers.Default) { MessageRepository(room.messageDao()).readAllData.first().filter { it.id == null }.toMutableList()}
+
+        while (pendingMessages.isNotEmpty()){
+            pendingMessages.forEach { pendingMessage -> if (sendPendingMessage(pendingMessage) != null) {
+                pendingMessages.remove(pendingMessage)
+                MessageRepository(room.messageDao()).deleteMessage(pendingMessage)
+                }
+            }
+        }
+
+    }
+
+    private suspend fun sendPendingMessage(message: MessageEntity):Long?{
+        return MessageRepositoryRetrofit.createMessage(Converter.convertMessageEntityToMessage(message))
     }
 
     private suspend fun getMapOfMessageByGroup(
