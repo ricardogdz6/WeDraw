@@ -101,7 +101,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     }
 
     fun createGroupButton(context: Context) {
-        //TODO METER RESTRICCION EN LA API
+
         if (groupName.isBlank()) {
             SnackbarManager.newSnackbar(
                 context.getString(R.string.no_dejes_el_nombre_vac_o),
@@ -119,7 +119,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 } else createGroupAction(context)
 
             } else {
-                if (groupList.size == 3) {
+                if (groupList.size == 5) {
                     SnackbarManager.newSnackbar(
                         context.getString(R.string.ya_est_s_en_el_m_ximo_de_grupos_permitido),
                         greenAchieve
@@ -138,7 +138,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                     Firebase.auth.currentUser!!.uid
                 )
             }
-            getUserGroups(context)
+
+
+            val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
+
+            groupList = updatedGroups
+            DataHandler.groupList += updatedGroups
+
             targetNavigation = groupList.first { it.code == returningCode }.id!!
             moreOptionsEnabled = !moreOptionsEnabled
             expandCreateGroup = false
@@ -154,7 +160,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 context.getString(R.string.no_dejes_el_c_digo_vac_o),
                 redWrong
             )
-        } else {
+        } else if (groupList.any{it.code == joinCode}){
+            SnackbarManager.newSnackbar(
+                context.getString(R.string.ya_estas_en_este_grupo),
+                greenAchieve
+            )
+        }
+        else {
             viewModelScope.launch {
 
                 val groupId =
@@ -183,7 +195,13 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                                 groupId = groupId!!
                             )
                         }
-                        getUserGroups(context)
+
+
+                        val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
+                        groupList = updatedGroups
+                        DataHandler.groupList += updatedGroups
+
+
                         targetNavigation = groupId!!
                         moreOptionsEnabled = !moreOptionsEnabled
                         expandJoinGroup = false
@@ -200,11 +218,10 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     //obtiene todos los grupos del usuario y los guarda en la base de datos local
     private suspend fun getUserGroups(context: Context) : MutableList<Group>{
         val userId = Firebase.auth.currentUser?.uid.toString()
-        Log.i("hilos","getUserGroups")
+
         val group = withContext(Dispatchers.Default) {
             GroupRepository.getGroupByUserId(userId)
         } ?: emptyList()
-        group.forEach { it.userGroups?.forEach { Log.i("GROUPS", it.userID.toString()) } }
 
         return group.toMutableList()
     }
@@ -212,146 +229,16 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
     private suspend fun getUsersAndSaveInLocal(context: Context) {
         val database = WDDatabase.getDatabase(context)
         val userRepository = UserRepository(database.userDao())
-        Log.i("hilos","getUsersAndSaveInLocal")
 
         groupList.forEach {
             it.userGroups?.forEach { userGroup ->
-                Log.i("wawa", userGroup.userID.toString())
+
                 Converter.converterUserToUserEntity(userGroup.userID)
                     ?.let { user -> userRepository.insert(user) }
             }
         }
     }
 }
-
-//
-//    suspend fun loadGroupsAndMessages(context: Context) {
-//
-//
-//        //region Obtener grupos de internet
-//        val connectivityManager =
-//            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//        val network = connectivityManager.activeNetwork
-//        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-//
-//        //Si tiene internet
-//        if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-//
-//
-//            withContext(Dispatchers.Default) {
-//                getUserGroups(context)
-//            }
-//
-//            showGroups = true
-//
-//            withContext(Dispatchers.Default) {
-//                getUsersAndSaveInLocal(context)
-//            }
-//
-//            withContext(Dispatchers.Default) {
-//                DataHandler(context).loadMessages()
-//            }
-//        } else {
-//            //region Obtener grupos localmente
-//            val localGroups = DataHandler(context).loadGroups()
-//            localGroups.collect {
-//                groupList = it.toSet()
-//                if (groupList.isNotEmpty()) showGroups = true
-//                DataHandler(context).loadMessages()
-//            }
-//
-//            //endregion
-//        }
-//
-//        //endregion
-//
-//
-//    }
-//
-//
-//}
-
-//
-//suspend fun localInit(context: Context) {
-//
-//    val localDatabase = WDDatabase.getDatabase(context)
-//
-//    //region INIT GRUPOS
-//
-//    val groupListLocal = mutableListOf<Group>()
-//    val allUserGroupLocal = mutableSetOf<UserGroup>()
-//    val userGroup = localDatabase.groupWithUsersDao()
-//    val userDatabase = UserRepository(localDatabase.userDao())
-//    val groupDatabase =
-//        com.bupware.wedraw.android.roomData.tables.group.GroupRepository(localDatabase.groupDao())
-//
-//    userGroup.readAllData()
-//        .collect { crossRefs ->
-//            crossRefs.forEach { userGroup ->
-//                allUserGroupLocal.add(
-//
-//                    UserGroup(
-//                        id = null,
-//                        userID = Converter.convertUserEntityToUser(
-//                            userDatabase.getUserByID(
-//                                userGroup.userId
-//                            ).first()
-//                        ),
-//                        groupID = Converter.convertGroupEntityToGroup(
-//                            groupDatabase.getGroupByGroupId(
-//                                userGroup.groupId
-//                            ).first()
-//                        ),
-//                        isAdmin = userGroup.isAdmin
-//                    )
-//                )
-//            }
-//
-//            localDatabase.groupDao().readAllData().collect { groups ->
-//                groups.forEach { group ->
-//                    Log.i("wowo", group.toString())
-//
-//                    //Obtengo userGroups
-//                    val userGroupList = allUserGroupLocal.filter { it.groupID.id == group.groupId }
-//
-//
-//                    groupListLocal.add(
-//                        Group(
-//                            id = group.groupId,
-//                            code = group.code,
-//                            name = group.name,
-//                            userGroups = userGroupList.toSet()
-//                        )
-//                    )
-//                }
-//                Log.i("wowo", groupListLocal.toString())
-//
-//            }
-//
-//        }
-//    Log.i("wowo", "INIT GRUPOS")
-//
-//
-//    //endregion
-//
-//
-//    /*
-//    //region INIT Messages
-//    var messageListLocal = mutableListOf<Message>()
-//    instance.messageDao().readAllDataMessage().collect {it.forEach {message ->
-//        messageListLocal.add(Message(
-//            id = null,
-//            text = ,
-//            timeZone = null,
-//            senderId = ,
-//            groupId = ,
-//            date = null
-//        ))
-//    }}
-//    //endregion
-//     */
-//
-//}
 
 
 

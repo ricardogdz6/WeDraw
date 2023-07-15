@@ -78,7 +78,7 @@ object GroupRepository {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
                     continuation.resume(response.body()!!,null)
-                }
+                } else continuation.resume(false,null)
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {

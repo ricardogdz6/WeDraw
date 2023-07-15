@@ -30,7 +30,7 @@ interface GroupService {
     fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 
     @POST("/weDraw/groups/{userID}/{groupID}")
-    fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Long): Call<Boolean>
+    fun insertUsertoUserGroup(@Path("userID") userID: String,@Path("groupID") groupID: Long): Call<Boolean>
 
     @PUT("/weDraw/groups/{id}")
     fun updateGroup(@Path("id") id: Long,@Body group: Group): Call<Boolean>
