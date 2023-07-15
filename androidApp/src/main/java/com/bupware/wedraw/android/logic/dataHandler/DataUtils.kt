@@ -18,9 +18,11 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepositor
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.group.Group as GroupRoom
@@ -32,6 +34,10 @@ import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as
 
 class DataUtils {
     suspend fun initData(context: Context) {
+
+        withContext(Dispatchers.Default) {
+            updateDeviceID()
+        }
 
         //primero localmente a memoria
         withContext(Dispatchers.Default) {
@@ -74,17 +80,15 @@ class DataUtils {
 
     }
 
-    suspend fun updateDeviceID(token:String){
-
-        //TODO si userID es null entonces todo peta. Habria que guardar en local y hacer un while con delay hasta introducir con exito el dato
+    suspend fun updateDeviceID(){
 
         val userID = Firebase.auth.currentUser?.uid
+        val token = FirebaseMessaging.getInstance().token.await()
 
         //Primero compruebo si este dispositivo ya está registrado
         val userDevices = withContext(Dispatchers.Default) { UserRepository.getUserDeviceByUserID(userID = userID.toString())?: emptyList()}
 
         if (!userDevices.any { it.deviceID == token }){
-
             //Si no lo está entonces lo inserto
             UserRepository.createUserDevice(UserDevice(
                 id = null,

@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils
 import com.bupware.wedraw.android.logic.firebase.FBAuth
+import com.bupware.wedraw.android.roomData.WDDatabase
+import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -44,9 +46,8 @@ class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : V
 
     fun initData(context : Context){
         viewModelScope.launch {
-            val dataUtils = DataUtils()
-            Log.i("DataUtils","1")
-            dataUtils.initData(context)
+
+
         }
     }
 

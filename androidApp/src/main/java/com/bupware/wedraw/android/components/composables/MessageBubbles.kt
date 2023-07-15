@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.Date
 import java.text.DateFormat
 import java.util.Calendar
@@ -111,7 +112,6 @@ fun convertirHoraYMinutos(date: Date): String {
 
     val hour = calendar.get(Calendar.HOUR_OF_DAY)
     val minute = calendar.get(Calendar.MINUTE)
-
     return String.format("%02d:%02d", hour, minute)
 }
 
