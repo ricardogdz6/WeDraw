@@ -9,6 +9,7 @@ import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.models.UserDevice
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
 import com.bupware.wedraw.android.roomData.WDDatabase
@@ -70,6 +71,28 @@ class DataUtils {
         }
         sendPendingMessages(context)
 
+
+    }
+
+    suspend fun updateDeviceID(token:String){
+
+        //TODO si userID es null entonces todo peta. Habria que guardar en local y hacer un while con delay hasta introducir con exito el dato
+
+        val userID = Firebase.auth.currentUser?.uid
+
+        //Primero compruebo si este dispositivo ya está registrado
+        val userDevices = withContext(Dispatchers.Default) { UserRepository.getUserDeviceByUserID(userID = userID.toString())?: emptyList()}
+
+        if (!userDevices.any { it.deviceID == token }){
+
+            //Si no lo está entonces lo inserto
+            UserRepository.createUserDevice(UserDevice(
+                id = null,
+                userID = userID.toString(),
+                deviceID = token
+            ))
+
+        }
 
     }
 

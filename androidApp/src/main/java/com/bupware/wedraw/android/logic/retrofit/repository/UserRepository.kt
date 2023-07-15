@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.logic.retrofit.repository
 
 import android.util.Log
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.models.UserDevice
 import com.bupware.wedraw.android.logic.retrofit.api.RetrofitClient
 import com.bupware.wedraw.android.logic.retrofit.services.UserService
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -119,6 +120,43 @@ object UserRepository {
 
     }
 
+    //region UserDevice
 
+    suspend fun getUserDeviceByUserID(userID:String): List<UserDevice>? = suspendCancellableCoroutine { continuation ->
+        userService.getUserDeviceByUserID(userID).enqueue(object : Callback<List<UserDevice>> {
+            override fun onResponse(call: Call<List<UserDevice>>, response: Response<List<UserDevice>>) {
+                if (response.isSuccessful){
+                    continuation.resume(response.body(),null)
+                }
+            }
 
+            override fun onFailure(call: Call<List<UserDevice>>, t: Throwable) {
+                continuation.cancel()
+            }
+        })
+    }
+
+    suspend fun createUserDevice(userDevice: UserDevice): Boolean = suspendCancellableCoroutine { continuation ->
+        userService.createUserDevice(
+            userDevice
+        ).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    continuation.resume(true,null)
+                } else {
+                    continuation.resume(false,null)
+                }
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                if (t is java.io.EOFException) {
+                    continuation.resume(true,null)
+                } else {
+                    continuation.resume(false,null)
+                }
+            }
+        })
+    }
+
+    //endregion
 }
