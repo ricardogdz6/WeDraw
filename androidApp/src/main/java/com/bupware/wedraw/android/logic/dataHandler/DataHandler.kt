@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -70,7 +71,10 @@ class DataHandler(val context: Context) {
             )
 
             //Guardo el mensaje en memoria
-            messageList[idGroup]?.add(message)
+            if (messageList[idGroup] != null){
+                messageList[idGroup]!!.add(message)
+            } else messageList[idGroup] = mutableListOf(message)
+
 
             //Guardo el mensaje en local [ROOM]
             MessageRepository(room.messageDao()).insert(roomMessage)
