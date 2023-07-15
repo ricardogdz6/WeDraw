@@ -18,6 +18,7 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -61,18 +62,6 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                 GlobalScope.launch(Dispatchers.Default) {
                     withContext(Dispatchers.IO) {
                         val idNewMessage = MessageRepository.createMessage(
-                            Message(
-                                id = null,
-                                text = text,
-                                timeZone = TimeZone.getDefault(),
-                                senderId = userID,
-                                groupId = groupId,
-                                date = null,
-                                imageId = null
-                            )
-                        )
-
-                        MessageRepository.createMessage(
                             Message(
                                 id = null,
                                 text = text,
