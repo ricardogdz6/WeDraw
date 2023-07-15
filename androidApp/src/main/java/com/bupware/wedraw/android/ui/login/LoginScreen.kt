@@ -72,8 +72,8 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel = hiltVie
                 datautils.initData(context).also { navController.navigate(route = Destinations.MainScreen.ruta) {
                     navController.popBackStack()
                 } }
-
             }
+
 
         }
 

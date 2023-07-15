@@ -107,6 +107,7 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
 @Composable
 fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hiltViewModel()){
 
+    Log.i("chat", DataHandler.messageList.toString())
     //region Image background
     Column(
         Modifier

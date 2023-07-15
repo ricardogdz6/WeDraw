@@ -29,9 +29,6 @@ class NotificationManager : FirebaseMessagingService() {
     @Override
     override fun onNewToken(token: String) {
         //Log.i("wawa", "FCM token: $token")
-        val dataUtils = DataUtils()
-        CoroutineScope(Dispatchers.Main).launch {
-            dataUtils.updateDeviceID(token)
-        }
+
     }
 }
