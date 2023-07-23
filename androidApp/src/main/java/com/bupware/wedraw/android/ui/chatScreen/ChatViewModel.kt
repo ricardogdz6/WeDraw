@@ -59,6 +59,9 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     var eraseState by savedStateHandle.saveable { mutableStateOf(false) }
     var sizeState by savedStateHandle.saveable { mutableStateOf(1) }
 
+    var sendConfirmation by savedStateHandle.saveable { mutableStateOf(false) }
+    var removeCanva by savedStateHandle.saveable { mutableStateOf(false) }
+
     fun loadMessages(groupId:Long){
         try {
             messageList = DataHandler.messageList[groupId]!!.sortedBy { it.date }

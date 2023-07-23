@@ -19,6 +19,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,8 +38,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,7 +85,9 @@ import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.theme.redWrong
 import com.bupware.wedraw.android.ui.drawingScreen.processImage
 import com.godaddy.android.colorpicker.HsvColor
 import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
@@ -113,13 +118,14 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
         else navController.popBackStack()
     }
 
-    Box() {
+    Box {
         //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
         val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
         ChatScreenBody(navController, group = group)
 
 
         if (viewModel.colorWheelShow) MoreColors()
+        if (viewModel.sendConfirmation) ConfirmationWindow()
     }
 
 }
@@ -316,15 +322,23 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
 @Preview
 @Composable
-fun CanvasContent(){
-    //TODO IN PROGRESS
+fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
     val controller = rememberDrawController()
+
+    //Si se acepta la ventana de confirmación se resetea el canva desde aqui
+    LaunchedEffect(viewModel.removeCanva){
+        viewModel.removeCanva = false
+        controller.reset()
+        viewModel.drawState = true
+        viewModel.eraseState = false
+        viewModel.sizeState = 1
+    }
 
     Column(
         Modifier
             .fillMaxSize()
             .padding(top = 55.dp)) {
-        Text(modifier = Modifier.fillMaxWidth(), fontSize = 25.sp, fontWeight = FontWeight.Bold ,text = stringResource(R.string.env_a_un_dibujo_a_tus_amigos), textAlign = TextAlign.Center ,color = Color.White, fontFamily = Lexend)
+        Text(modifier = Modifier.fillMaxWidth(), fontSize = 20.sp, fontWeight = FontWeight.Bold ,text = stringResource(R.string.env_a_un_dibujo_a_tus_amigos), textAlign = TextAlign.Center ,color = Color.White, fontFamily = Lexend)
 
         Spacer(modifier = Modifier.height(20.dp))
         
@@ -349,7 +363,12 @@ fun CanvasContent(){
                 CanvasBottom(controller)
             }
 
-            Spacer(modifier = Modifier.height(60.dp))
+            //TODO IF EL DIBUJO ESTA PINTADO ENTONCES CONFIRMWINDOW
+            Button(onClick = { viewModel.sendConfirmation = true }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)) {
+                Text(text = "Enviar", color = Color.White, fontFamily = Lexend, fontSize = 20.sp)
+            }
+
+            Spacer(modifier = Modifier.height(40.dp))
         }
 
         
@@ -390,7 +409,10 @@ fun CanvasBottom(controller: DrawController, viewModel: ChatScreenViewModel = hi
         }
 
         //Tools
-        Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.Center) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp), horizontalArrangement = Arrangement.Center) {
             DrawButton(state = viewModel.drawState, action = {controller.changeColor(Color.Black); viewModel.drawState = true; viewModel.eraseState = false})
             Spacer(modifier = Modifier.width(5.dp))
             EraseButton(state = viewModel.eraseState, action = {controller.changeColor(Color.White); viewModel.drawState = false; viewModel.eraseState = true})
@@ -614,3 +636,73 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 
 
 //endregion
+
+@Composable
+fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    BackHandler() {
+        viewModel.sendConfirmation = false
+    }
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Color.White.copy(0.4f))
+                .clickable { viewModel.sendConfirmation = false })
+
+
+            Column(
+                Modifier
+                    .background(Color.White, RoundedCornerShape(15.dp))
+                    .fillMaxWidth(0.95f)
+                    .height(200.dp)
+                    , horizontalAlignment = Alignment.CenterHorizontally) {
+
+
+                Spacer(modifier = Modifier
+                    .height(25.dp)
+                    .fillMaxWidth()
+                    .background(
+                        blueVariant2WeDraw,
+                        RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)
+                    ))
+
+                Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.Black, fontFamily = Lexend)
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    Row() {
+                        //TODO ENVIAR IMAGEN
+                        Button(onClick = {
+                            viewModel.sendConfirmation = false /*TODO*/
+                            viewModel.removeCanva = true
+                            viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus
+                                         }
+                            , colors = ButtonDefaults.buttonColors(backgroundColor = greenAchieve)) {
+                            Text(text = "Confirmar")
+                        }
+
+                        Spacer(modifier = Modifier.width(15.dp))
+
+                        Button(onClick = { viewModel.sendConfirmation = false; }, colors = ButtonDefaults.buttonColors(backgroundColor = redWrong)) {
+                            Text(text = "Cancelar")
+                        }
+                    }
+
+                }
+
+                Spacer(modifier = Modifier
+                    .height(25.dp)
+                    .fillMaxWidth()
+                    .background(
+                        blueVariant2WeDraw,
+                        RoundedCornerShape(bottomEnd = 15.dp, bottomStart = 15.dp)
+                    ))
+
+            }
+
+    }
+}
+
