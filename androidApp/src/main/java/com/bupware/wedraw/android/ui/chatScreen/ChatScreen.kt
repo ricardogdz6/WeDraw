@@ -15,6 +15,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,17 +30,23 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,8 +63,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.R
+import com.bupware.wedraw.android.components.buttons.CircleColoredButton
+import com.bupware.wedraw.android.components.buttons.DrawButton
+import com.bupware.wedraw.android.components.buttons.EraseButton
+import com.bupware.wedraw.android.components.buttons.MoreColorsButton
+import com.bupware.wedraw.android.components.buttons.RedoButton
 import com.bupware.wedraw.android.components.buttons.SendMessageButton
+import com.bupware.wedraw.android.components.buttons.SizeButtons
 import com.bupware.wedraw.android.components.buttons.SwitchToDrawingButton
+import com.bupware.wedraw.android.components.buttons.UndoButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.composables.MessageBubble
 import com.bupware.wedraw.android.components.composables.MessageBubbleHost
@@ -70,7 +84,11 @@ import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.theme.redWeDraw
 import com.bupware.wedraw.android.ui.drawingScreen.processImage
+import com.godaddy.android.colorpicker.HsvColor
+import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
+import com.godaddy.android.colorpicker.harmony.HarmonyColorPicker
 import io.ak1.drawbox.DrawBox
+import io.ak1.drawbox.DrawController
 import io.ak1.drawbox.rememberDrawController
 import kotlinx.coroutines.launch
 
@@ -95,9 +113,15 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
         else navController.popBackStack()
     }
 
-    //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
-    val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
-    ChatScreenBody(navController, group = group)
+    Box() {
+        //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
+        val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
+        ChatScreenBody(navController, group = group)
+
+
+        if (viewModel.colorWheelShow) MoreColors()
+    }
+
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -319,15 +343,108 @@ fun CanvasContent(){
             }
             Spacer(modifier = Modifier.height(10.dp))
             Box(modifier = Modifier
-                .background(Color(0x812C4560), RoundedCornerShape(15.dp))
                 .fillMaxWidth(0.95f)
                 .weight(0.30f)
-            )
+            ){
+                CanvasBottom(controller)
+            }
 
             Spacer(modifier = Modifier.height(60.dp))
         }
 
         
+    }
+
+}
+
+@Composable
+fun CanvasBottom(controller: DrawController, viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    //Si se actualiza el color en el color Wheel aqui se actualiza
+    LaunchedEffect(viewModel.controllerColor){
+        controller.changeColor(viewModel.controllerColor)
+    }
+
+    Column(
+        Modifier
+            .height(130.dp)
+            .fillMaxWidth()
+            .background(Color(0x812C4560), RoundedCornerShape(15.dp))
+            .padding(10.dp)) {
+
+        //Colors
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(30.dp))
+                .height(50.dp)
+                .padding(5.dp), horizontalArrangement = Arrangement.Center) {
+
+            viewModel.colorsAvailable.forEach { 
+                CircleColoredButton(color = it, controller)
+                Spacer(modifier = Modifier.width(5.dp))
+            }
+
+            MoreColorsButton()
+
+        }
+
+        //Tools
+        Row(Modifier.fillMaxWidth().padding(top = 10.dp), horizontalArrangement = Arrangement.Center) {
+            DrawButton(state = viewModel.drawState, action = {controller.changeColor(Color.Black); viewModel.drawState = true; viewModel.eraseState = false})
+            Spacer(modifier = Modifier.width(5.dp))
+            EraseButton(state = viewModel.eraseState, action = {controller.changeColor(Color.White); viewModel.drawState = false; viewModel.eraseState = true})
+            Spacer(modifier = Modifier.width(15.dp))
+            SizeButtons(controller = controller)
+            Spacer(modifier = Modifier.width(15.dp))
+            UndoButton(action = {controller.unDo()})
+            Spacer(modifier = Modifier.width(5.dp))
+            RedoButton(action = {controller.reDo()})
+        }
+
+
+
+    }
+}
+
+@Composable
+fun MoreColors(viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    //Esto es para borrar la animacion del clickable
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+        Box(
+            Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { viewModel.colorWheelShow = false }
+                .background(Color.White.copy(0.5f)))
+
+        Column(
+            Modifier
+                .background(Color.White, RoundedCornerShape(15.dp))
+                .padding(5.dp)
+                .fillMaxWidth(0.95f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Column(
+                Modifier
+                    .fillMaxHeight(0.40f)
+                    .fillMaxWidth(0.95f)
+                    .background(Color.White, RoundedCornerShape(15.dp))
+            ) {
+
+                HarmonyColorPicker(harmonyMode = ColorHarmonyMode.SHADES, onColorChanged = { color: HsvColor -> viewModel.controllerColor = hsvToColor(color.hue,color.saturation,color.value) })
+            }
+
+            Button(modifier = Modifier.fillMaxWidth(0.5f),onClick = { viewModel.colorWheelShow = false }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)){
+                Text(text = "Aceptar", color = Color.White, fontFamily = Lexend)
+            }
+        }
+
     }
 
 }
