@@ -372,7 +372,6 @@ class DataUtils {
 
         groupList.forEach {
             it.userGroups?.forEach { userGroup ->
-                Log.i("wawa", userGroup.userID.toString())
                 Converter.converterUserToUserEntity(userGroup.userID)
                     ?.let { user -> userRepository.insert(user) }
             }

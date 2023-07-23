@@ -47,13 +47,11 @@ object GroupRepository {
         groupService.getGroupByUserId(userId).enqueue(object : Callback<List<Group>?> {
             override fun onResponse(call: Call<List<Group>?>, response: Response<List<Group>?>) {
                 if (response.isSuccessful) {
-                    Log.i("wawa",response.body().toString())
                     continuation.resume(response.body(),null)
                 }
             }
 
             override fun onFailure(call: Call<List<Group>?>, t: Throwable) {
-                Log.i("wawa",t.stackTraceToString())
                 continuation.resume(null,null)
             }
         })
@@ -97,7 +95,6 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable) {
-                Log.i("wawa",t.stackTraceToString())
                 continuation.cancel()
             }
         })

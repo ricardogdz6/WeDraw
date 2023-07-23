@@ -40,10 +40,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -67,12 +69,15 @@ import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.ui.drawingScreen.processImage
+import io.ak1.drawbox.DrawBox
+import io.ak1.drawbox.rememberDrawController
 import kotlinx.coroutines.launch
 
 @Preview
 @Composable
 fun PreviewChatScreen(){
-    ChatScreen(rememberNavController(), 1)
+    ChatScreen(rememberNavController(), 2)
 }
 
 
@@ -84,12 +89,15 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
         viewModel.loadMessages(groupId)
     }
 
+
     BackHandler() {
         if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}
         else navController.popBackStack()
     }
 
-    ChatScreenBody(navController, group = DataHandler.groupList.first {it.id == groupId})
+    //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
+    val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
+    ChatScreenBody(navController, group = group)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -127,7 +135,6 @@ fun Body(viewModel: ChatScreenViewModel = hiltViewModel()) {
     }
 
     Chat()
-
 
     //Footer
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
@@ -207,7 +214,7 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        CanvasContent()
+                        if (state) CanvasContent()
 
                     }
                     //endregion
@@ -283,8 +290,45 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
 }
 
+@Preview
 @Composable
 fun CanvasContent(){
+    //TODO IN PROGRESS
+    val controller = rememberDrawController()
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(top = 55.dp)) {
+        Text(modifier = Modifier.fillMaxWidth(), fontSize = 25.sp, fontWeight = FontWeight.Bold ,text = stringResource(R.string.env_a_un_dibujo_a_tus_amigos), textAlign = TextAlign.Center ,color = Color.White, fontFamily = Lexend)
+
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        Column(
+            Modifier
+                .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(modifier = Modifier
+                .background(Color.White, RoundedCornerShape(15.dp))
+                .fillMaxWidth(0.95f)
+                .weight(0.70f)
+            ) {
+                //TODO CAMBIAR CALLBACK
+                Column(Modifier.clip(RoundedCornerShape(15.dp))) {
+                    DrawBox(drawController = controller, bitmapCallback = processImage())
+                }
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(modifier = Modifier
+                .background(Color(0x812C4560), RoundedCornerShape(15.dp))
+                .fillMaxWidth(0.95f)
+                .weight(0.30f)
+            )
+
+            Spacer(modifier = Modifier.height(60.dp))
+        }
+
+        
+    }
 
 }
 

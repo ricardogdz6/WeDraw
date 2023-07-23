@@ -83,7 +83,6 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
     if (DataHandler.forceUpdate.value){
         DataHandler.forceUpdate.value = false
         viewModel.groupList = emptyList<Group>().toMutableList()
-        Log.i("wawaa", DataHandler.groupList.toString())
         viewModel.groupList = DataHandler.groupList
     }
     //endregion
@@ -192,7 +191,6 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Column() {
     Button(onClick = {
 
-        Log.i("wawa", viewModel.groupList.toString())
         Firebase.auth.signOut();
 
         navController.navigate(Destinations.LoginScreen.ruta) {

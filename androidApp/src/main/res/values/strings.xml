@@ -21,4 +21,5 @@
     <string name="ya_est_s_en_el_m_ximo_de_grupos_permitido">Ya estás en el máximo de grupos permitido</string>
     <string name="el_grupo_est_lleno">El grupo está lleno</string>
     <string name="ya_estas_en_este_grupo">Ya estas en este grupo</string>
+    <string name="env_a_un_dibujo_a_tus_amigos">¡Envía un dibujo a tus amigos!</string>
 </resources>

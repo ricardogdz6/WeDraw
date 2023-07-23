@@ -121,8 +121,6 @@ fun MessageBubble(message: Message, showTriangle:Boolean){
     val arrowWidth = with(LocalDensity.current) { if (showTriangle) 8.dp.toPx() else 0.dp.toPx() }
     val arrowHeight = with(LocalDensity.current) {if (showTriangle) 12.dp.toPx() else 0.dp.toPx()  }
 
-    Log.i("wawa",message.toString())
-
     Column(
         modifier = Modifier
             .width(IntrinsicSize.Max)

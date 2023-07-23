@@ -98,7 +98,7 @@ fun DrawingScreenBody(
 
 
         Column(Modifier.height(IntrinsicSize.Max)) {
-            Button(onClick = { controller.unDo() }) {
+            Button(onClick = { controller.unDo()}) {
                 Text(text = "undo")
             }
 
