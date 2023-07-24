@@ -90,6 +90,7 @@ dependencies {
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.1.1"))
     implementation("com.google.firebase:firebase-auth-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx:23.2.0")
 
     //Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

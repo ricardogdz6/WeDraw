@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
@@ -22,6 +23,7 @@ import com.bupware.wedraw.android.logic.navigation.NavigationHost
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +58,6 @@ class MainActivity : ComponentActivity() {
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun StartingPoint(){
-
 
     val context = LocalContext.current
     val dataUtils = DataUtils()
