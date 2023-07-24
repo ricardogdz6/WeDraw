@@ -39,7 +39,7 @@ import kotlin.concurrent.thread
 class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     var moreOptionsEnabled by savedStateHandle.saveable { mutableStateOf(false) }
-    var showGroups by savedStateHandle.saveable { mutableStateOf(true) }
+    var showGroups by savedStateHandle.saveable { mutableStateOf(false) }
     var showSettings by savedStateHandle.saveable { mutableStateOf(false) }
 
     //Settings Menu

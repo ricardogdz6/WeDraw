@@ -84,6 +84,7 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
         DataHandler.forceUpdate.value = false
         viewModel.groupList = emptyList<Group>().toMutableList()
         viewModel.groupList = DataHandler.groupList
+        viewModel.showGroups = true
     }
     //endregion
 

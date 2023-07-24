@@ -640,6 +640,8 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 @Composable
 fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    val interactionSource = remember { MutableInteractionSource() }
+
     BackHandler() {
         viewModel.sendConfirmation = false
     }
@@ -649,7 +651,10 @@ fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
             Modifier
                 .fillMaxSize()
                 .background(Color.White.copy(0.4f))
-                .clickable { viewModel.sendConfirmation = false })
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { viewModel.sendConfirmation = false })
 
 
             Column(
