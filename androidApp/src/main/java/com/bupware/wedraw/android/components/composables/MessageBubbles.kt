@@ -107,6 +107,7 @@ fun MessageBubbleHost(message: Message, showTriangle:Boolean){
 }
 
 fun convertirHoraYMinutos(date: Date): String {
+
     val calendar = Calendar.getInstance()
     calendar.time = date
 

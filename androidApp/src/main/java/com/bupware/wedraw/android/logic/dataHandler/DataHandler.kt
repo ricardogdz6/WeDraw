@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -14,11 +13,10 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.withContext
 import java.sql.Date
+import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
 class DataHandler(val context: Context) {
 
@@ -79,10 +77,16 @@ class DataHandler(val context: Context) {
             //Guardo el mensaje en local [ROOM]
             MessageRepository(room.messageDao()).insert(roomMessage)
 
+
+            sendPushNotification(message)
+
         }
 
     }
 
+    suspend fun sendPushNotification(message: Message){
+        MessageRepositoryRetrofit.sendPushNotification(message)
+    }
 
     suspend fun saveGroups(groups: List<Group>) {
 
@@ -115,7 +119,9 @@ class DataHandler(val context: Context) {
 
     companion object {
 
-        var forceUpdate = mutableStateOf(false)
+        var forceMessagesUpdate = mutableStateOf(false)
+
+        var forceGroupsUpdate = mutableStateOf(false)
 
         lateinit var user: User
 

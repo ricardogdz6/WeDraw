@@ -97,9 +97,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
 
-    //Firebase Cloud Messaging
-    implementation("com.google.firebase:firebase-messaging-ktx")
-
     //Glance Widget
     // For Glance support
     implementation ("androidx.glance:glance:1.0.0-beta01")

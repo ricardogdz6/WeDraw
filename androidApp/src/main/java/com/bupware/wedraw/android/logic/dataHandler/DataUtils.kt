@@ -3,7 +3,6 @@ package com.bupware.wedraw.android.logic.dataHandler
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.provider.Telephony.MmsSms.PendingMessages
 import android.util.Log
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
@@ -25,11 +24,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
+import com.bupware.wedraw.android.roomData.tables.user.UserRepository as UserRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.group.Group as GroupRoom
 
 import com.bupware.wedraw.android.roomData.tables.message.Message as MessageRoom
 import com.bupware.wedraw.android.roomData.tables.user.User as UserRoom
-import com.bupware.wedraw.android.roomData.tables.message.Message as MessageEntity
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
 class DataUtils {
@@ -61,18 +60,17 @@ class DataUtils {
              * Si no hay grupos en remoto no hago nada.
              * */
             getGroupsRemote(context).also {
-                if (it != null) {
-                    remoteGroupsToLocal(it, context)
-                }
+                if (it != null) remoteGroupsToLocal(it, context)
             }?.let {
-
                 DataHandler.groupList = it.toMutableList()
-                DataHandler.forceUpdate.value = true
+                DataHandler.forceGroupsUpdate.value = true
             }
+
+            getUsersRemote(context).also{
+                if (it != null) remoteUsersToLocal(it,context)
+            }
+
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
-
-
-
 
         }
         sendPendingMessages(context)
@@ -138,6 +136,8 @@ class DataUtils {
                         )
                         // Incrementa el índice solo si se elimina el mensaje
                         index++
+
+                        DataHandler(context).sendPushNotification(Converter.convertMessageFailedToMessageDTO(optionalId = returningId, message = pendingMessage))
                     }
                 }
             }
@@ -181,6 +181,8 @@ class DataUtils {
                         )
                         // Incrementa el índice solo si se elimina el mensaje
                         index++
+
+                        DataHandler(context).sendPushNotification(Converter.convertMessageFailedToMessageDTO(optionalId = returningId, message = pendingMessage))
                     }
                 }
             }
@@ -239,6 +241,22 @@ class DataUtils {
         return groups
     }
 
+    private suspend fun getUsersRemote(context: Context): List<User>? {
+
+        val userId = Firebase.auth.currentUser?.uid.toString()
+        val usersTotal = mutableListOf<User>()
+
+        DataHandler.groupList.forEach {
+            val users = withContext(Dispatchers.Default){
+                UserRepository.getUsersByGroupId(groupId = it.id!!)
+            }
+            if (users!!.isNotEmpty()) usersTotal += users
+        }
+
+
+        return usersTotal
+    }
+
     private suspend fun remoteGroupsToLocal(groups: List<Group>, context: Context): Boolean {
 
         val database = WDDatabase.getDatabase(context)
@@ -246,6 +264,21 @@ class DataUtils {
             GroupRepositoryRoom(database.groupDao())
         try {
             groupRepository.insertAll(Converter.converterGroupsToGroupEntityList(groups))
+
+        } catch (e: Exception) {
+            return false
+        }
+        return true
+    }
+
+    private suspend fun remoteUsersToLocal(users: List<User>, context: Context): Boolean {
+
+        val database = WDDatabase.getDatabase(context)
+
+        val userRepository =
+            UserRepositoryRoom(database.userDao())
+        try {
+            userRepository.insertAll(Converter.converterUsersEntitiesToUser(users))
 
         } catch (e: Exception) {
             return false

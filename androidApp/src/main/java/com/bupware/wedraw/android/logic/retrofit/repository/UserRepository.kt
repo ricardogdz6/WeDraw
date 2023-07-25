@@ -43,6 +43,21 @@ object UserRepository {
         })
     }
 
+    suspend fun getUsersByGroupId(groupId:Long): List<User>? = suspendCancellableCoroutine { continuation ->
+        userService.getUsersByGroupId(groupId).enqueue(object : Callback<List<User>?> {
+            override fun onResponse(call: Call<List<User>?>, response: Response<List<User>?>) {
+                if (response.isSuccessful){
+                    continuation.resume(response.body(),null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<User>?>, t: Throwable) {
+                Log.i("error",t.toString())
+                continuation.cancel()
+            }
+        })
+    }
+
     suspend fun getUserById(email:String): List<User>? = suspendCancellableCoroutine { continuation ->
         userService.getUserById(email).enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {

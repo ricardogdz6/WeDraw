@@ -24,6 +24,9 @@ interface MessageService {
     @POST("/weDraw/messages")
     fun createMessage(@Body message: Message): Call<Long>
 
+    @POST("/weDraw/messages/notification")
+    fun sendPushNotification(@Body message: Message): Call<Boolean>
+
     @PUT("/weDraw/messages/{messageId}/{userID}")
     fun updateMessageStatus(@Path("messageId") messageId: Long,@Path("userID") userID: String): Call<Boolean>
 

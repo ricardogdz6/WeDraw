@@ -23,8 +23,12 @@ interface UserService {
     @GET("/weDraw/users/username/{username}")
     fun getUserByUsername(@Path("username") username: String): Call<List<User>>
 
+    @GET("/weDraw/users/userID/group/{groupId}")
+    fun getUsersByGroupId(@Path("groupId") groupId: Long): Call<List<User>?>
+
     @POST("/weDraw/users")
     fun createUser(@Body user: User): Call<Boolean>
+
 
     @PUT("/weDraw/users/{email}")
     fun updateUser(@Path("email") email: String,@Body user: User): Call<Boolean>

@@ -68,6 +68,19 @@ object MessageRepository {
         })
     }
 
+    suspend fun sendPushNotification(message: Message): Boolean? = suspendCancellableCoroutine { continuation ->
+        messageService.sendPushNotification(message).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body(),null)
+                }
+            }
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                continuation.resume(null,null)
+            }
+        })
+    }
+
     suspend fun updateMessageStatus(messageId:Long,userId: String):Boolean = suspendCancellableCoroutine { continuation ->
 
         messageService.updateMessageStatus(messageId,userId).enqueue(object:Callback<Boolean>{
