@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -326,6 +327,7 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 @Composable
 fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
     val controller = rememberDrawController()
+    val context = LocalContext.current
 
     //Si se acepta la ventana de confirmación se resetea el canva desde aqui
     LaunchedEffect(viewModel.removeCanva){
@@ -334,6 +336,11 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
         viewModel.drawState = true
         viewModel.eraseState = false
         viewModel.sizeState = 1
+    }
+
+    //Si se confirma en la window entonces se exporta
+    LaunchedEffect(viewModel.exportDrawing){
+        controller.saveBitmap()
     }
 
     Column(
@@ -354,7 +361,7 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
             ) {
                 //TODO CAMBIAR CALLBACK
                 Column(Modifier.clip(RoundedCornerShape(15.dp))) {
-                    DrawBox(drawController = controller, bitmapCallback = processImage())
+                    DrawBox(drawController = controller, bitmapCallback = viewModel.processDrawing(context = context))
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -643,6 +650,7 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val interactionSource = remember { MutableInteractionSource() }
+    val context = LocalContext.current
 
     BackHandler() {
         viewModel.sendConfirmation = false
@@ -679,10 +687,11 @@ fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
                     Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.Black, fontFamily = Lexend)
 
                     Spacer(modifier = Modifier.height(20.dp))
-                    
+
                     Row() {
                         //TODO ENVIAR IMAGEN
                         Button(onClick = {
+                            viewModel.exportDrawing = true
                             viewModel.sendConfirmation = false /*TODO*/
                             viewModel.removeCanva = true
                             viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus

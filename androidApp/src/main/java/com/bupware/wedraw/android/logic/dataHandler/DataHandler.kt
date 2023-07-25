@@ -1,6 +1,9 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -8,13 +11,20 @@ import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository
+import com.bupware.wedraw.android.roomData.tables.image.Image
+import com.bupware.wedraw.android.roomData.tables.image.ImageRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.sql.Date
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
@@ -82,6 +92,43 @@ class DataHandler(val context: Context) {
 
         }
 
+    }
+
+    suspend fun saveBitmapLocalOS(bitmap: Bitmap):Uri{
+        return withContext(Dispatchers.IO) {
+            val cacheDir = context.cacheDir
+            val file = File(cacheDir, "image_${System.currentTimeMillis()}.png")
+
+            var outputStream: OutputStream? = null
+            try {
+                outputStream = FileOutputStream(file)
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.flush()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                outputStream?.close()
+            }
+
+            // Agregar la imagen a la galería para que esté disponible para otras aplicaciones
+            MediaStore.Images.Media.insertImage(
+                context.contentResolver,
+                file.absolutePath,
+                file.name,
+                null
+            )
+
+            // Devolver la URI de la imagen guardada
+            Uri.fromFile(file)
+        }
+    }
+
+    suspend fun saveBitmapLocal(uri: Uri){
+        val room = WDDatabase.getDatabase(context = context)
+        ImageRepository(room.imageDao()).insert(Image(
+            id = null,
+
+        ))
     }
 
     suspend fun sendPushNotification(message: Message){
