@@ -1,11 +1,14 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +16,11 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler.Companion.bitmapToBlob
+import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
+import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.theme.redWrong
 import com.bupware.wedraw.android.ui.drawingScreen.convertImageBitmapToBitmap
 import com.google.firebase.auth.ktx.auth
@@ -22,6 +28,10 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -42,6 +52,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     var userID: String = Firebase.auth.currentUser?.uid.toString()
 
     var messageList by savedStateHandle.saveable { mutableStateOf(listOf<Message>()) }
+    var messageUrisList by savedStateHandle.saveable { mutableStateOf(mutableMapOf<Long,Uri>()) }
 
     val colorsAvailable by savedStateHandle.saveable { mutableStateOf(listOf<Color>(
         Color.Red,
@@ -65,9 +76,11 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     var sendConfirmation by savedStateHandle.saveable { mutableStateOf(false) }
     var removeCanva by savedStateHandle.saveable { mutableStateOf(false) }
 
-    fun loadMessages(groupId:Long){
+    fun loadMessages(groupId:Long, context: Context){
         try {
             messageList = DataHandler.messageList[groupId]!!.sortedBy { it.date }
+            messageUrisList = DataHandler.uriList[groupId]!!.toMutableMap()
+
         }catch (e:Exception){
             Log.i("chat",e.stackTraceToString())
             messageList = emptyList()
@@ -75,13 +88,71 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         }
     }
 
-    fun sendMessage(text:String,context: Context, image: ImageBitmap? = null) {
+    fun sendMessage(text: String, context: Context, image: Bitmap? = null) {
 
-        if (image != null) {
 
-            addMessageLocal(false)
+        if (text.length >= 1000) {
+            SnackbarManager.newSnackbar(
+                context.getString(R.string.el_mensaje_no_puede_superar_los_1000_car_cteres),
+                redWrong
+            )
+        } else {
+
+            if (text.isNotBlank()) {
+
+                //Añado el mensaje a este viewModel para que aparezca instantaneamente
+                //Además, guardo en memoria y local el mensaje con el id returneado de la API
+                addMessageLocal()
+
+                GlobalScope.launch(Dispatchers.Default) {
+                    withContext(Dispatchers.IO) {
+                        val idNewMessage = MessageRepository.createMessage(
+                            Message(
+                                id = null,
+                                text = text,
+                                timeZone = TimeZone.getDefault(),
+                                senderId = userID,
+                                groupId = groupId,
+                                date = null,
+                                imageId = null,
+                                imageBitmap = null
+                            )
+                        )
+
+                        //RECIBO EL ID DEL MESSAGE Y LO MANDO
+                        DataHandler(context).saveMessage(
+                            idGroup = groupId, message = Message(
+                                id = idNewMessage,
+                                text = text,
+                                timeZone = TimeZone.getDefault(),
+                                senderId = userID,
+                                imageId = null,
+                                groupId = groupId,
+                                date = Date(),
+                                imageBitmap = null
+                            )
+                        )
+                    }
+                }
+
+                writingMessage = ""
+
+                moveLazyToBottom = true
+            }
+        }
+
+
+    }
+
+    fun sendMessageWithImage(text:String,context: Context, image: Bitmap? = null): Flow<Long?> = callbackFlow {
+
+            addMessageLocal(image!!.asImageBitmap())
 
             GlobalScope.launch(Dispatchers.Default) {
+
+                val imageId = withContext(Dispatchers.IO) {MessageRepository.createImage(Image(id = null, bitmap = bitmapToBlob(image)))}
+                trySend(imageId)
+
                 withContext(Dispatchers.IO) {
                     val idNewMessage = MessageRepository.createMessage(
                         Message(
@@ -91,7 +162,8 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             senderId = userID,
                             groupId = groupId,
                             date = null,
-                            imageId = null
+                            imageId = imageId,
+                            imageBitmap = null
                         )
                     )
 
@@ -102,9 +174,10 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             text = text,
                             timeZone = TimeZone.getDefault(),
                             senderId = userID,
-                            imageId = null,
+                            imageId = imageId,
                             groupId = groupId,
-                            date = Date()
+                            date = Date(),
+                            imageBitmap = null
                         )
                     )
                 }
@@ -112,61 +185,12 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
             moveLazyToBottom = true
 
-        } else {
-
-            if (text.length >= 1000) {
-                SnackbarManager.newSnackbar(
-                    context.getString(R.string.el_mensaje_no_puede_superar_los_1000_car_cteres),
-                    redWrong
-                )
-            } else {
-
-                if (text.isNotBlank()) {
-
-                    //Añado el mensaje a este viewModel para que aparezca instantaneamente
-                    //Además, guardo en memoria y local el mensaje con el id returneado de la API
-                    addMessageLocal()
-
-                    GlobalScope.launch(Dispatchers.Default) {
-                        withContext(Dispatchers.IO) {
-                            val idNewMessage = MessageRepository.createMessage(
-                                Message(
-                                    id = null,
-                                    text = text,
-                                    timeZone = TimeZone.getDefault(),
-                                    senderId = userID,
-                                    groupId = groupId,
-                                    date = null,
-                                    imageId = null
-                                )
-                            )
-
-                            //RECIBO EL ID DEL MESSAGE Y LO MANDO
-                            DataHandler(context).saveMessage(
-                                idGroup = groupId, message = Message(
-                                    id = idNewMessage,
-                                    text = text,
-                                    timeZone = TimeZone.getDefault(),
-                                    senderId = userID,
-                                    imageId = null,
-                                    groupId = groupId,
-                                    date = Date()
-                                )
-                            )
-                        }
-                    }
-
-                    writingMessage = ""
-
-                    moveLazyToBottom = true
-                }
-            }
-        }
+        awaitClose { /* Cleanup logic, if needed */ }
     }
 
 
-    fun addMessageLocal(isImage: Boolean = false){
-        val newMessage = Message(id = null, text = if (isImage) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date())
+    fun addMessageLocal(image: ImageBitmap? = null){
+        val newMessage = Message(id = null, text = if (image != null) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date(),  imageBitmap = image)
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
 
@@ -181,18 +205,31 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
                 val bitmap = convertImageBitmapToBitmap(bitmap = imageBitmap)
 
+                viewModelScope.launch {
                 //Se guarda en local system y obtengo la uri
-                val uri = viewModelScope.launch {
+                val uri =
                     withContext(Dispatchers.IO) {
                         DataHandler(context).saveBitmapLocalOS(bitmap)
                     }
+
+                    Log.i("wawa",uri.toString())
+
+
+                    //Lo mandamos para obtener el id con el que guardarlo en local
+                    val imageID = sendMessageWithImage("", context, image = bitmap).collect {
+                        viewModelScope.launch {
+
+                            //Lo guardo en memoria
+                            val oldMap = DataHandler.uriList[groupId]!!.toMutableMap()
+                            oldMap[it!!] = uri
+                            DataHandler.uriList[groupId] = oldMap!!
+
+                            //Ahora lo guardo en Room local
+                            val room = WDDatabase.getDatabase(context = context)
+                            if (it != null) DataHandler(context).saveBitmapLocal(it, uri)
+                        }
+                    }
                 }
-                //Ahora lo guardo en Room local
-
-
-                //Y luego se manda
-                sendMessage("", context, image = imageBitmap)
-
 
             } else SnackbarManager.newSnackbar("No dejes el dibujo vacío", redWrong)
         }

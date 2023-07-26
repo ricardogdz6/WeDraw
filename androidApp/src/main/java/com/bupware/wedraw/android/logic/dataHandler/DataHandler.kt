@@ -2,8 +2,10 @@ package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -21,7 +23,9 @@ import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
@@ -123,12 +127,18 @@ class DataHandler(val context: Context) {
         }
     }
 
-    suspend fun saveBitmapLocal(uri: Uri){
+    suspend fun saveBitmapLocal(imageID:Long,uri: Uri){
         val room = WDDatabase.getDatabase(context = context)
         ImageRepository(room.imageDao()).insert(Image(
-            id = null,
-
+            id = imageID,
+            uri = uri.toString()
         ))
+
+    }
+
+    suspend fun loadUrisRoom(id:Long): Uri{
+        val room = WDDatabase.getDatabase(context = context)
+        return Uri.parse(ImageRepository(room.imageDao()).getDrawingImage(id)!!.uri)
     }
 
     suspend fun sendPushNotification(message: Message){
@@ -181,6 +191,18 @@ class DataHandler(val context: Context) {
         //Map de idGrupo y los mensajes correspondientes
         var messageList = mutableMapOf<Long, MutableList<Message>>()
 
+        var uriList = mutableMapOf<Long, Map<Long,Uri>>()
+
+
+        fun bitmapToBlob(bitmap: Bitmap): ByteArray {
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            return stream.toByteArray()
+        }
+
+        fun blobToBitmap(blob: ByteArray): Bitmap {
+            return BitmapFactory.decodeByteArray(blob, 0, blob.size)
+        }
 
     }
 

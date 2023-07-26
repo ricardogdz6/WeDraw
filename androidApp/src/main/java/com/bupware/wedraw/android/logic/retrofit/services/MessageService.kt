@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.logic.retrofit.services
 
 import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import retrofit2.Call
@@ -23,6 +24,12 @@ interface MessageService {
 
     @POST("/weDraw/messages")
     fun createMessage(@Body message: Message): Call<Long>
+
+    @GET("/weDraw/messages/getImage/{imageID}")
+    fun getImage(@Path("imageID") imageID: Long): Call<ByteArray>
+
+    @POST("/weDraw/messages/createImage")
+    fun createImage(@Body image: Image): Call<Long>
 
     @POST("/weDraw/messages/notification")
     fun sendPushNotification(@Body message: Message): Call<Boolean>

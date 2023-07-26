@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.logic.retrofit.repository
 
 import android.util.Log
+import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.api.RetrofitClient
 import com.bupware.wedraw.android.logic.retrofit.services.MessageService
@@ -56,6 +57,34 @@ object MessageRepository {
 
     suspend fun createMessage(message: Message): Long? = suspendCancellableCoroutine { continuation ->
         messageService.createMessage(message).enqueue(object : Callback<Long> {
+            override fun onResponse(call: Call<Long>, response: Response<Long>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body(),null)
+                }
+            }
+
+            override fun onFailure(call: Call<Long>, t: Throwable) {
+                continuation.resume(null,null)
+            }
+        })
+    }
+
+    suspend fun getImage(imageID: Long): ByteArray? = suspendCancellableCoroutine { continuation ->
+        messageService.getImage(imageID).enqueue(object : Callback<ByteArray> {
+            override fun onResponse(call: Call<ByteArray>, response: Response<ByteArray>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body(),null)
+                }
+            }
+
+            override fun onFailure(call: Call<ByteArray>, t: Throwable) {
+                continuation.resume(null,null)
+            }
+        })
+    }
+
+    suspend fun createImage(image: Image): Long? = suspendCancellableCoroutine { continuation ->
+        messageService.createImage(image).enqueue(object : Callback<Long> {
             override fun onResponse(call: Call<Long>, response: Response<Long>) {
                 if (response.isSuccessful) {
                     continuation.resume(response.body(),null)

@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.components.buttons
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState

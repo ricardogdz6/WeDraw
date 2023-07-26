@@ -1,5 +1,6 @@
 package com.bupware.wedraw.android.roomData.tables.image
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 

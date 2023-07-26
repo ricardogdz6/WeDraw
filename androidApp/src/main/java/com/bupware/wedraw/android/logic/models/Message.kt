@@ -13,6 +13,7 @@ data class Message(
     var senderId: String,
     var imageId: Long?,
     var groupId: Long,
-    var date: Date?
+    var date: Date?,
+    var imageBitmap: ImageBitmap?
 ): java.io.Serializable
 

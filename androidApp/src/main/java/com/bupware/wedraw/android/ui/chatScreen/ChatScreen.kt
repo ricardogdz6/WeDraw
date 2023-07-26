@@ -82,7 +82,6 @@ import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.theme.greenAchieve
 import com.bupware.wedraw.android.theme.redWeDraw
 import com.bupware.wedraw.android.theme.redWrong
-import com.bupware.wedraw.android.ui.drawingScreen.processImage
 import com.godaddy.android.colorpicker.HsvColor
 import com.godaddy.android.colorpicker.harmony.ColorHarmonyMode
 import com.godaddy.android.colorpicker.harmony.HarmonyColorPicker
@@ -101,15 +100,17 @@ fun PreviewChatScreen(){
 @Composable
 fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    val context = LocalContext.current
+
     LaunchedEffect(Unit){
         viewModel.groupId = groupId
-        viewModel.loadMessages(groupId)
+        viewModel.loadMessages(groupId,context)
     }
 
     //region Forzar update de messages tras un push notification
     if (DataHandler.forceMessagesUpdate.value){
         DataHandler.forceMessagesUpdate.value = false
-        viewModel.loadMessages(groupId)
+        viewModel.loadMessages(groupId,context)
         //TODO IF NO OFFSET ENTONCES ESTO DE ABAJO
         viewModel.moveLazyToBottom = true
     }
@@ -203,8 +204,6 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
 
 
             SendMessageButton(viewModel::sendMessage)
-
-
     }
 }
 
@@ -691,8 +690,8 @@ fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
                     Row() {
                         //TODO ENVIAR IMAGEN
                         Button(onClick = {
+                            viewModel.sendConfirmation = false
                             viewModel.exportDrawing = true
-                            viewModel.sendConfirmation = false /*TODO*/
                             viewModel.removeCanva = true
                             viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus
                                          }

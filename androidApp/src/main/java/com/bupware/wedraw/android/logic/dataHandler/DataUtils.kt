@@ -3,7 +3,9 @@ package com.bupware.wedraw.android.logic.dataHandler
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -21,6 +23,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
@@ -53,6 +56,8 @@ class DataUtils {
             DataHandler.messageList =
                 getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
             Log.i("DataUtils", "initData: ${DataHandler.messageList}")
+
+            DataHandler.uriList = getMapOfMessageUri(context).toMutableMap()
 
 
             /**
@@ -218,6 +223,28 @@ class DataUtils {
         }
 
         return map
+    }
+
+    private suspend fun getMapOfMessageUri(context: Context): Map<Long,Map<Long,Uri>>{
+
+        val urisByGroup = mutableMapOf<Long,Map<Long,Uri>>()
+
+
+        DataHandler.messageList.forEach { message ->
+
+            val uriList = mutableMapOf<Long, Uri>()
+
+            message.value.forEach {
+                if (it.imageId != null) {
+                    uriList[it.imageId!!] = DataHandler(context).loadUrisRoom(it.imageId!!)
+                }
+            }
+
+            urisByGroup[message.key] = uriList
+
+        }
+
+        return urisByGroup
     }
 
     private suspend fun getMessagesLocalByGroupId(

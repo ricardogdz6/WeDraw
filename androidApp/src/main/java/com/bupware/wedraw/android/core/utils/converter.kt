@@ -71,7 +71,8 @@ object Converter {
                     senderId = message.ownerId,
                     groupId = message.owner_group_Id,
                     imageId = message.image_Id,
-                    timeZone = null //Todo: No se si el timezone aqui deberia ser null.
+                    timeZone = null, //Todo: No se si el timezone aqui deberia ser null.
+                    imageBitmap = null
                 )
             )
         }
@@ -97,7 +98,8 @@ object Converter {
             senderId = message.ownerId,
             imageId = message.image_Id,
             groupId = message.owner_group_Id,
-            date = message.date
+            date = message.date,
+            imageBitmap = null
         )
     }
 
@@ -109,7 +111,8 @@ object Converter {
             senderId = messageEntity.ownerId,
             groupId = messageEntity.owner_group_Id,
             imageId = messageEntity.image_Id,
-            timeZone = TimeZone.getDefault()
+            timeZone = TimeZone.getDefault(),
+            imageBitmap = null
         )
     }
 

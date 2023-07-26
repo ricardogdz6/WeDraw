@@ -12,13 +12,14 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import com.bupware.wedraw.android.ui.widget.callback.WDrawRefreshCallback
 import com.bupware.wedraw.android.ui.widget.callback.WDrawReverseLetterCallback
-
+import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotificationManager : FirebaseMessagingService() {
 
@@ -67,9 +68,18 @@ class NotificationManager : FirebaseMessagingService() {
                     senderId = message.data["senderId"].toString(),
                     imageId = imageId,
                     groupId = message.data["groupId"]!!.toLong(),
-                    date = Converter.parseDate(message.data["date"].toString())
+                    date = Converter.parseDate(message.data["date"].toString()),
+                    imageBitmap = null
                 )
             )
+
+            //Si es un mensaje con imagen se pide la imagen para descargar a la BBDD
+            if (imageId != null) {
+                val byteArray = withContext(Dispatchers.IO) {MessageRepositoryRetrofit.getImage(imageId)}
+                val bitmap = DataHandler.blobToBitmap(byteArray!!)
+                val uri = DataHandler(context).saveBitmapLocalOS(bitmap)
+                DataHandler(context).saveBitmapLocal(imageId!!,uri)
+            }
 
             DataHandler.forceMessagesUpdate.value = true
 
