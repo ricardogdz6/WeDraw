@@ -193,6 +193,7 @@ class DataHandler(val context: Context) {
 
         var uriList = mutableMapOf<Long, Map<Long,Uri>>()
 
+        var notificationList = mutableMapOf<Long, Long>()
 
         fun bitmapToBlob(bitmap: Bitmap): ByteArray {
             val stream = ByteArrayOutputStream()

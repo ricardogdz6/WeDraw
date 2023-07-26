@@ -41,7 +41,7 @@
                 android:resource="@xml/wedraw_widget_info" />
         </receiver>
         <service
-            android:name=".core.api.NotificationManager"
+            android:name=".core.api.PushNotificationManager"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

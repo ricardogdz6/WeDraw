@@ -1,96 +1,52 @@
 package com.bupware.wedraw.android.core.api
 
 import android.content.Context
-import android.util.Log
-import androidx.glance.appwidget.action.actionRunCallback
-import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
-import com.bupware.wedraw.android.logic.dataHandler.DataUtils
-import com.bupware.wedraw.android.logic.models.Message
-import com.bupware.wedraw.android.roomData.WDDatabase
-import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
-import com.bupware.wedraw.android.roomData.tables.user.UserRepository
-import com.bupware.wedraw.android.ui.widget.callback.WDrawRefreshCallback
-import com.bupware.wedraw.android.ui.widget.callback.WDrawReverseLetterCallback
-import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class NotificationManager : FirebaseMessagingService() {
+    private val PREFS_NAME = "MyPrefs"
+    private val NOTIFICATION_COUNT_KEY = "notification_count"
 
-
-    @Override
     override fun onMessageReceived(message: RemoteMessage) {
 
-        //Log incoming message
-        Log.v("CloudMessage", "From ${message.from}")
+        val idGroup = message.data["groupId"]!!.toLong()
 
-        //Log Data Payload
-        if (message.data.isNotEmpty()) {
-            Log.v("CloudMessage", "Message Data ${message.data}")
-        }
+        val currentCount = getNotificationCount(idGroup) + 1
+        saveNotificationCount(currentCount, groupId = idGroup)
 
-        //Check if message contains a notification payload
-
-        message.data.let {
-            Log.v("CloudMessage", "Message Data Body ${it["body"]}")
-            Log.v("CloudMessage", "Message Data Title  ${it["title"]}")
-            //when app in forground that notification is not shown on status bar
-            //lets write a code to display notification in status bar when app in forground.
-            //showNotificationOnStatusBar(it)
-        }
-
-        if (message.notification != null) {
-
-            Log.v("CloudMessage", "Notification ${message.notification}")
-            Log.v("CloudMessage", "Notification Title ${message.notification!!.title}")
-            Log.v("CloudMessage", "Notification Body ${message.notification!!.body}")
-
-        }
-
-        val context = applicationContext
-
-        CoroutineScope(Dispatchers.IO).launch {
-
-            val imageId = if (message.data["imageId"].toString() == "null") null else message.data["imageId"]!!.toLong()
-
-            DataHandler(context).saveMessage(
-                idGroup = message.data["groupId"]!!.toLong()
-                ,message = Message(
-                    id = message.data["id"]!!.toLong(),
-                    text = message.data["text"].toString(),
-                    timeZone = null,
-                    senderId = message.data["senderId"].toString(),
-                    imageId = imageId,
-                    groupId = message.data["groupId"]!!.toLong(),
-                    date = Converter.parseDate(message.data["date"].toString()),
-                    imageBitmap = null
-                )
-            )
-
-            //Si es un mensaje con imagen se pide la imagen para descargar a la BBDD
-            if (imageId != null) {
-                val byteArray = withContext(Dispatchers.IO) {MessageRepositoryRetrofit.getImage(imageId)}
-                val bitmap = DataHandler.blobToBitmap(byteArray!!)
-                val uri = DataHandler(context).saveBitmapLocalOS(bitmap)
-                DataHandler(context).saveBitmapLocal(imageId!!,uri)
-            }
-
-            DataHandler.forceMessagesUpdate.value = true
-
-        }
+        //Los setteo en la var de DataHandler por si se recibe la notificación y se está In-App
+        DataHandler.notificationList[idGroup] = currentCount + 1.toLong()
 
     }
 
+    private fun showNotification(message: RemoteMessage) {
+        // Mostrar la notificación en la bandeja de entrada
+        // Implementar el código para mostrar la notificación según tus necesidades
+    }
 
-    @Override
-    override fun onNewToken(token: String) {
-        //Log.i("wawa", "FCM token: $token")
+    private fun getNotificationCount(groupId:Long): Int {
+        val preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        return preferences.getInt(NOTIFICATION_COUNT_KEY + "$groupId", 0)
+    }
 
+    private fun saveNotificationCount(count: Int, groupId:Long) {
+        val preferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        val editor = preferences.edit()
+        editor.putInt(NOTIFICATION_COUNT_KEY + "$groupId", count)
+        editor.apply()
+    }
+
+    companion object {
+
+        private val PREFS_NAME = "MyPrefs"
+        private val NOTIFICATION_COUNT_KEY = "notification_count"
+        fun resetNotificationCount(groupId: Long,context: Context) {
+            val preferences = context.getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+            val editor = preferences.edit()
+            editor.putInt(NOTIFICATION_COUNT_KEY + "$groupId", 0)
+            editor.apply()
+        }
     }
 }

@@ -52,6 +52,7 @@ import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.blueWeDraw
 import com.bupware.wedraw.android.theme.Lexend
@@ -475,39 +476,46 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                Column(
-                    Modifier
-                        .background(Color.Red, RoundedCornerShape(10.dp))
-                        .height(IntrinsicSize.Max)
-                        .width(40.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        modifier = Modifier,
-                        text = nombre,
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End,
-                        fontFamily = Lexend
-                    )
-                }
+                if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong()) {
 
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Box(Modifier.padding(end = 10.dp)) {
-                    Box(
+                    Column(
                         Modifier
-                            .background(selectedColor, RoundedCornerShape(10.dp))
+                            .background(Color.Red, RoundedCornerShape(10.dp))
                             .height(IntrinsicSize.Max)
-                            .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
+                            .width(40.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
+                        Text(
                             modifier = Modifier,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.notification),
-                            tint = Color.White,
-                            contentDescription = "People in group"
+                            text = DataHandler.notificationList[idGroup.toLong()].toString(),
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.End,
+                            fontFamily = Lexend
                         )
                     }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(Modifier.padding(end = 10.dp)) {
+                        Box(
+                            Modifier
+                                .background(selectedColor, RoundedCornerShape(10.dp))
+                                .height(IntrinsicSize.Max)
+                                .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier,
+                                imageVector = ImageVector.vectorResource(id = R.drawable.notification),
+                                tint = Color.White,
+                                contentDescription = "People in group"
+                            )
+                        }
+                    }
                 }
+
 
             }
         }

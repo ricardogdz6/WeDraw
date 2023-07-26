@@ -116,6 +116,10 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
     }
     //endregion
 
+    //Si recibes notificaciones dentro del chat correspondiente se actualiza to el rato a 0 para que no salga en mainscreen
+    LaunchedEffect(DataHandler.notificationList[groupId]){
+        DataHandler.notificationList[groupId] = 0
+    }
 
     BackHandler() {
         if (viewModel.switchDrawingStatus) {viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus}

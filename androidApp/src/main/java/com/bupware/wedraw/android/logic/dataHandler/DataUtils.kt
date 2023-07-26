@@ -20,6 +20,7 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -59,6 +60,7 @@ class DataUtils {
 
             DataHandler.uriList = getMapOfMessageUri(context).toMutableMap()
 
+            initNotificationCounter(context)
 
             /**
              * Obtengo los grupos en remoto los paso a local y los meto en memoria.
@@ -101,6 +103,22 @@ class DataUtils {
 
         }
 
+    }
+
+    suspend fun initNotificationCounter(context: Context) {
+
+        val PREFS_NAME = "MyPrefs"
+        val NOTIFICATION_COUNT_KEY = "notification_count"
+
+        DataHandler.groupList.forEach {
+
+            val preferences =
+                context.getSharedPreferences(PREFS_NAME, FirebaseMessagingService.MODE_PRIVATE)
+            DataHandler.notificationList[it.id!!] =
+                preferences.getInt(NOTIFICATION_COUNT_KEY + "${it.id}", 0).toLong()
+
+
+        }
     }
 
     private suspend fun sendPendingMessages(context: Context) {
