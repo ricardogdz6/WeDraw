@@ -60,8 +60,8 @@ class PushNotificationManager : FirebaseMessagingService() {
                     imageId = imageId,
                     groupId = message.data["groupId"]!!.toLong(),
                     date = Converter.parseDate(message.data["date"].toString()),
-                    imageBitmap = null
-                )
+                    bitmap = null
+                ), uri = null, bitmap = null
             )
 
             //Si es un mensaje con imagen se pide la imagen para descargar a la BBDD

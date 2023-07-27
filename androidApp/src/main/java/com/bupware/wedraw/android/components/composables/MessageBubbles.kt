@@ -51,7 +51,7 @@ fun MessageBubbleHost(message: Message, showTriangle:Boolean, viewModel: ChatScr
 
     val context = LocalContext.current
 
-    val containsBitmap = message.imageBitmap != null
+    val containsBitmap = message.bitmap != null
     val containsImageId = message.imageId != null
 
     val inputStream = if (containsImageId) context.contentResolver.openInputStream(viewModel.messageUrisList[message.imageId]!!) else null
@@ -91,13 +91,12 @@ fun MessageBubbleHost(message: Message, showTriangle:Boolean, viewModel: ChatScr
                     )
             ) {
 
-                if (containsBitmap || containsImageId){
-
+                if (containsImageId || containsBitmap){
                     Column(Modifier.padding(5.dp)) {
                         Box() {
                             Image(modifier = Modifier
                                 .clip(RoundedCornerShape(15.dp)),
-                                bitmap = if (containsBitmap) message.imageBitmap!! else bitmap!!.asImageBitmap(),
+                                bitmap = if (containsBitmap) message.bitmap!! else bitmap!!.asImageBitmap(),
                                 contentDescription = "")
                             Column(Modifier.fillMaxSize(),verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.End) {
                                 Text(
@@ -171,7 +170,7 @@ fun MessageBubble(message: Message, showTriangle:Boolean, viewModel: ChatScreenV
 
     val context = LocalContext.current
 
-    val containsBitmap = message.imageBitmap != null
+    val containsBitmap = message.bitmap != null
     val containsImageId = message.imageId != null
 
     val inputStream = if (containsImageId) context.contentResolver.openInputStream(viewModel.messageUrisList[message.imageId]!!) else null
@@ -212,11 +211,11 @@ fun MessageBubble(message: Message, showTriangle:Boolean, viewModel: ChatScreenV
             ) {
 
 
-                if (containsBitmap || containsImageId){
+                if (containsImageId || containsBitmap){
 
                     Column(Modifier.padding(5.dp)) {
                         Box() {
-                            Image(modifier = Modifier.clip(RoundedCornerShape(15.dp)),bitmap = if (containsBitmap) message.imageBitmap!! else bitmap!!.asImageBitmap(), contentDescription = "")
+                            Image(modifier = Modifier.clip(RoundedCornerShape(15.dp)),bitmap = if (containsBitmap) message.bitmap!! else bitmap!!.asImageBitmap(), contentDescription = "")
                             Column(Modifier.fillMaxSize(),
                                 verticalArrangement = Arrangement.Bottom,
                                 horizontalAlignment = Alignment.End

@@ -46,3 +46,22 @@ interface MessageFailedDao {
 
 }
 
+@Dao
+interface MessageWithImageFailedDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMessage(message: MessageWithImageFailed)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMessagesList(messages: List<MessageWithImageFailed>)
+    @Query("SELECT * FROM messagesWithImageFailed_table ORDER BY id ASC")
+    fun readAllDataMessage(): Flow<List<MessageWithImageFailed>>
+
+    @Query("DELETE FROM messagesWithImageFailed_table WHERE date = :date")
+    suspend fun deleteMessage(date: Date)
+    @Query("SELECT * FROM messagesWithImageFailed_table WHERE owner_group_Id = :groupId")
+    fun getMessagesByGroupId(groupId: Long): Flow<List<MessageWithImageFailed>>
+
+    @Query("DELETE FROM messagesWithImageFailed_table")
+    suspend fun deleteAll()
+
+}
+

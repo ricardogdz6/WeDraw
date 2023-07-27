@@ -7,6 +7,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.asAndroidBitmap
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
@@ -17,6 +18,7 @@ import com.bupware.wedraw.android.roomData.tables.image.Image
 import com.bupware.wedraw.android.roomData.tables.image.ImageRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
+import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
@@ -49,7 +51,34 @@ class DataHandler(val context: Context) {
 
     }
 
-    suspend fun saveMessage(message: Message, idGroup: Long) {
+    suspend fun saveFailedMessageWithImage(message: Message, uri: Uri, bitmap: Bitmap, idGroup: Long) {
+
+        val roomMessageFailed =
+            com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailed(
+                owner_group_Id = message.groupId,
+                ownerId = message.senderId,
+                text = message.text,
+                image_Id = message.imageId,
+                date = message.date?.let { Date(it.time) },
+                uri = uri.toString(),
+                bitmap = bitmapToBlob(bitmap)
+            )
+
+        //Guardo el mensaje en memoria
+        messageList[idGroup]?.add(message)
+
+        //Guardo el mensaje en local [ROOM]
+        MessageWithImageFailedRepository(room.messageWithImageFailedDao()).insert(roomMessageFailed)
+
+        //Además, trato de enviarlo activamente
+        //TODO CAMBIAR ESTE PENDING POR EL DE IMAGE
+        val dataUtils = DataUtils()
+        dataUtils.sendSinglePendingMessageWithImage(context = context, message = roomMessageFailed)
+
+
+    }
+
+    suspend fun saveMessage(message: Message, uri: Uri?, bitmap: Bitmap?, idGroup: Long) {
 
         if (message.id == null){
 
@@ -58,7 +87,9 @@ class DataHandler(val context: Context) {
                 ownerId = message.senderId,
                 text = message.text,
                 image_Id = message.imageId,
-                date = message.date?.let { Date(it.time) }
+                date = message.date?.let { Date(it.time) },
+                uri = uri.toString(),
+                bitmap = if (bitmap == null) null else bitmapToBlob(bitmap)
             )
 
             //Guardo el mensaje en memoria
@@ -125,6 +156,23 @@ class DataHandler(val context: Context) {
             // Devolver la URI de la imagen guardada
             Uri.fromFile(file)
         }
+    }
+
+    suspend fun saveMessageWithImageMemory(imageID: Long, groupId:Long, uri:String){
+        try {
+            val oldMap = DataHandler.uriList[groupId]!!.toMutableMap()
+            oldMap[imageID] = Uri.parse(uri)
+            DataHandler.uriList[groupId] = oldMap
+        } catch (e:Exception){
+            val newMap = mapOf(imageID to Uri.parse(uri)).toMutableMap()
+            newMap[imageID] = Uri.parse(uri)
+            DataHandler.uriList[groupId] = newMap
+        }
+    }
+
+    suspend fun saveMessageWithImageLocal(imageID: Long,uri: Uri){
+        val room = WDDatabase.getDatabase(context = context)
+        DataHandler(context).saveBitmapLocal(imageID, uri)
     }
 
     suspend fun saveBitmapLocal(imageID:Long,uri: Uri){

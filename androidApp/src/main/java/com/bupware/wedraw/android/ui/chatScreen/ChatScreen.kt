@@ -1,6 +1,7 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -72,6 +73,7 @@ import com.bupware.wedraw.android.components.buttons.UndoButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.composables.MessageBubble
 import com.bupware.wedraw.android.components.composables.MessageBubbleHost
+import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
@@ -364,7 +366,7 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
             ) {
                 //TODO CAMBIAR CALLBACK
                 Column(Modifier.clip(RoundedCornerShape(15.dp))) {
-                    DrawBox(drawController = controller, bitmapCallback = viewModel.processDrawing(context = context))
+                    DrawBox(backgroundColor = Color.White,drawController = controller, bitmapCallback = viewModel.processDrawing(context = context))
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
@@ -692,12 +694,15 @@ fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Row() {
-                        //TODO ENVIAR IMAGEN
+
                         Button(onClick = {
-                            viewModel.sendConfirmation = false
-                            viewModel.exportDrawing = true
+                                viewModel.sendConfirmation = false
+                                viewModel.exportDrawing = true
+
+                            //TODO ESTO MOVER??
                             viewModel.removeCanva = true
                             viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus
+
                                          }
                             , colors = ButtonDefaults.buttonColors(backgroundColor = greenAchieve)) {
                             Text(text = "Confirmar")

@@ -41,3 +41,23 @@ class MessageFailedRepository(private val messageFailedDao: MessageFailedDao) {
 
 
 }
+
+class MessageWithImageFailedRepository(private val messageFailedDao: MessageWithImageFailedDao) {
+    suspend fun insert(message: MessageWithImageFailed) {
+        messageFailedDao.insertMessage(message)
+    }
+
+    suspend fun insertMessagesList(messages: List<MessageWithImageFailed>) {
+        messageFailedDao.insertMessagesList(messages)
+    }
+
+    val readAllData: Flow<List<MessageWithImageFailed>> = messageFailedDao.readAllDataMessage()
+
+    suspend fun deleteAll() = messageFailedDao.deleteAll()
+
+    suspend fun deleteMessage(message: MessageWithImageFailed) = messageFailedDao.deleteMessage(message.date!!)
+
+    suspend fun getMessagesByGroupId(groupId: Long): Flow<List<MessageWithImageFailed>> = messageFailedDao.getMessagesByGroupId(groupId)
+
+
+}

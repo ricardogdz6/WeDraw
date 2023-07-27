@@ -5,6 +5,7 @@ import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.roomData.tables.message.Message
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailed
+import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailed
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.user.User
 import java.text.SimpleDateFormat
@@ -72,7 +73,7 @@ object Converter {
                     groupId = message.owner_group_Id,
                     imageId = message.image_Id,
                     timeZone = null, //Todo: No se si el timezone aqui deberia ser null.
-                    imageBitmap = null
+                    bitmap = null
                 )
             )
         }
@@ -80,6 +81,17 @@ object Converter {
     }
 
     fun convertMessageFailedToMessageEntity(message:MessageFailed, optionalId:Long?):Message{
+        return Message(
+            id = optionalId ?: message.id,
+            owner_group_Id = message.owner_group_Id,
+            ownerId = message.ownerId,
+            text = message.text,
+            image_Id = message.image_Id,
+            date = message.date
+        )
+    }
+
+    fun convertMessageWithImageFailedToMessageEntity(message: MessageWithImageFailed, optionalId:Long?):Message{
         return Message(
             id = optionalId ?: message.id,
             owner_group_Id = message.owner_group_Id,
@@ -99,7 +111,20 @@ object Converter {
             imageId = message.image_Id,
             groupId = message.owner_group_Id,
             date = message.date,
-            imageBitmap = null
+            bitmap = null
+        )
+    }
+
+    fun convertMessageWithImageFailedToMessageDTO(message:MessageWithImageFailed, optionalId:Long?):MessageDTO{
+        return MessageDTO(
+            id = optionalId ?: message.id,
+            text = message.text,
+            timeZone = null,
+            senderId = message.ownerId,
+            imageId = message.image_Id,
+            groupId = message.owner_group_Id,
+            date = message.date,
+            bitmap = null
         )
     }
 
@@ -112,7 +137,7 @@ object Converter {
             groupId = messageEntity.owner_group_Id,
             imageId = messageEntity.image_Id,
             timeZone = TimeZone.getDefault(),
-            imageBitmap = null
+            bitmap = null
         )
     }
 

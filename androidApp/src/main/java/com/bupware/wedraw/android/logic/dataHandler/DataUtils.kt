@@ -1,13 +1,17 @@
 package com.bupware.wedraw.android.logic.dataHandler
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.util.Log
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.lifecycle.viewModelScope
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
+import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.models.UserDevice
@@ -17,10 +21,13 @@ import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailed
 import com.bupware.wedraw.android.roomData.tables.message.MessageFailedRepository
 import com.bupware.wedraw.android.roomData.tables.message.MessageRepository
+import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailed
+import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailedRepository
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -38,9 +45,12 @@ import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as
 class DataUtils {
     suspend fun initData(context: Context) {
 
-        withContext(Dispatchers.Default) {
-            updateDeviceID()
+        CoroutineScope(Dispatchers.Default).launch {
+            withContext(Dispatchers.Default) {
+                updateDeviceID()
+            }
         }
+
 
         //primero localmente a memoria
         withContext(Dispatchers.Default) {
@@ -48,6 +58,8 @@ class DataUtils {
             DataHandler.groupList = Converter.converterGroupsEntityToGroupsList(
                 getGroupsLocal(context) ?: emptyList()
             )
+
+            DataHandler.forceGroupsUpdate.value = true
 
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
             DataHandler.userList =
@@ -73,14 +85,17 @@ class DataUtils {
                 DataHandler.forceGroupsUpdate.value = true
             }
 
+
             getUsersRemote(context).also{
                 if (it != null) remoteUsersToLocal(it,context)
             }
+
 
             Log.i("DataUtils", "initData: ${DataHandler.groupList}")
 
         }
         sendPendingMessages(context)
+        sendPendingMessagesWithImage(context)
 
 
     }
@@ -121,14 +136,16 @@ class DataUtils {
         }
     }
 
+    fun convertImageBitmapToBitmap(bitmap: ImageBitmap): Bitmap {
+        return bitmap.asAndroidBitmap()
+    }
+
     private suspend fun sendPendingMessages(context: Context) {
         val room = WDDatabase.getDatabase(context)
         val pendingMessages = withContext(Dispatchers.Default) {
             MessageFailedRepository(room.messageFailedDao()).readAllData.first().toMutableList()
         }
 
-
-        Log.i("DataUtilsSendOffline", "0sendPendingMessages: $pendingMessages")
 
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -137,17 +154,56 @@ class DataUtils {
         while (index < pendingMessages.size) {
             val pendingMessage : MessageFailed = pendingMessages[index]
             val network = connectivityManager.activeNetwork
-            Log.i("DataUtilsSendOffline", "1sendPendingMessages: $network")
+
             if (network != null) {
                 val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-                Log.i("DataUtilsSendOffline", "2sendPendingMessages: $networkCapabilities")
+
                 if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+
+/*
+                    var imageID = -1L
+                    if (pendingMessage.uri != "null") {
+                        val imageId = withContext(Dispatchers.IO) {
+                            com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository.createImage(
+                                Image(
+                                    id = null,
+                                    bitmap = DataHandler.bitmapToBlob(
+                                        (DataHandler.blobToBitmap(pendingMessage.bitmap!!))
+                                    )
+                                )
+                            )
+                        }
+                        imageID = imageId ?: -1
+                    }
+
+ */
+
+
                     val returningId = sendPendingMessage(
-                            pendingMessage.toMessage()
+                        pendingMessage.toMessage()
                     )
-                    Log.i("DataUtilsSendOffline", "3sendPendingMessages: $returningId")
+
+
+                    /*
                     if (returningId != null) {
-                        Log.i("DataUtilsSendOffline", "4sendPendingMessages: $returningId")
+
+                        if (pendingMessage.uri != "null") {
+                            //Lo guardo en memoria
+                            val oldMap = DataHandler.uriList[pendingMessage.owner_group_Id]!!.toMutableMap()
+                            oldMap[imageID!!] = Uri.parse(pendingMessage.uri.toString())
+                            DataHandler.uriList[pendingMessage.owner_group_Id] = oldMap!!
+
+                            //Ahora lo guardo en Room local
+                            val room = WDDatabase.getDatabase(context = context)
+                            if (imageID != null) DataHandler(context).saveBitmapLocal(
+                                imageID,
+                                Uri.parse(pendingMessage.uri!!)
+                            )
+                        }
+
+                     */
+
+
                         MessageFailedRepository(room.messageFailedDao()).deleteMessage(
                             pendingMessage
                         )
@@ -160,16 +216,170 @@ class DataUtils {
                         // Incrementa el índice solo si se elimina el mensaje
                         index++
 
-                        DataHandler(context).sendPushNotification(Converter.convertMessageFailedToMessageDTO(optionalId = returningId, message = pendingMessage))
+                        DataHandler(context).sendPushNotification(
+                            Converter.convertMessageFailedToMessageDTO(
+                                optionalId = returningId,
+                                message = pendingMessage
+                            )
+                        )
                     }
+                }
+
+            }
+
+            // Espera antes de la siguiente iteración del bucle
+            delay(5000)
+
+        //MessageFailedRepository(room.messageFailedDao()).deleteAll()
+    }
+
+    private suspend fun sendPendingMessagesWithImage(context: Context) {
+        val room = WDDatabase.getDatabase(context)
+        val pendingMessages = withContext(Dispatchers.Default) {
+            MessageWithImageFailedRepository(room.messageWithImageFailedDao()).readAllData.first().toMutableList()
+        }
+
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        var index = 0
+
+        var imageID:Long? = null
+
+        while (index < pendingMessages.size) {
+            val pendingMessage : MessageWithImageFailed = pendingMessages[index]
+            val network = connectivityManager.activeNetwork
+
+            if (network != null) {
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+                if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+
+                    //PRIMERO NECESITAMOS EL IMAGEID
+                    //PARA ESTAS ALTURAS, SE PUEDE TENER O NO, ASÍ QUE PRIMERO COMPRUEBO SI ES NULL
+                    if (pendingMessage.image_Id != null ) {imageID = pendingMessage.image_Id}
+                    else if (imageID == null) {
+                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, bitmap = pendingMessage.bitmap!!))}
+                    }
+
+                    if (imageID != null){
+
+                            val returningId = sendPendingMessage(
+                                pendingMessage.toMessage()
+                            )
+
+                            if (returningId != null) {
+                                //Lo guardo en memoria
+                                DataHandler(context).saveMessageWithImageMemory(imageID = imageID,groupId = pendingMessage.owner_group_Id,uri = pendingMessage.uri.toString())
+                                //Ahora lo guardo en Room local
+                                DataHandler(context).saveMessageWithImageLocal(imageID, Uri.parse(pendingMessage.uri))
+
+
+                                MessageWithImageFailedRepository(room.messageWithImageFailedDao()).deleteMessage(
+                                    pendingMessage
+                                )
+                                MessageRepository(room.messageDao()).insert(
+                                    Converter.convertMessageWithImageFailedToMessageEntity(
+                                        pendingMessage,
+                                        returningId
+                                    )
+                                )
+                                // Incrementa el índice solo si se elimina el mensaje
+                                index++
+
+                                DataHandler(context).sendPushNotification(
+                                    Converter.convertMessageWithImageFailedToMessageDTO(
+                                        optionalId = returningId,
+                                        message = pendingMessage
+                                    )
+                                )
+
+                            }
+                    }
+
+
+                }
+            }
+
+        }
+
+        // Espera antes de la siguiente iteración del bucle
+        delay(5000)
+
+    }
+
+    suspend fun sendSinglePendingMessageWithImage(context: Context, message:MessageWithImageFailed) {
+        val room = WDDatabase.getDatabase(context)
+        val pendingMessages = listOf<MessageWithImageFailed>(message)
+
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        var index = 0
+
+        var imageID:Long? = null
+
+        while (index < pendingMessages.size) {
+            val pendingMessage : MessageWithImageFailed = pendingMessages[index]
+            val network = connectivityManager.activeNetwork
+
+            if (network != null) {
+                val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+
+                if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+
+                    //PRIMERO NECESITAMOS EL IMAGEID
+                    //PARA ESTAS ALTURAS, SE PUEDE TENER O NO, ASÍ QUE PRIMERO COMPRUEBO SI ES NULL
+                    if (pendingMessage.image_Id != null ) {imageID = pendingMessage.image_Id}
+                    else if (imageID == null) {
+                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, bitmap = pendingMessage.bitmap!!))}
+                    }
+
+                    if (imageID != null){
+
+                        val returningId = sendPendingMessage(
+                            pendingMessage.toMessage()
+                        )
+
+                        if (returningId != null) {
+                            //Lo guardo en memoria
+                            DataHandler(context).saveMessageWithImageMemory(imageID = imageID,groupId = pendingMessage.owner_group_Id,uri = pendingMessage.uri.toString())
+                            //Ahora lo guardo en Room local
+                            DataHandler(context).saveMessageWithImageLocal(imageID, Uri.parse(pendingMessage.uri))
+
+
+                            MessageWithImageFailedRepository(room.messageWithImageFailedDao()).deleteMessage(
+                                pendingMessage
+                            )
+                            MessageRepository(room.messageDao()).insert(
+                                Converter.convertMessageWithImageFailedToMessageEntity(
+                                    pendingMessage,
+                                    returningId
+                                )
+                            )
+                            // Incrementa el índice solo si se elimina el mensaje
+                            index++
+
+                            DataHandler(context).sendPushNotification(
+                                Converter.convertMessageWithImageFailedToMessageDTO(
+                                    optionalId = returningId,
+                                    message = pendingMessage
+                                )
+                            )
+
+                        }
+                    }
+
                 }
             }
 
             // Espera antes de la siguiente iteración del bucle
             delay(5000)
         }
-        //MessageFailedRepository(room.messageFailedDao()).deleteAll()
+
     }
+
 
     suspend fun sendSinglePendingMessage(context: Context, message:MessageFailed) {
         val room = WDDatabase.getDatabase(context)
@@ -187,11 +397,15 @@ class DataUtils {
                 val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
                 Log.i("DataUtilsSendOffline", "2sendPendingMessages: $networkCapabilities")
                 if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+
+
                     val returningId = sendPendingMessage(
                         pendingMessage.toMessage()
                     )
                     Log.i("DataUtilsSendOffline", "3sendPendingMessages: $returningId")
                     if (returningId != null) {
+
+
                         Log.i("DataUtilsSendOffline", "4sendPendingMessages: $returningId")
                         MessageFailedRepository(room.messageFailedDao()).deleteMessage(
                             pendingMessage
@@ -213,7 +427,7 @@ class DataUtils {
             // Espera antes de la siguiente iteración del bucle
             delay(5000)
         }
-        //MessageFailedRepository(room.messageFailedDao()).deleteAll()
+
     }
 
     private suspend fun sendPendingMessage(message: MessageRoom): Long? {

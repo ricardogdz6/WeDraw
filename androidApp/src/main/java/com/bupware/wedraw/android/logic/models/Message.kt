@@ -1,5 +1,7 @@
 package com.bupware.wedraw.android.logic.models
 
+import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.room.PrimaryKey
 import java.io.Serializable
@@ -14,6 +16,6 @@ data class Message(
     var imageId: Long?,
     var groupId: Long,
     var date: Date?,
-    var imageBitmap: ImageBitmap?
+    var bitmap: ImageBitmap?
 ): java.io.Serializable
 

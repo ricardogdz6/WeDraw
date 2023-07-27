@@ -476,7 +476,8 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong()) {
+                //TODO FUNCIONA CORRECTAMENTE LAS NOTIFICACIONES?
+                if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong() && DataHandler.notificationList[idGroup.toLong()] != null) {
 
                     Column(
                         Modifier

@@ -79,11 +79,17 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     fun loadMessages(groupId:Long, context: Context){
         try {
             messageList = DataHandler.messageList[groupId]!!.sortedBy { it.date }
-            messageUrisList = DataHandler.uriList[groupId]!!.toMutableMap()
-
         }catch (e:Exception){
             Log.i("chat",e.stackTraceToString())
             messageList = emptyList()
+            //Se acaba de unir al grupo y por tanto no hay historial
+        }
+
+        try {
+            messageUrisList = DataHandler.uriList[groupId]!!.toMutableMap()
+        }catch (e:Exception){
+            Log.i("chat",e.stackTraceToString())
+            messageUrisList = emptyMap<Long,Uri>().toMutableMap()
             //Se acaba de unir al grupo y por tanto no hay historial
         }
     }
@@ -115,7 +121,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 groupId = groupId,
                                 date = null,
                                 imageId = null,
-                                imageBitmap = null
+                                bitmap = null
                             )
                         )
 
@@ -129,8 +135,8 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 imageId = null,
                                 groupId = groupId,
                                 date = Date(),
-                                imageBitmap = null
-                            )
+                                bitmap = null
+                            ), uri = null, bitmap = null
                         )
                     }
                 }
@@ -144,53 +150,17 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     }
 
-    fun sendMessageWithImage(text:String,context: Context, image: Bitmap? = null): Flow<Long?> = callbackFlow {
+    fun sendMessageWithImage(text:String,imageId:Long,uri: Uri,context: Context, image: Bitmap){
 
-            addMessageLocal(image!!.asImageBitmap())
+        addMessageLocal(image.asImageBitmap())
+        moveLazyToBottom = true
 
-            GlobalScope.launch(Dispatchers.Default) {
-
-                val imageId = withContext(Dispatchers.IO) {MessageRepository.createImage(Image(id = null, bitmap = bitmapToBlob(image)))}
-                trySend(imageId)
-
-                withContext(Dispatchers.IO) {
-                    val idNewMessage = MessageRepository.createMessage(
-                        Message(
-                            id = null,
-                            text = text,
-                            timeZone = TimeZone.getDefault(),
-                            senderId = userID,
-                            groupId = groupId,
-                            date = null,
-                            imageId = imageId,
-                            imageBitmap = null
-                        )
-                    )
-
-                    //RECIBO EL ID DEL MESSAGE Y LO MANDO
-                    DataHandler(context).saveMessage(
-                        idGroup = groupId, message = Message(
-                            id = idNewMessage,
-                            text = text,
-                            timeZone = TimeZone.getDefault(),
-                            senderId = userID,
-                            imageId = imageId,
-                            groupId = groupId,
-                            date = Date(),
-                            imageBitmap = null
-                        )
-                    )
-                }
-            }
-
-            moveLazyToBottom = true
-
-        awaitClose { /* Cleanup logic, if needed */ }
+        attemptSendMessage(text = text, imageId = imageId, context = context, uri = uri, bitmap = image)
     }
 
 
     fun addMessageLocal(image: ImageBitmap? = null){
-        val newMessage = Message(id = null, text = if (image != null) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date(),  imageBitmap = image)
+        val newMessage = Message(id = null, text = if (image != null) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date(), bitmap = image)
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
 
@@ -198,50 +168,143 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         messageList = oldList
     }
 
+    fun attemptSendMessage(text: String,imageId: Long, context: Context, uri: Uri, bitmap: Bitmap){
+        GlobalScope.launch(Dispatchers.Default) {
+
+            withContext(Dispatchers.IO) {
+                val idNewMessage = MessageRepository.createMessage(
+                    Message(
+                        id = null,
+                        text = text,
+                        timeZone = TimeZone.getDefault(),
+                        senderId = userID,
+                        groupId = groupId,
+                        date = null,
+                        imageId = imageId,
+                        bitmap = null
+                    )
+                )
+
+                if (idNewMessage == null){
+                    DataHandler(context).saveFailedMessageWithImage(message = Message(
+                       id= null,
+                       text= "",
+                       timeZone= TimeZone.getDefault(),
+                       senderId= userID,
+                       imageId= imageId,
+                       groupId= groupId,
+                       date= Date(),
+                        bitmap = null
+                    ),uri = uri, bitmap = bitmap, idGroup = groupId)
+                }
+                else {
+                    //RECIBO EL ID DEL MESSAGE Y LO MANDO
+                    DataHandler(context).saveMessage(
+                        idGroup = groupId, message = Message(
+                            id = idNewMessage,
+                            text = text,
+                            timeZone = TimeZone.getDefault(),
+                            senderId = userID,
+                            imageId = imageId ?: 0,
+                            groupId = groupId,
+                            date = Date(),
+                            bitmap = null
+                        ), uri = uri, bitmap = bitmap
+                    )
+                }
+
+
+            }
+        }
+    }
+
     fun processDrawing(context: Context): (ImageBitmap?, Throwable?) -> Unit {
         return { imageBitmap, error ->
 
             if (imageBitmap != null) {
+                if (hasColorOtherThanWhite(imageBitmap)) {
 
-                val bitmap = convertImageBitmapToBitmap(bitmap = imageBitmap)
+                    val bitmap = convertImageBitmapToBitmap(bitmap = imageBitmap)
 
-                viewModelScope.launch {
-                //Se guarda en local system y obtengo la uri
-                val uri =
-                    withContext(Dispatchers.IO) {
-                        DataHandler(context).saveBitmapLocalOS(bitmap)
-                    }
-
-                    Log.i("wawa",uri.toString())
-
-
-                    //Lo mandamos para obtener el id con el que guardarlo en local
-                    val imageID = sendMessageWithImage("", context, image = bitmap).collect {
-                        viewModelScope.launch {
-
-                            //Lo guardo en memoria
-                            val oldMap = DataHandler.uriList[groupId]!!.toMutableMap()
-                            oldMap[it!!] = uri
-                            DataHandler.uriList[groupId] = oldMap!!
-
-                            //Ahora lo guardo en Room local
-                            val room = WDDatabase.getDatabase(context = context)
-                            if (it != null) DataHandler(context).saveBitmapLocal(it, uri)
+                    viewModelScope.launch {
+                        //Se guarda en local system y obtengo la uri
+                        val uri = withContext(Dispatchers.IO) {
+                            DataHandler(context).saveBitmapLocalOS(bitmap)
                         }
-                    }
-                }
 
-            } else SnackbarManager.newSnackbar("No dejes el dibujo vacío", redWrong)
+                        //Lo mandamos para obtener el id con el que guardarlo en local
+                        val imageID = withContext(Dispatchers.IO) {
+                            MessageRepository.createImage(
+                                Image(
+                                    id = null,
+                                    bitmap = bitmapToBlob(bitmap)
+                                )
+                            )
+                        }
+
+                        if (imageID != null) {
+                            viewModelScope.launch {
+
+                                sendMessageWithImage(
+                                    text = "",
+                                    imageId = imageID,
+                                    uri = uri,
+                                    context = context,
+                                    image = bitmap
+                                )
+
+                                //Lo guardo en memoria
+                                DataHandler(context).saveMessageWithImageMemory(
+                                    imageID = imageID,
+                                    groupId = groupId,
+                                    uri = uri.toString()
+                                )
+
+                                //Ahora lo guardo en Room local
+                                DataHandler(context).saveMessageWithImageLocal(imageID, uri)
+                            }
+
+                        } else {
+                            DataHandler(context).saveFailedMessageWithImage(
+                                uri = uri, bitmap = bitmap, idGroup = groupId, message = Message(
+                                    id = null,
+                                    text = "",
+                                    timeZone = TimeZone.getDefault(),
+                                    senderId = userID,
+                                    imageId = null,
+                                    groupId = groupId,
+                                    date = Date(),
+                                    bitmap = null
+                                )
+                            )
+                        }
+
+                    }
+
+                } else SnackbarManager.newSnackbar("No dejes el dibujo vacío", redWrong)
+            }
         }
     }
 
 }
 
 
+fun isColorWhite(color: Color): Boolean {
+    return color == Color.White
+}
+fun hasColorOtherThanWhite(imageBitmap: ImageBitmap): Boolean {
+    val bitmap = imageBitmap.asAndroidBitmap()
 
-fun obtenerHoraMinuto(date: Date): String {
-    val sdf = SimpleDateFormat("HH:mm")
-    return sdf.format(date)
+    for (x in 0 until bitmap.width) {
+        for (y in 0 until bitmap.height) {
+            val pixelColor = bitmap.getPixel(x, y)
+            if (!isColorWhite(Color(pixelColor))) {
+                Log.i("wawa", "NO BLANCO: $x $y")
+                return true
+            }
+        }
+    }
+    return false
 }
 
 fun hsvToColor(hue: Float, saturation: Float, value: Float): Color {
