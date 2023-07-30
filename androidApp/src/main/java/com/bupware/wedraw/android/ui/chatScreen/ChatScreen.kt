@@ -1,14 +1,15 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
@@ -103,6 +104,7 @@ fun PreviewChatScreen(){
 fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val context = LocalContext.current
+    val controller = rememberDrawController()
 
     LaunchedEffect(Unit){
         viewModel.groupId = groupId
@@ -131,31 +133,31 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
     Box {
         //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
         val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
-        ChatScreenBody(navController, group = group)
+        ChatScreenBody(navController = navController, group = group, controller = controller)
 
 
         if (viewModel.colorWheelShow) MoreColors()
-        if (viewModel.sendConfirmation) ConfirmationWindow()
+
     }
 
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun ChatScreenBody(navController: NavController, group: Group ,viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ChatScreenBody(controller: DrawController,navController: NavController, group: Group ,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Body()
 
-    TopBar(navController = navController, code = group.code, groupName = group.name, people = group.userGroups?.size ?:0)
+    TopBar(controller = controller, navController = navController, code = group.code, groupName = group.name, people = group.userGroups?.size ?:0)
 
 }
 
 @Composable
-fun TopBar(navController: NavController, code:String,groupName:String,people:Int){
+fun TopBar(controller: DrawController,navController: NavController, code:String,groupName:String,people:Int){
     //Topbar
     Column() {
         ChatTopBar(navController, code = code, groupName = groupName)
-        DrawingCanvas(people = people)
+        DrawingCanvas(people = people, controller = controller)
     }
 }
 
@@ -215,7 +217,7 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
+fun DrawingCanvas(controller: DrawController,people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Box() {
 
@@ -252,7 +254,7 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        if (state) CanvasContent()
+                        if (state) CanvasContent(controller)
 
                     }
                     //endregion
@@ -328,10 +330,10 @@ fun DrawingCanvas(people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
 }
 
-@Preview
+
 @Composable
-fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
-    val controller = rememberDrawController()
+fun CanvasContent(controller: DrawController,viewModel: ChatScreenViewModel = hiltViewModel()){
+
     val context = LocalContext.current
 
     //Si se acepta la ventana de confirmación se resetea el canva desde aqui
@@ -341,11 +343,6 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
         viewModel.drawState = true
         viewModel.eraseState = false
         viewModel.sizeState = 1
-    }
-
-    //Si se confirma en la window entonces se exporta
-    LaunchedEffect(viewModel.exportDrawing){
-        controller.saveBitmap()
     }
 
     Column(
@@ -362,24 +359,38 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
             Box(modifier = Modifier
                 .background(Color.White, RoundedCornerShape(15.dp))
                 .fillMaxWidth(0.95f)
-                .weight(0.70f)
+                .weight(0.65f)
             ) {
-                //TODO CAMBIAR CALLBACK
-                Column(Modifier.clip(RoundedCornerShape(15.dp))) {
-                    DrawBox(backgroundColor = Color.White,drawController = controller, bitmapCallback = viewModel.processDrawing(context = context))
+                Box(Modifier.clip(RoundedCornerShape(15.dp))) {
+                    DrawBox(drawController = controller, bitmapCallback = viewModel.processDrawing(context = context), trackHistory = viewModel.pathHistory())
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))
-            Box(modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .weight(0.30f)
-            ){
-                CanvasBottom(controller)
-            }
 
-            //TODO IF EL DIBUJO ESTA PINTADO ENTONCES CONFIRMWINDOW
-            Button(onClick = { viewModel.sendConfirmation = true }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)) {
-                Text(text = "Enviar", color = Color.White, fontFamily = Lexend, fontSize = 20.sp)
+            //ESTA COLUMNA CONTIENE LA PARTE DE ABAJO DEL CANVA
+            Box(Modifier.weight(0.35f)) {
+
+                Column() {
+                    AnimatedVisibility(visible = viewModel.sendConfirmation,
+                        enter = slideInHorizontally(initialOffsetX = { fullWidth -> fullWidth * 2 }),
+                        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> fullWidth * 2  })
+                    ) {
+                        ConfirmationWindow(controller)
+                    }
+                }
+
+                Column() {
+                    AnimatedVisibility(visible = !viewModel.sendConfirmation,
+                        enter = slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth * 2 }),
+                        exit = slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth * 2 })
+                    )
+                    {
+                        CanvasButtons(controller)
+                    }
+                }
+
+
+
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -387,6 +398,24 @@ fun CanvasContent(viewModel: ChatScreenViewModel = hiltViewModel()){
 
         
     }
+
+}
+
+@Composable
+fun CanvasButtons(controller: DrawController, viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    Column(Modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(modifier = Modifier
+            .fillMaxWidth(0.95f)
+        ){
+            CanvasBottom(controller)
+        }
+
+        Button(onClick = { viewModel.sendConfirmation = true }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)) {
+            Text(text = "Enviar", color = Color.White, fontFamily = Lexend, fontSize = 20.sp)
+        }
+    }
+
 
 }
 
@@ -524,7 +553,6 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
             }
 
             //Titulo
-            //TODO DESHARDCODEAR
             Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                 Text(modifier = Modifier.fillMaxWidth(), text = groupName, fontFamily = Lexend, fontSize = 25.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
 
@@ -586,7 +614,6 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 
     LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom) {
         items(viewModel.messageList.size) { index ->
-
 
             val isIndexRestable = index != 0
             val isMessageSenderSameThanLast =
@@ -652,7 +679,7 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 //endregion
 
 @Composable
-fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
+fun ConfirmationWindow(controller: DrawController,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val interactionSource = remember { MutableInteractionSource() }
     val context = LocalContext.current
@@ -661,72 +688,44 @@ fun ConfirmationWindow(viewModel: ChatScreenViewModel = hiltViewModel()){
         viewModel.sendConfirmation = false
     }
 
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(Color.White.copy(0.4f))
-                .clickable(
-                    interactionSource = interactionSource,
-                    indication = null
-                ) { viewModel.sendConfirmation = false })
 
+    Column(
+        Modifier
+            .height(130.dp)
+            .fillMaxWidth(0.95f)
+            .background(Color(0x812C4560), RoundedCornerShape(15.dp))
+            .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Column(
-                Modifier
-                    .background(Color.White, RoundedCornerShape(15.dp))
-                    .fillMaxWidth(0.95f)
-                    .height(200.dp)
-                    , horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.White, fontFamily = Lexend)
+        
+        Spacer(modifier = Modifier.height(10.dp))
+        
+        Row() {
+            Button(onClick = {
 
-
-                Spacer(modifier = Modifier
-                    .height(25.dp)
-                    .fillMaxWidth()
-                    .background(
-                        blueVariant2WeDraw,
-                        RoundedCornerShape(topEnd = 15.dp, topStart = 15.dp)
-                    ))
-
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.Black, fontFamily = Lexend)
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Row() {
-
-                        Button(onClick = {
-                                viewModel.sendConfirmation = false
-                                viewModel.exportDrawing = true
-
-                            //TODO ESTO MOVER??
-                            viewModel.removeCanva = true
-                            viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus
-
-                                         }
-                            , colors = ButtonDefaults.buttonColors(backgroundColor = greenAchieve)) {
-                            Text(text = "Confirmar")
-                        }
-
-                        Spacer(modifier = Modifier.width(15.dp))
-
-                        Button(onClick = { viewModel.sendConfirmation = false; }, colors = ButtonDefaults.buttonColors(backgroundColor = redWrong)) {
-                            Text(text = "Cancelar")
-                        }
-                    }
-
+                if (viewModel.blankBitmap) {
+                    SnackbarManager.newSnackbar("No dejes el dibujo vacío", redWrong)
+                } else {
+                    viewModel.sendConfirmation = false
+                    controller.saveBitmap()
+                    viewModel.removeCanva = true
+                    viewModel.switchDrawingStatus = !viewModel.switchDrawingStatus
+                    viewModel.blankBitmap = true
                 }
 
-                Spacer(modifier = Modifier
-                    .height(25.dp)
-                    .fillMaxWidth()
-                    .background(
-                        blueVariant2WeDraw,
-                        RoundedCornerShape(bottomEnd = 15.dp, bottomStart = 15.dp)
-                    ))
-
+                             }, colors = ButtonDefaults.buttonColors(backgroundColor = greenAchieve)) {
+                Text(text = "Aceptar", color = Color.White, fontFamily = Lexend)
             }
 
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Button(onClick = { viewModel.sendConfirmation = !viewModel.sendConfirmation }, colors = ButtonDefaults.buttonColors(backgroundColor = redWrong)) {
+                Text(text = "Cancelar", color = Color.White, fontFamily = Lexend)
+            }
+        }
+        
+
     }
+
 }
 

@@ -213,6 +213,11 @@ class DataUtils {
                                 returningId
                             )
                         )
+
+                        DataHandler.messageList =
+                            getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
+                        DataHandler.forceMessagesUpdate.value = true
+
                         // Incrementa el índice solo si se elimina el mensaje
                         index++
 
@@ -282,16 +287,24 @@ class DataUtils {
                                 MessageRepository(room.messageDao()).insert(
                                     Converter.convertMessageWithImageFailedToMessageEntity(
                                         pendingMessage,
-                                        returningId
+                                        returningId,
+                                        imageID
                                     )
                                 )
+
+                                //Recargo los mensajes
+                                DataHandler.messageList =
+                                    getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
+                                DataHandler.forceMessagesUpdate.value = true
+
                                 // Incrementa el índice solo si se elimina el mensaje
                                 index++
 
                                 DataHandler(context).sendPushNotification(
                                     Converter.convertMessageWithImageFailedToMessageDTO(
                                         optionalId = returningId,
-                                        message = pendingMessage
+                                        message = pendingMessage,
+                                        imageID = imageID
                                     )
                                 )
 
@@ -312,6 +325,7 @@ class DataUtils {
     suspend fun sendSinglePendingMessageWithImage(context: Context, message:MessageWithImageFailed) {
         val room = WDDatabase.getDatabase(context)
         val pendingMessages = listOf<MessageWithImageFailed>(message)
+
 
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -348,23 +362,29 @@ class DataUtils {
                             //Ahora lo guardo en Room local
                             DataHandler(context).saveMessageWithImageLocal(imageID, Uri.parse(pendingMessage.uri))
 
-
                             MessageWithImageFailedRepository(room.messageWithImageFailedDao()).deleteMessage(
                                 pendingMessage
                             )
                             MessageRepository(room.messageDao()).insert(
                                 Converter.convertMessageWithImageFailedToMessageEntity(
                                     pendingMessage,
-                                    returningId
+                                    returningId,
+                                    imageID
                                 )
                             )
+
+                            //Recargo los mensajes
+                            DataHandler.messageList =
+                                getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
+                            DataHandler.forceMessagesUpdate.value = true
                             // Incrementa el índice solo si se elimina el mensaje
                             index++
 
                             DataHandler(context).sendPushNotification(
                                 Converter.convertMessageWithImageFailedToMessageDTO(
                                     optionalId = returningId,
-                                    message = pendingMessage
+                                    message = pendingMessage,
+                                    imageID = imageID
                                 )
                             )
 

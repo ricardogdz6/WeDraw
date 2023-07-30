@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -20,7 +19,6 @@ import com.bupware.wedraw.android.logic.dataHandler.DataHandler.Companion.bitmap
 import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
-import com.bupware.wedraw.android.roomData.WDDatabase
 import com.bupware.wedraw.android.theme.redWrong
 import com.bupware.wedraw.android.ui.drawingScreen.convertImageBitmapToBitmap
 import com.google.firebase.auth.ktx.auth
@@ -28,13 +26,8 @@ import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
@@ -75,6 +68,8 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     var sendConfirmation by savedStateHandle.saveable { mutableStateOf(false) }
     var removeCanva by savedStateHandle.saveable { mutableStateOf(false) }
+
+    var blankBitmap by savedStateHandle.saveable { mutableStateOf(true) }
 
     fun loadMessages(groupId:Long, context: Context){
         try {
@@ -151,10 +146,6 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     }
 
     fun sendMessageWithImage(text:String,imageId:Long,uri: Uri,context: Context, image: Bitmap){
-
-        addMessageLocal(image.asImageBitmap())
-        moveLazyToBottom = true
-
         attemptSendMessage(text = text, imageId = imageId, context = context, uri = uri, bitmap = image)
     }
 
@@ -222,11 +213,14 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         return { imageBitmap, error ->
 
             if (imageBitmap != null) {
-                if (hasColorOtherThanWhite(imageBitmap)) {
 
-                    val bitmap = convertImageBitmapToBitmap(bitmap = imageBitmap)
+                    val bitmap = convertImageBitmapToBitmap(bitmap = imageBitmap!!)
 
                     viewModelScope.launch {
+
+                        addMessageLocal(bitmap.asImageBitmap())
+                        moveLazyToBottom = true //TODO IF OFFSET
+
                         //Se guarda en local system y obtengo la uri
                         val uri = withContext(Dispatchers.IO) {
                             DataHandler(context).saveBitmapLocalOS(bitmap)
@@ -265,6 +259,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             }
 
                         } else {
+
                             DataHandler(context).saveFailedMessageWithImage(
                                 uri = uri, bitmap = bitmap, idGroup = groupId, message = Message(
                                     id = null,
@@ -281,30 +276,16 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
                     }
 
-                } else SnackbarManager.newSnackbar("No dejes el dibujo vacío", redWrong)
-            }
+                }
+
         }
     }
 
-}
-
-
-fun isColorWhite(color: Color): Boolean {
-    return color == Color.White
-}
-fun hasColorOtherThanWhite(imageBitmap: ImageBitmap): Boolean {
-    val bitmap = imageBitmap.asAndroidBitmap()
-
-    for (x in 0 until bitmap.width) {
-        for (y in 0 until bitmap.height) {
-            val pixelColor = bitmap.getPixel(x, y)
-            if (!isColorWhite(Color(pixelColor))) {
-                Log.i("wawa", "NO BLANCO: $x $y")
-                return true
-            }
+    fun pathHistory(): (Int, Int) -> Unit {
+        return { x: Int, y: Int ->
+            if (x != 0 || y != 0) blankBitmap = false
         }
     }
-    return false
 }
 
 fun hsvToColor(hue: Float, saturation: Float, value: Float): Color {

@@ -91,13 +91,13 @@ object Converter {
         )
     }
 
-    fun convertMessageWithImageFailedToMessageEntity(message: MessageWithImageFailed, optionalId:Long?):Message{
+    fun convertMessageWithImageFailedToMessageEntity(message: MessageWithImageFailed, optionalId:Long?,imageID:Long):Message{
         return Message(
             id = optionalId ?: message.id,
             owner_group_Id = message.owner_group_Id,
             ownerId = message.ownerId,
             text = message.text,
-            image_Id = message.image_Id,
+            image_Id = imageID,
             date = message.date
         )
     }
@@ -115,7 +115,7 @@ object Converter {
         )
     }
 
-    fun convertMessageWithImageFailedToMessageDTO(message:MessageWithImageFailed, optionalId:Long?):MessageDTO{
+    fun convertMessageWithImageFailedToMessageDTO(message:MessageWithImageFailed, optionalId:Long?,imageID: Long):MessageDTO{
         return MessageDTO(
             id = optionalId ?: message.id,
             text = message.text,

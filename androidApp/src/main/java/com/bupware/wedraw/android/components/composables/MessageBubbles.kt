@@ -48,7 +48,6 @@ import java.util.Calendar
 
 @Composable
 fun MessageBubbleHost(message: Message, showTriangle:Boolean, viewModel: ChatScreenViewModel = hiltViewModel()){
-
     val context = LocalContext.current
 
     val containsBitmap = message.bitmap != null

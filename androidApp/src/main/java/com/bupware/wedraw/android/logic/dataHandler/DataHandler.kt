@@ -71,7 +71,7 @@ class DataHandler(val context: Context) {
         MessageWithImageFailedRepository(room.messageWithImageFailedDao()).insert(roomMessageFailed)
 
         //Además, trato de enviarlo activamente
-        //TODO CAMBIAR ESTE PENDING POR EL DE IMAGE
+
         val dataUtils = DataUtils()
         dataUtils.sendSinglePendingMessageWithImage(context = context, message = roomMessageFailed)
 
