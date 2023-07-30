@@ -130,6 +130,8 @@ dependencies {
     implementation("com.godaddy.android.colorpicker:compose-color-picker:0.7.0")
     implementation("com.godaddy.android.colorpicker:compose-color-picker-android:0.7.0")
 
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
+
 
 
 

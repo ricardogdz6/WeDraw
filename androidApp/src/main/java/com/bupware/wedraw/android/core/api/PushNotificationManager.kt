@@ -18,6 +18,7 @@ class PushNotificationManager : FirebaseMessagingService() {
     @Override
     override fun onMessageReceived(message: RemoteMessage) {
 
+        //region REMOVE
         //Log incoming message
         Log.v("CloudMessage", "From ${message.from}")
 
@@ -43,6 +44,8 @@ class PushNotificationManager : FirebaseMessagingService() {
             Log.v("CloudMessage", "Notification Body ${message.notification!!.body}")
 
         }
+        //endregion
+
 
         val context = applicationContext
 
@@ -50,7 +53,7 @@ class PushNotificationManager : FirebaseMessagingService() {
 
             val imageId = if (message.data["imageId"].toString() == "null") null else message.data["imageId"]!!.toLong()
 
-            DataHandler(context).saveMessage(
+            DataHandler(context).saveMessageNoPush(
                 idGroup = message.data["groupId"]!!.toLong()
                 ,message = Message(
                     id = message.data["id"]!!.toLong(),
@@ -70,6 +73,7 @@ class PushNotificationManager : FirebaseMessagingService() {
                 val bitmap = DataHandler.blobToBitmap(byteArray!!)
                 val uri = DataHandler(context).saveBitmapLocalOS(bitmap)
                 DataHandler(context).saveBitmapLocal(imageId!!,uri)
+                DataHandler(context).saveMessageWithImageMemory(imageID = imageId, groupId = message.data["groupId"]!!.toLong(), uri = uri.toString())
             }
 
             DataHandler.forceMessagesUpdate.value = true

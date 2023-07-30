@@ -129,6 +129,55 @@ class DataHandler(val context: Context) {
 
     }
 
+    suspend fun saveMessageNoPush(message: Message, uri: Uri?, bitmap: Bitmap?, idGroup: Long) {
+
+        if (message.id == null){
+
+            val roomMessageFailed = com.bupware.wedraw.android.roomData.tables.message.MessageFailed(
+                owner_group_Id = message.groupId,
+                ownerId = message.senderId,
+                text = message.text,
+                image_Id = message.imageId,
+                date = message.date?.let { Date(it.time) },
+                uri = uri.toString(),
+                bitmap = if (bitmap == null) null else bitmapToBlob(bitmap)
+            )
+
+            //Guardo el mensaje en memoria
+            messageList[idGroup]?.add(message)
+
+            //Guardo el mensaje en local [ROOM]
+            MessageFailedRepository(room.messageFailedDao()).insert(roomMessageFailed)
+
+            //Además, trato de enviarlo activamente
+            val dataUtils = DataUtils()
+            dataUtils.sendSinglePendingMessage(context = context,message = roomMessageFailed)
+
+        } else {
+
+            val roomMessage = com.bupware.wedraw.android.roomData.tables.message.Message(
+                id = message.id,
+                owner_group_Id = message.groupId,
+                ownerId = message.senderId,
+                text = message.text,
+                image_Id = message.imageId,
+                date = message.date?.let { Date(it.time) }
+            )
+
+            //Guardo el mensaje en memoria
+            if (messageList[idGroup] != null){
+                messageList[idGroup]!!.add(message)
+            } else messageList[idGroup] = mutableListOf(message)
+
+
+            //Guardo el mensaje en local [ROOM]
+            MessageRepository(room.messageDao()).insert(roomMessage)
+
+
+        }
+
+    }
+
     suspend fun saveBitmapLocalOS(bitmap: Bitmap):Uri{
         return withContext(Dispatchers.IO) {
             val cacheDir = context.cacheDir

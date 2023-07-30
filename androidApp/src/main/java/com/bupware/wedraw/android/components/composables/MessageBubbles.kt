@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bupware.wedraw.android.components.extra.DeviceConfig
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.ui.chatScreen.ChatScreenViewModel
@@ -241,7 +242,7 @@ fun MessageBubble(message: Message, showTriangle:Boolean, viewModel: ChatScreenV
 
                         if (showTriangle) {
                             Text(
-                                text = message.senderId, //TODO AQUI EL NOMBRE
+                                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .graphicsLayer(rotationY = 180f)

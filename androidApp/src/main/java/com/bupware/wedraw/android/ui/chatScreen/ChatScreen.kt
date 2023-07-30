@@ -362,7 +362,7 @@ fun CanvasContent(controller: DrawController,viewModel: ChatScreenViewModel = hi
                 .weight(0.65f)
             ) {
                 Box(Modifier.clip(RoundedCornerShape(15.dp))) {
-                    DrawBox(drawController = controller, bitmapCallback = viewModel.processDrawing(context = context), trackHistory = viewModel.pathHistory())
+                    DrawBox(backgroundColor = Color.White,drawController = controller, bitmapCallback = viewModel.processDrawing(context = context), trackHistory = viewModel.pathHistory())
                 }
             }
             Spacer(modifier = Modifier.height(10.dp))

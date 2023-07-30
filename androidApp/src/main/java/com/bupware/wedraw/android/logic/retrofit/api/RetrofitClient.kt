@@ -1,6 +1,8 @@
 package com.bupware.wedraw.android.logic.retrofit.api
 
 import com.google.gson.*
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.reflect.Type
@@ -13,8 +15,7 @@ object RetrofitClient {
 
     //TODO QUITAR ESTA LINEA DEL MANIFEST android:usesCleartextTraffic="true"
 
-    //private const val BASE_URL = "http://ec2-13-40-218-75.eu-west-2.compute.amazonaws.com:5000/"
-    //private const val BASE_URL = "http://ec2-18-130-254-216.eu-west-2.compute.amazonaws.com:5000/"
+    //private const val BASE_URL = "http://ec2-15-188-118-107.eu-west-3.compute.amazonaws.com:8080/"
     private const val BASE_URL = "http://192.168.1.126:8080/"
 
     var gson = GsonBuilder()

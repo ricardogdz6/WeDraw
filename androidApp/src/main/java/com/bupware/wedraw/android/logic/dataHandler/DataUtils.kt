@@ -160,48 +160,10 @@ class DataUtils {
 
                 if (networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
 
-/*
-                    var imageID = -1L
-                    if (pendingMessage.uri != "null") {
-                        val imageId = withContext(Dispatchers.IO) {
-                            com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository.createImage(
-                                Image(
-                                    id = null,
-                                    bitmap = DataHandler.bitmapToBlob(
-                                        (DataHandler.blobToBitmap(pendingMessage.bitmap!!))
-                                    )
-                                )
-                            )
-                        }
-                        imageID = imageId ?: -1
-                    }
-
- */
-
 
                     val returningId = sendPendingMessage(
                         pendingMessage.toMessage()
                     )
-
-
-                    /*
-                    if (returningId != null) {
-
-                        if (pendingMessage.uri != "null") {
-                            //Lo guardo en memoria
-                            val oldMap = DataHandler.uriList[pendingMessage.owner_group_Id]!!.toMutableMap()
-                            oldMap[imageID!!] = Uri.parse(pendingMessage.uri.toString())
-                            DataHandler.uriList[pendingMessage.owner_group_Id] = oldMap!!
-
-                            //Ahora lo guardo en Room local
-                            val room = WDDatabase.getDatabase(context = context)
-                            if (imageID != null) DataHandler(context).saveBitmapLocal(
-                                imageID,
-                                Uri.parse(pendingMessage.uri!!)
-                            )
-                        }
-
-                     */
 
 
                         MessageFailedRepository(room.messageFailedDao()).deleteMessage(

@@ -14,6 +14,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -201,7 +202,24 @@ object Converter {
         val pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"
         val dateFormat = SimpleDateFormat(pattern)
 
-        return dateFormat.parse(dateString)
+        // La hora que llega es de Madrid
+        val madridDate = dateFormat.parse(dateString)
+
+        // Obtener el offset
+        val currentMilis = System.currentTimeMillis()
+        var differenceMilis = 0L
+        var systemDate = madridDate
+
+        if (madridDate.time > currentMilis) {
+            differenceMilis = madridDate.time - currentMilis
+            systemDate = Date(systemDate.time - differenceMilis)
+        }
+        else {
+            differenceMilis = currentMilis - madridDate.time
+            systemDate = Date(systemDate.time + differenceMilis)
+        }
+
+        return systemDate
     }
 
 
