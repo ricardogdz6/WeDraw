@@ -116,7 +116,7 @@ fun MessageHostBodyImageID(bitmap: Bitmap, message: Message,showTriangle:Boolean
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = blueVariant2WeDraw //TODO CAMBIAL.
+                color = blueVariant2WeDraw
                 , textAlign = TextAlign.Start
             )
         }
@@ -153,7 +153,7 @@ fun MessageHostBodyBitmap(message: Message,showTriangle:Boolean){
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = blueVariant2WeDraw //TODO CAMBIAL.
+                color = blueVariant2WeDraw
                 , textAlign = TextAlign.Start
             )
         }
@@ -303,7 +303,7 @@ fun MessageBodyImageID(bitmap: Bitmap,message: Message,showTriangle:Boolean){
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = blueVariant2WeDraw //TODO CAMBIAL.
+                color = blueVariant2WeDraw
                 , textAlign = TextAlign.Start
             )
         }
@@ -341,7 +341,7 @@ fun MessageBodyImageBitmap(message: Message,showTriangle:Boolean){
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = blueVariant2WeDraw //TODO CAMBIAL.
+                color = blueVariant2WeDraw
                 , textAlign = TextAlign.Start
             )
         }
@@ -381,7 +381,7 @@ fun MessageBodyText(showTriangle:Boolean,message: Message){
                     .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 0.dp),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = blueVariant2WeDraw //TODO CAMBIAL.
+                color = blueVariant2WeDraw
                 , textAlign = TextAlign.Start
             )
         }

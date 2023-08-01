@@ -23,4 +23,7 @@ interface GroupDao {
     @Query("SELECT * FROM groups_table WHERE groupId = :groupId")
     fun getGroupByGroupId(groupId: Long): Flow<Group>
 
+    @Query("DELETE FROM groups_table WHERE groupId = :groupId")
+    fun deleteGroupById(groupId: Long)
+
 }

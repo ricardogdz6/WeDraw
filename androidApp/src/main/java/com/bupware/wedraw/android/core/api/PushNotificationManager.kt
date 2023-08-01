@@ -26,6 +26,14 @@ class PushNotificationManager : FirebaseMessagingService() {
 
             val imageId = if (message.data["imageId"].toString() == "null") null else message.data["imageId"]!!.toLong()
 
+            //region Se añade el usuario si no existia
+            val isUserInMemory = DataHandler.userList.firstOrNull { it.id ==  message.data["senderId"].toString()}
+            if (isUserInMemory == null) {
+                val user = withContext(Dispatchers.IO) { UserRepository.getUserById(message.data["senderId"].toString())!!.first()}
+                DataHandler.userList.add(user)
+            }
+            //endregion
+
             DataHandler(context).saveMessageNoPush(
                 idGroup = message.data["groupId"]!!.toLong()
                 ,message = Message(
@@ -48,14 +56,6 @@ class PushNotificationManager : FirebaseMessagingService() {
                 DataHandler(context).saveBitmapLocal(imageId!!,uri)
                 DataHandler(context).saveMessageWithImageMemory(imageID = imageId, groupId = message.data["groupId"]!!.toLong(), uri = uri.toString())
             }
-
-            //region Se añade el usuario si no existia
-            val isUserInMemory = DataHandler.userList.firstOrNull { it.id ==  message.data["senderId"].toString()}
-            if (isUserInMemory == null) {
-                val user = withContext(Dispatchers.IO) { UserRepository.getUserById(message.data["senderId"].toString())!!.first()}
-                DataHandler.userList.add(user)
-            }
-            //endregion
 
             DataHandler.forceMessagesUpdate.value = true
 

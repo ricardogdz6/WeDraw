@@ -18,8 +18,10 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler.Companion.bitmapToBlob
+import com.bupware.wedraw.android.logic.dataHandler.DataUtils
 import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
+import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository
 import com.bupware.wedraw.android.theme.redWrong
 import com.bupware.wedraw.android.ui.drawingScreen.convertImageBitmapToBitmap
@@ -41,7 +43,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     var writingMessage by savedStateHandle.saveable { mutableStateOf("") }
 
     var moveLazyToBottom by savedStateHandle.saveable { mutableStateOf(true) }
-    var exportDrawing by savedStateHandle.saveable { mutableStateOf(false) }
+    var isFirstMessageVisible by savedStateHandle.saveable { mutableStateOf(true) }
 
     var groupId = 0L
     var userID: String = Firebase.auth.currentUser?.uid.toString()
@@ -284,8 +286,31 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
     }
 
     fun chatGoBottom(){
-        //TODO IF NO OFFSET
-        moveLazyToBottom = true
+        if (isFirstMessageVisible){
+            moveLazyToBottom = true
+        }
+    }
+
+    fun exitGroup(context: Context){
+        //TODO dejar el grupo en local y gestionarlo para una futura update
+
+        //Nos salimos del grupo en remoto y en local
+        viewModelScope.launch {
+            val deleteCompleted = withContext(Dispatchers.Default) {GroupRepository.exitGroup(userID,groupId)}
+
+            DataUtils.deleteGroupInMemory(groupId)
+
+            if (deleteCompleted){
+                DataHandler(context).exitGroup(groupId)
+            }
+
+            //Y envio el push para actualizar los grupos en vivo
+            DataUtils.sendGroupExitPush()
+
+        }
+       
+
+
     }
 
     fun copyToClipboard(context: Context, text: String, label: String = "Copied Text") {
@@ -343,4 +368,5 @@ fun hsvToColor(hue: Float, saturation: Float, value: Float): Color {
 
     return Color(red, green, blue)
 }
+
 

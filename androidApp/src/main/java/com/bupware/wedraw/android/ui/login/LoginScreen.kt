@@ -56,7 +56,6 @@ fun PreviewLogin() {
 
 @Composable
 fun LoginScreen(navController: NavController,viewModel: LoginViewModel = hiltViewModel() ) {
-    //TODO QUITAR ESTE FIX
 
     val context = LocalContext.current
 

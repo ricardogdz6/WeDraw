@@ -165,15 +165,14 @@ class DataUtils {
                     )
 
 
-                        MessageFailedRepository(room.messageFailedDao()).deleteMessage(
-                            pendingMessage
+                    MessageFailedRepository(room.messageFailedDao()).deleteMessage(
+                        pendingMessage
+                    )
+                    MessageRepository(room.messageDao()).insert(
+                        Converter.convertMessageFailedToMessageEntity(
+                            pendingMessage, returningId
                         )
-                        MessageRepository(room.messageDao()).insert(
-                            Converter.convertMessageFailedToMessageEntity(
-                                pendingMessage,
-                                returningId
-                            )
-                        )
+                    )
 
                         DataHandler.messageList =
                             getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
@@ -501,6 +500,8 @@ class DataUtils {
         return usersTotal
     }
 
+
+
     private suspend fun remoteGroupsToLocal(groups: List<Group>, context: Context): Boolean {
 
         val database = WDDatabase.getDatabase(context)
@@ -589,6 +590,15 @@ class DataUtils {
 
         }
 
+        suspend fun sendGroupExitPush(){
+
+        }
+
+        fun deleteGroupInMemory(groupId:Long){
+            val targetGroup = DataHandler.groupList.first { it.id == groupId }
+            DataHandler.groupList.remove(targetGroup)
+        }
+
         suspend fun updateUsername(newUsername: String): Boolean {
 
             var usernameExists = withContext(Dispatchers.Default) {
@@ -654,5 +664,7 @@ class DataUtils {
             }
         }
     }
+
+
 
 }

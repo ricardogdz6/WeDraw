@@ -269,6 +269,17 @@ class DataHandler(val context: Context) {
 
     }
 
+    suspend fun exitGroup(groupId: Long){
+        val room = WDDatabase.getDatabase(context = context)
+        GroupRepository(room.groupDao()).deleteGroup(groupId = groupId)
+    }
+
+    suspend fun deleteUserFromGroup(){
+        val room = WDDatabase.getDatabase(context = context)
+        GroupWithUsersRepository(room.groupWithUsersDao())
+        //TODO PUSH
+    }
+
 
     companion object {
 

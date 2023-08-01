@@ -65,7 +65,7 @@ object Converter {
                     senderId = message.ownerId,
                     groupId = message.owner_group_Id,
                     imageID = message.image_Id,
-                    timeZone = null, //Todo: No se si el timezone aqui deberia ser null.
+                    timeZone = null,
                     bitmap = null
                 )
             )

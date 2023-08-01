@@ -342,7 +342,6 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
 
 @Composable
 fun PeopleLimitBar(){
-    //TODO quitar el hardcode del limit
     Row(
         Modifier
             .height(40.dp)
@@ -476,7 +475,6 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                //TODO FUNCIONA CORRECTAMENTE LAS NOTIFICACIONES?
                 if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong() && DataHandler.notificationList[idGroup.toLong()] != null) {
 
                     Column(
@@ -602,7 +600,6 @@ fun MoreColorsButton(viewModel: ChatScreenViewModel = hiltViewModel()){
         .background(Color.White, CircleShape)
         .width(40.dp)
         .fillMaxHeight(),onClick = {
-        //TODO PREMIUM
         viewModel.colorWheelShow = true
     }) {
         Icon(

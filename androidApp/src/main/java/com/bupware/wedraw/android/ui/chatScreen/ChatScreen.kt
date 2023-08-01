@@ -1,7 +1,12 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.graphics.Rect
 import android.util.Log
+import android.view.ViewTreeObserver
+import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -21,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +36,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,19 +44,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,6 +70,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -65,6 +80,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -84,6 +101,7 @@ import com.bupware.wedraw.android.components.composables.MessageBubbleHost
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
+import com.bupware.wedraw.android.components.extra.keyboardAsState
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Group
@@ -107,6 +125,7 @@ fun PreviewChatScreen(){
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
@@ -136,6 +155,7 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
         else navController.popBackStack()
     }
 
+
     Box {
         //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
         val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
@@ -147,6 +167,8 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
     }
 
 }
+
+
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -163,7 +185,7 @@ fun TopBar(controller: DrawController,navController: NavController, code:String,
     //Topbar
     Column() {
         ChatTopBar(navController, code = code, groupName = groupName)
-        DrawingCanvas(people = people, controller = controller)
+        DrawingCanvas(people = people, navController = navController ,controller = controller)
     }
 }
 
@@ -223,7 +245,7 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun DrawingCanvas(controller: DrawController,people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
+fun DrawingCanvas(controller: DrawController, navController: NavController,people:Int,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     Box() {
 
@@ -288,9 +310,12 @@ fun DrawingCanvas(controller: DrawController,people:Int,viewModel: ChatScreenVie
                 .fillMaxWidth()
             , horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
 
+            val context = LocalContext.current
+            //TODO Meter funcionalidad a este boton
             //region 3 DOTS
             IconButton(modifier = Modifier.padding(top = 0.dp, start = 5.dp),onClick = {
-                TODO()
+                //navController.popBackStack()
+                //viewModel.exitGroup(context = context)
             }) {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.threedots),
@@ -313,8 +338,9 @@ fun DrawingCanvas(controller: DrawController,people:Int,viewModel: ChatScreenVie
                 color = Color.White
             )
 
+            //TODO meter funcionalidad a este onclick para ver usuarios
             IconButton(modifier = Modifier.padding(top = 0.dp, end = 5.dp, start = 2.dp),onClick = {
-                TODO()
+
             }) {
                 Box(
                     Modifier
@@ -525,6 +551,7 @@ fun MoreColors(viewModel: ChatScreenViewModel = hiltViewModel()){
 fun ChatTopBar(navController: NavController, groupName:String ,code:String ,viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val context = LocalContext.current
+    val isKeyboardOpen by keyboardAsState()
 
     Box() {
 
@@ -543,7 +570,7 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
             .background(Color.White, RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp))) {
         
         //Back && Name
-        Box(Modifier.fillMaxHeight(0.5f)) {
+        Box(Modifier.fillMaxHeight(if (isKeyboardOpen.name == "Opened") 1f else 0.5f)) {
 
             //Go back
             Row(
@@ -568,6 +595,7 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
             }
         }
 
+        if (isKeyboardOpen.name == "Closed") {
 
             //CODE
             Row(
@@ -601,13 +629,14 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
                     .offset(x = (-5).dp, y = (-5).dp)
                     .fillMaxHeight(0.8f)
                     .background(color = blueVariant2WeDraw, RoundedCornerShape(8.dp))
-                    .clickable { viewModel.copyToClipboard(context,code) }) {
+                    .clickable { viewModel.copyToClipboard(context, code) }) {
                     Icon(
                         imageVector = ImageVector.vectorResource(id = R.drawable.clipboard),
                         tint = Color.White,
                         contentDescription = "CopyToClipboard"
                     )
                 }
+            }
         }
 
     }
@@ -622,52 +651,69 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
+    //region Controlar el offset del chat
+    val firstVisibleItemIndex = listState.firstVisibleItemIndex
+    val isFirstItemVisible = firstVisibleItemIndex == 0
+
+    LaunchedEffect(isFirstItemVisible) {
+        viewModel.isFirstMessageVisible = isFirstItemVisible
+    }
+    //endregion
+
+    val isKeyboardOpen by keyboardAsState()
+    LaunchedEffect(isKeyboardOpen.name == "Opened"){
+        viewModel.chatGoBottom()
+    }
+
     LaunchedEffect(viewModel.moveLazyToBottom) {
         viewModel.moveLazyToBottom = false
         scope.launch {
-            listState.scrollToItem(viewModel.messageList.size)
+            listState.scrollToItem(0)
         }
     }
 
 
-    LazyColumn(state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom) {
+
+    LazyColumn(reverseLayout = true, state = listState,modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(top = 200.dp,bottom = 100.dp),verticalArrangement = Arrangement.Bottom) {
         items(viewModel.messageList.size) { index ->
 
-            val isIndexRestable = index != 0
+            val isIndexRestable = index != viewModel.messageList.size - 1
+            val reversedIndex = (viewModel.messageList.size - 1) - index
+
             val isMessageSenderSameThanLast =
-                isIndexRestable && viewModel.messageList[index - 1].senderId == viewModel.messageList[index].senderId
+                isIndexRestable && viewModel.messageList[reversedIndex - 1].senderId == viewModel.messageList[reversedIndex].senderId
             val isMessageSenderDifferentThanLast =
-                isIndexRestable && viewModel.messageList[index - 1].senderId != viewModel.messageList[index].senderId
+                isIndexRestable && viewModel.messageList[reversedIndex - 1].senderId != viewModel.messageList[reversedIndex].senderId
 
             when {
 
                 //Si el siguiente mensaje es de la misma persona se pone el bubble sin arrow
                 isMessageSenderSameThanLast -> {
-                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                    if (viewModel.messageList[reversedIndex].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                             Spacer(modifier = Modifier.height(5.dp))
-                            MessageBubbleHost(viewModel.messageList[index], false)
+                            MessageBubbleHost(viewModel.messageList[reversedIndex], false)
                         }
 
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                             Spacer(modifier = Modifier.height(5.dp))
-                            MessageBubble(viewModel.messageList[index], false)
+                            MessageBubble(viewModel.messageList[reversedIndex], false)
                         }
                     }
                 }
 
                 //Si el siguiente mensaje es de otra persona se vuelve a poner el mensaje básico normal
                 isMessageSenderDifferentThanLast -> {
-                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                    if (viewModel.messageList[reversedIndex].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
                             Spacer(modifier = Modifier.height(10.dp))
-                            MessageBubbleHost(viewModel.messageList[index], true)
+                            MessageBubbleHost(viewModel.messageList[reversedIndex], true)
                         }
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
                             Spacer(modifier = Modifier.height(10.dp))
-                            MessageBubble(viewModel.messageList[index], true)
+                            MessageBubble(viewModel.messageList[reversedIndex], true)
 
                         }
                     }
@@ -675,13 +721,13 @@ fun Chat(viewModel: ChatScreenViewModel = hiltViewModel()){
 
                 //Si no, es un mensaje básico
                 else -> {
-                    if (viewModel.messageList[index].senderId == viewModel.userID) {
+                    if (viewModel.messageList[reversedIndex].senderId == viewModel.userID) {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.End) {
-                            MessageBubbleHost(viewModel.messageList[index], true)
+                            MessageBubbleHost(viewModel.messageList[reversedIndex], true)
                         }
                     } else {
                         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-                            MessageBubble(viewModel.messageList[index], true)
+                            MessageBubble(viewModel.messageList[reversedIndex], true)
                         }
                     }
                 }

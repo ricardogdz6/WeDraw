@@ -34,7 +34,7 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 
 //region MainScreen
-//TODO gestionar inputs y esas cosas
+
 @Composable
 fun TextFieldJoin(modificador: Modifier){
 

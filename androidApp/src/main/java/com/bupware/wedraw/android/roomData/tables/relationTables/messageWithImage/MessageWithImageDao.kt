@@ -13,7 +13,7 @@ interface MessageWithImageDao : MessageDao, ImageDao {
     @Query("SELECT * FROM messages_table INNER JOIN images_table ON messages_table.id = images_table.id WHERE messages_table.id = :messagesId")
     fun getMessageWithImage(messagesId: Long): MessageWithImage
 
-    //TODO ID NULL? CHEKIAR
+
     @Transaction
     suspend fun insertMessageWithImage(messageWithImage: MessageWithImage) {
         val imgId = insertImage(messageWithImage.image)

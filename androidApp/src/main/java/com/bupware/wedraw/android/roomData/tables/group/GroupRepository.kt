@@ -10,6 +10,8 @@ class GroupRepository (private val groupDao: GroupDao) {
 
     fun deleteAll() = groupDao.deleteAll()
 
+    fun deleteGroup(groupId: Long) = groupDao.deleteGroupById(groupId)
+
     val readAllData : Flow<List<Group>> = groupDao.readAllData()
 
     fun getGroupByGroupId(groupId: Long): Flow<Group> = groupDao.getGroupByGroupId(groupId)

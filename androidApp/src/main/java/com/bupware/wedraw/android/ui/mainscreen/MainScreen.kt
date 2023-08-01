@@ -85,7 +85,7 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
         viewModel.initValues(context)
     }
 
-    //TODO QUITAR ESTE FIX
+
     BackHandler() {}
 
     SystemBarColor(color = Color(0xFF2C4560))
@@ -275,7 +275,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
     else if (viewModel.showGroups && viewModel.groupList.isEmpty()) {
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            //TODO ANIMACION VANISH?
             Text(text = stringResource(R.string.crea_o_nete_a_un_grupo), fontFamily = Lexend, fontWeight = FontWeight.Bold)
         }
 
@@ -322,7 +321,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
-    //TODO quitar este hardcode
     LaunchedEffect(Unit){
         viewModel.showSettings = true
     }
