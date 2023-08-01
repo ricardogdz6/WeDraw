@@ -404,6 +404,7 @@ fun CanvasContent(controller: DrawController,viewModel: ChatScreenViewModel = hi
 @Composable
 fun CanvasButtons(controller: DrawController, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+    Spacer(modifier = Modifier.height(5.dp))
     Column(Modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(modifier = Modifier
             .fillMaxWidth(0.95f)
@@ -554,7 +555,7 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
 
             //Titulo
             Row(Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                Text(modifier = Modifier.fillMaxWidth(), text = groupName, fontFamily = Lexend, fontSize = 25.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                Text(modifier = Modifier.fillMaxWidth(), text = groupName, fontFamily = Lexend, fontSize = 25.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, color = Color.Black)
 
             }
         }
@@ -696,7 +697,7 @@ fun ConfirmationWindow(controller: DrawController,viewModel: ChatScreenViewModel
             .background(Color(0x812C4560), RoundedCornerShape(15.dp))
             .padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-        Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.White, fontFamily = Lexend)
+        Text(text = "¿Estás seguro de querer enviar este dibujo?", color = Color.White, fontFamily = Lexend, textAlign = TextAlign.Center)
         
         Spacer(modifier = Modifier.height(10.dp))
         

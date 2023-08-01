@@ -5,9 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.asAndroidBitmap
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
@@ -25,13 +23,15 @@ import com.bupware.wedraw.android.roomData.tables.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
+import java.sql.Blob
 import java.sql.Date
+import java.sql.SQLException
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
 class DataHandler(val context: Context) {
@@ -58,7 +58,7 @@ class DataHandler(val context: Context) {
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
-                image_Id = message.imageId,
+                image_Id = message.imageID,
                 date = message.date?.let { Date(it.time) },
                 uri = uri.toString(),
                 bitmap = bitmapToBlob(bitmap)
@@ -86,7 +86,7 @@ class DataHandler(val context: Context) {
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
-                image_Id = message.imageId,
+                image_Id = message.imageID,
                 date = message.date?.let { Date(it.time) },
                 uri = uri.toString(),
                 bitmap = if (bitmap == null) null else bitmapToBlob(bitmap)
@@ -109,7 +109,7 @@ class DataHandler(val context: Context) {
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
-                image_Id = message.imageId,
+                image_Id = message.imageID,
                 date = message.date?.let { Date(it.time) }
             )
 
@@ -121,7 +121,6 @@ class DataHandler(val context: Context) {
 
             //Guardo el mensaje en local [ROOM]
             MessageRepository(room.messageDao()).insert(roomMessage)
-
 
             sendPushNotification(message)
 
@@ -137,7 +136,7 @@ class DataHandler(val context: Context) {
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
-                image_Id = message.imageId,
+                image_Id = message.imageID,
                 date = message.date?.let { Date(it.time) },
                 uri = uri.toString(),
                 bitmap = if (bitmap == null) null else bitmapToBlob(bitmap)
@@ -160,7 +159,7 @@ class DataHandler(val context: Context) {
                 owner_group_Id = message.groupId,
                 ownerId = message.senderId,
                 text = message.text,
-                image_Id = message.imageId,
+                image_Id = message.imageID,
                 date = message.date?.let { Date(it.time) }
             )
 
@@ -298,8 +297,27 @@ class DataHandler(val context: Context) {
             return stream.toByteArray()
         }
 
-        fun blobToBitmap(blob: ByteArray): Bitmap {
-            return BitmapFactory.decodeByteArray(blob, 0, blob.size)
+        fun blobToBitmap(blob: Blob?): Bitmap? {
+            if (blob == null) return null
+
+            return try {
+                val inputStream = blob.binaryStream
+                val bytes = ByteArrayOutputStream()
+                val buffer = ByteArray(4096)
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    bytes.write(buffer, 0, bytesRead)
+                }
+                val byteArray = bytes.toByteArray()
+                BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            } catch (e: IOException) {
+                // Manejar la excepción si ocurre un error al leer los bytes
+                null
+            }
+        }
+
+        fun byteArrayToBitmap(byteArray: ByteArray): Bitmap {
+            return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
         }
 
     }

@@ -1,6 +1,5 @@
 package com.bupware.wedraw.android.core.utils
 
-import android.util.Log
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.roomData.tables.message.Message
@@ -9,14 +8,7 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailed
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.user.User
 import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import java.util.TimeZone
 import com.bupware.wedraw.android.logic.models.User as UserDTO
 import com.bupware.wedraw.android.logic.models.Group as GroupDTO
@@ -72,7 +64,7 @@ object Converter {
                     date = message.date,
                     senderId = message.ownerId,
                     groupId = message.owner_group_Id,
-                    imageId = message.image_Id,
+                    imageID = message.image_Id,
                     timeZone = null, //Todo: No se si el timezone aqui deberia ser null.
                     bitmap = null
                 )
@@ -109,7 +101,7 @@ object Converter {
             text = message.text,
             timeZone = null,
             senderId = message.ownerId,
-            imageId = message.image_Id,
+            imageID = message.image_Id,
             groupId = message.owner_group_Id,
             date = message.date,
             bitmap = null
@@ -122,7 +114,7 @@ object Converter {
             text = message.text,
             timeZone = null,
             senderId = message.ownerId,
-            imageId = message.image_Id,
+            imageID = message.image_Id,
             groupId = message.owner_group_Id,
             date = message.date,
             bitmap = null
@@ -136,7 +128,7 @@ object Converter {
             date = messageEntity.date,
             senderId = messageEntity.ownerId,
             groupId = messageEntity.owner_group_Id,
-            imageId = messageEntity.image_Id,
+            imageID = messageEntity.image_Id,
             timeZone = TimeZone.getDefault(),
             bitmap = null
         )

@@ -8,7 +8,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.lifecycle.viewModelScope
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Image
@@ -227,7 +226,7 @@ class DataUtils {
                     //PARA ESTAS ALTURAS, SE PUEDE TENER O NO, ASÍ QUE PRIMERO COMPRUEBO SI ES NULL
                     if (pendingMessage.image_Id != null ) {imageID = pendingMessage.image_Id}
                     else if (imageID == null) {
-                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, bitmap = pendingMessage.bitmap!!))}
+                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, byteArray = pendingMessage.bitmap!!))}
                     }
 
                     if (imageID != null){
@@ -309,7 +308,7 @@ class DataUtils {
                     //PARA ESTAS ALTURAS, SE PUEDE TENER O NO, ASÍ QUE PRIMERO COMPRUEBO SI ES NULL
                     if (pendingMessage.image_Id != null ) {imageID = pendingMessage.image_Id}
                     else if (imageID == null) {
-                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, bitmap = pendingMessage.bitmap!!))}
+                        imageID = withContext(Dispatchers.IO) { MessageRepositoryRetrofit.createImage(Image(id = null, byteArray = pendingMessage.bitmap!!))}
                     }
 
                     if (imageID != null){
@@ -449,8 +448,12 @@ class DataUtils {
             val uriList = mutableMapOf<Long, Uri>()
 
             message.value.forEach {
-                if (it.imageId != null) {
-                    uriList[it.imageId!!] = DataHandler(context).loadUrisRoom(it.imageId!!)
+                try {
+                    if (it.imageID != null) {
+                        uriList[it.imageID!!] = DataHandler(context).loadUrisRoom(it.imageID!!)
+                    }
+                } catch (e:Exception) {
+                    Log.i("EXCEPTION", e.stackTraceToString())
                 }
             }
 

@@ -9,7 +9,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.EOFException
 
 object UserRepository {
     private val userService = RetrofitClient.getRetrofit().create(UserService::class.java)
@@ -58,8 +57,8 @@ object UserRepository {
         })
     }
 
-    suspend fun getUserById(email:String): List<User>? = suspendCancellableCoroutine { continuation ->
-        userService.getUserById(email).enqueue(object : Callback<List<User>> {
+    suspend fun getUserById(id:String): List<User>? = suspendCancellableCoroutine { continuation ->
+        userService.getUserById(id).enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if (response.isSuccessful){
                     continuation.resume(response.body(),null)

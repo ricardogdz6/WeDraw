@@ -9,6 +9,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.sql.Blob
 
 object MessageRepository {
     private val messageService = RetrofitClient.getRetrofit().create(MessageService::class.java)
@@ -69,15 +70,16 @@ object MessageRepository {
         })
     }
 
-    suspend fun getImage(imageID: Long): ByteArray? = suspendCancellableCoroutine { continuation ->
-        messageService.getImage(imageID).enqueue(object : Callback<ByteArray> {
-            override fun onResponse(call: Call<ByteArray>, response: Response<ByteArray>) {
+    suspend fun getImage(imageID: Long): Image? = suspendCancellableCoroutine { continuation ->
+        messageService.getImage(imageID).enqueue(object : Callback<Image> {
+            override fun onResponse(call: Call<Image>, response: Response<Image>) {
                 if (response.isSuccessful) {
                     continuation.resume(response.body(),null)
                 }
             }
 
-            override fun onFailure(call: Call<ByteArray>, t: Throwable) {
+            override fun onFailure(call: Call<Image>, t: Throwable) {
+                Log.i("wawa",t.stackTraceToString())
                 continuation.resume(null,null)
             }
         })

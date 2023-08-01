@@ -7,9 +7,11 @@ import com.bupware.wedraw.android.logic.models.User
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import java.sql.Blob
 
 interface MessageService {
 
@@ -26,7 +28,7 @@ interface MessageService {
     fun createMessage(@Body message: Message): Call<Long>
 
     @GET("/weDraw/messages/getImage/{imageID}")
-    fun getImage(@Path("imageID") imageID: Long): Call<ByteArray>
+    fun getImage(@Path("imageID") imageID: Long): Call<Image>
 
     @POST("/weDraw/messages/createImage")
     fun createImage(@Body image: Image): Call<Long>

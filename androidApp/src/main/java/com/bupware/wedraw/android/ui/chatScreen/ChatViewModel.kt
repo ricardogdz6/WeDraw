@@ -115,7 +115,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 senderId = userID,
                                 groupId = groupId,
                                 date = null,
-                                imageId = null,
+                                imageID = null,
                                 bitmap = null
                             )
                         )
@@ -127,7 +127,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                 text = text,
                                 timeZone = TimeZone.getDefault(),
                                 senderId = userID,
-                                imageId = null,
+                                imageID = null,
                                 groupId = groupId,
                                 date = Date(),
                                 bitmap = null
@@ -151,7 +151,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
 
     fun addMessageLocal(image: ImageBitmap? = null){
-        val newMessage = Message(id = null, text = if (image != null) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageId = null,date = Date(), bitmap = image)
+        val newMessage = Message(id = null, text = if (image != null) "" else writingMessage, timeZone = TimeZone.getDefault(), senderId =userID ,groupId =groupId, imageID = null,date = Date(), bitmap = image)
         val oldList = messageList.toMutableList()
         oldList.add(newMessage)
 
@@ -171,7 +171,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                         senderId = userID,
                         groupId = groupId,
                         date = null,
-                        imageId = imageId,
+                        imageID = imageId,
                         bitmap = null
                     )
                 )
@@ -182,7 +182,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                        text= "",
                        timeZone= TimeZone.getDefault(),
                        senderId= userID,
-                       imageId= imageId,
+                       imageID= imageId,
                        groupId= groupId,
                        date= Date(),
                         bitmap = null
@@ -196,7 +196,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             text = text,
                             timeZone = TimeZone.getDefault(),
                             senderId = userID,
-                            imageId = imageId ?: 0,
+                            imageID = imageId,
                             groupId = groupId,
                             date = Date(),
                             bitmap = null
@@ -231,7 +231,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             MessageRepository.createImage(
                                 Image(
                                     id = null,
-                                    bitmap = bitmapToBlob(bitmap)
+                                    byteArray = bitmapToBlob(bitmap)
                                 )
                             )
                         }
@@ -266,7 +266,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                                     text = "",
                                     timeZone = TimeZone.getDefault(),
                                     senderId = userID,
-                                    imageId = null,
+                                    imageID = null,
                                     groupId = groupId,
                                     date = Date(),
                                     bitmap = null
