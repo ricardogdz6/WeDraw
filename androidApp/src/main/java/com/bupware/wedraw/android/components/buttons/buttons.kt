@@ -57,6 +57,7 @@ import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.blueWeDraw
 import com.bupware.wedraw.android.theme.Lexend
@@ -484,7 +485,7 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong() && DataHandler.notificationList[idGroup.toLong()] != null) {
+                if (MemoryData.notificationList[idGroup.toLong()] != 0.toLong() && MemoryData.notificationList[idGroup.toLong()] != null) {
 
                     Column(
                         Modifier
@@ -496,7 +497,7 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
                     ) {
                         Text(
                             modifier = Modifier,
-                            text = DataHandler.notificationList[idGroup.toLong()].toString(),
+                            text = MemoryData.notificationList[idGroup.toLong()].toString(),
                             color = Color.White,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,

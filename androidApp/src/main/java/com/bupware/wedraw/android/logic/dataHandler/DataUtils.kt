@@ -59,24 +59,24 @@ class DataUtils:Serializable {
         withContext(Dispatchers.Default) {
 
 
-                DataHandler.groupList = Converter.converterGroupsEntityToGroupsList(
+            MemoryData.groupList = Converter.converterGroupsEntityToGroupsList(
                     getGroupsLocal(context) ?: emptyList()
                 )
 
-                DataHandler.forceGroupsUpdate.value = true
+            MemoryData.forceGroupsUpdate.value = true
 
-                Log.i("DataUtils", "initData: ${DataHandler.groupList}")
-                DataHandler.userList =
+
+            MemoryData.userList =
                     Converter.convertUsersEntityToUsersList(
                         getUsersLocal(context) ?: emptySet()
                     )
-                Log.i("DataUtils", "initData: ${DataHandler.userList}")
 
-                DataHandler.messageList =
-                    getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
-                Log.i("DataUtils", "initData: ${DataHandler.messageList}")
 
-                DataHandler.uriList = getMapOfMessageUri(context).toMutableMap()
+            MemoryData.messageList =
+                    getMapOfMessageByGroup(MemoryData.groupList, context).toMutableMap()
+
+
+            MemoryData.uriList = getMapOfMessageUri(context).toMutableMap()
 
                 initNotificationCounter(context)
 
@@ -87,8 +87,8 @@ class DataUtils:Serializable {
                 getGroupsRemote(context).also {
                     if (it != null) remoteGroupsToLocal(it, context)
                 }?.let {
-                    DataHandler.groupList = it.toMutableList()
-                    DataHandler.forceGroupsUpdate.value = true
+                    MemoryData.groupList = it.toMutableList()
+                    MemoryData.forceGroupsUpdate.value = true
                 }
 
 
@@ -97,7 +97,6 @@ class DataUtils:Serializable {
                 }
 
 
-                Log.i("DataUtils", "initData: ${DataHandler.groupList}")
 
 
 
@@ -135,11 +134,11 @@ class DataUtils:Serializable {
         val PREFS_NAME = "MyPrefs"
         val NOTIFICATION_COUNT_KEY = "notification_count"
 
-        DataHandler.groupList.forEach {
+        MemoryData.groupList.forEach {
 
             val preferences =
                 context.getSharedPreferences(PREFS_NAME, FirebaseMessagingService.MODE_PRIVATE)
-            DataHandler.notificationList[it.id!!] =
+            MemoryData.notificationList[it.id!!] =
                 preferences.getInt(NOTIFICATION_COUNT_KEY + "${it.id}", 0).toLong()
 
 
@@ -185,9 +184,9 @@ class DataUtils:Serializable {
                         )
                     )
 
-                        DataHandler.messageList =
-                            getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
-                        DataHandler.forceMessagesUpdate.value = true
+                    MemoryData.messageList =
+                            getMapOfMessageByGroup(MemoryData.groupList, context).toMutableMap()
+                    MemoryData.forceMessagesUpdate.value = true
 
                         // Incrementa el índice solo si se elimina el mensaje
                         index++
@@ -264,9 +263,9 @@ class DataUtils:Serializable {
                                 )
 
                                 //Recargo los mensajes
-                                DataHandler.messageList =
-                                    getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
-                                DataHandler.forceMessagesUpdate.value = true
+                                MemoryData.messageList =
+                                    getMapOfMessageByGroup(MemoryData.groupList, context).toMutableMap()
+                                MemoryData.forceMessagesUpdate.value = true
 
                                 // Incrementa el índice solo si se elimina el mensaje
                                 index++
@@ -345,9 +344,9 @@ class DataUtils:Serializable {
                             )
 
                             //Recargo los mensajes
-                            DataHandler.messageList =
-                                getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
-                            DataHandler.forceMessagesUpdate.value = true
+                            MemoryData.messageList =
+                                getMapOfMessageByGroup(MemoryData.groupList, context).toMutableMap()
+                            MemoryData.forceMessagesUpdate.value = true
                             // Incrementa el índice solo si se elimina el mensaje
                             index++
 
@@ -453,7 +452,7 @@ class DataUtils:Serializable {
         val urisByGroup = mutableMapOf<Long,Map<Long,Uri>>()
 
 
-        DataHandler.messageList.forEach { message ->
+        MemoryData.messageList.forEach { message ->
 
             val uriList = mutableMapOf<Long, Uri>()
 
@@ -500,7 +499,7 @@ class DataUtils:Serializable {
         val userId = Firebase.auth.currentUser?.uid.toString()
         val usersTotal = mutableListOf<User>()
 
-        DataHandler.groupList.forEach {
+        MemoryData.groupList.forEach {
             val users = withContext(Dispatchers.Default){
                 UserRepository.getUsersByGroupId(groupId = it.id!!)
             }
@@ -596,7 +595,7 @@ class DataUtils:Serializable {
                 //Si existe pero no tiene campo username, le pedimos que ponga un username
                 if (user.username!!.isEmpty())
                     askForUsername()
-                else DataHandler.user = user
+                else MemoryData.user = user
             }
 
         }
@@ -606,8 +605,8 @@ class DataUtils:Serializable {
         }
 
         fun deleteGroupInMemory(groupId:Long){
-            val targetGroup = DataHandler.groupList.first { it.id == groupId }
-            DataHandler.groupList.remove(targetGroup)
+            val targetGroup = MemoryData.groupList.first { it.id == groupId }
+            MemoryData.groupList.remove(targetGroup)
         }
 
         suspend fun updateUsername(newUsername: String): Boolean {
@@ -633,7 +632,7 @@ class DataUtils:Serializable {
                             user = user
                         )
                     }
-                    DataHandler.user = user
+                    MemoryData.user = user
                     return true
                 } else {
                     Log.e("Error", "Usuario no existe, no puede actualizarse")

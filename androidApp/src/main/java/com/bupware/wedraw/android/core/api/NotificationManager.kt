@@ -2,6 +2,7 @@ package com.bupware.wedraw.android.core.api
 
 import android.content.Context
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -17,7 +18,7 @@ class NotificationManager : FirebaseMessagingService() {
         saveNotificationCount(currentCount, groupId = idGroup)
 
         //Los setteo en la var de DataHandler por si se recibe la notificación y se está In-App
-        DataHandler.notificationList[idGroup] = currentCount + 1.toLong()
+        MemoryData.notificationList[idGroup] = currentCount + 1.toLong()
 
     }
 

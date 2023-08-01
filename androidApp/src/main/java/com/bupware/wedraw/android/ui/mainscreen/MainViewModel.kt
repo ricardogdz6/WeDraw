@@ -15,6 +15,7 @@ import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.gestionLogin
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils.Companion.updateUsername
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.UserGroup
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
@@ -51,10 +52,9 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
     var targetNavigation by savedStateHandle.saveable { mutableStateOf(0L) }
     var navigateToChat by savedStateHandle.saveable { mutableStateOf(false) }
-    var dataHandler by savedStateHandle.saveable { mutableStateOf(DataHandler) }
     //Init
     var askForUsername by savedStateHandle.saveable { mutableStateOf(false) }
-    var groupList by savedStateHandle.saveable { mutableStateOf(dataHandler.groupList) }
+    var groupList by savedStateHandle.saveable { mutableStateOf(MemoryData.groupList) }
 
     //Username
     var username by savedStateHandle.saveable { mutableStateOf("") }
@@ -109,7 +109,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             )
         } else {
 
-            if (DataHandler.user.premium == true) {
+            if (MemoryData.user.premium == true) {
 
                 if (groupList.size == 10) {
                     SnackbarManager.newSnackbar(
@@ -143,7 +143,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
             val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
 
             groupList = updatedGroups
-            DataHandler.groupList += updatedGroups
+            MemoryData.groupList += updatedGroups
 
             targetNavigation = groupList.first { it.code == returningCode }.id!!
             moreOptionsEnabled = !moreOptionsEnabled
@@ -199,7 +199,7 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
 
                         val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
                         groupList = updatedGroups
-                        DataHandler.groupList += updatedGroups
+                        MemoryData.groupList += updatedGroups
 
 
                         targetNavigation = groupId!!

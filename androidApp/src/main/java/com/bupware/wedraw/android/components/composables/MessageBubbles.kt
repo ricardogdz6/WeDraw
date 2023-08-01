@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.bupware.wedraw.android.components.extra.DeviceConfig
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.ui.chatScreen.ChatScreenViewModel
@@ -110,7 +111,7 @@ fun MessageHostBodyImageID(bitmap: Bitmap, message: Message,showTriangle:Boolean
     Column(Modifier.padding(5.dp)) {
         if (showTriangle) {
             Text(
-                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                text = MemoryData.userList.first { it.id == message.senderId }.username.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
@@ -147,7 +148,7 @@ fun MessageHostBodyBitmap(message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp)) {
         if (showTriangle) {
             Text(
-                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                text = MemoryData.userList.first { it.id == message.senderId }.username.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
@@ -297,7 +298,7 @@ fun MessageBodyImageID(bitmap: Bitmap,message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp).graphicsLayer(rotationY = 180f)) {
         if (showTriangle) {
             Text(
-                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                text = MemoryData.userList.first { it.id == message.senderId }.username.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
@@ -335,7 +336,7 @@ fun MessageBodyImageBitmap(message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp).graphicsLayer(rotationY = 180f)) {
         if (showTriangle) {
             Text(
-                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                text = MemoryData.userList.first { it.id == message.senderId }.username.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
@@ -374,7 +375,7 @@ fun MessageBodyText(showTriangle:Boolean,message: Message){
 
         if (showTriangle) {
             Text(
-                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                text = MemoryData.userList.first { it.id == message.senderId }.username.toString(),
                 modifier = Modifier
                     .fillMaxWidth()
                     .graphicsLayer(rotationY = 180f)

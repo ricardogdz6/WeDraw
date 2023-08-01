@@ -104,6 +104,7 @@ import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.extra.keyboardAsState
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
@@ -137,16 +138,16 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
     }
 
     //region Forzar update de messages tras un push notification
-    if (DataHandler.forceMessagesUpdate.value){
-        DataHandler.forceMessagesUpdate.value = false
+    if (MemoryData.forceMessagesUpdate.value){
+        MemoryData.forceMessagesUpdate.value = false
         viewModel.loadMessages(groupId,context)
         viewModel.chatGoBottom()
     }
     //endregion
 
     //Si recibes notificaciones dentro del chat correspondiente se actualiza to el rato a 0 para que no salga en mainscreen
-    LaunchedEffect(DataHandler.notificationList[groupId]){
-        DataHandler.notificationList[groupId] = 0
+    LaunchedEffect(MemoryData.notificationList[groupId]){
+        MemoryData.notificationList[groupId] = 0
     }
 
     BackHandler() {
@@ -157,7 +158,7 @@ fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScree
 
     Box {
         //TODO QUITAR ESTA LINEA Y DEJAR EL CASO DE TRUE SOLO, ESTO ESTÁ ASÍ PARA PODER HACER PREVIEW
-        val group = if (DataHandler.groupList.firstOrNull {it.id == groupId} != null) DataHandler.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
+        val group = if (MemoryData.groupList.firstOrNull {it.id == groupId} != null) MemoryData.groupList.first {it.id == groupId} else Group(id = null, name = "", code = "",userGroups = null)
         ChatScreenBody(navController = navController, group = group, controller = controller)
 
 

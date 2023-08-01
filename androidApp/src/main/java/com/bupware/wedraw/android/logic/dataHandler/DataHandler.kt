@@ -66,7 +66,7 @@ class DataHandler(val context: Context):Serializable {
             )
 
         //Guardo el mensaje en memoria
-        messageList[idGroup]?.add(message)
+        MemoryData.messageList[idGroup]?.add(message)
 
         //Guardo el mensaje en local [ROOM]
         MessageWithImageFailedRepository(room.messageWithImageFailedDao()).insert(roomMessageFailed)
@@ -94,7 +94,7 @@ class DataHandler(val context: Context):Serializable {
             )
 
             //Guardo el mensaje en memoria
-            messageList[idGroup]?.add(message)
+            MemoryData.messageList[idGroup]?.add(message)
 
             //Guardo el mensaje en local [ROOM]
             MessageFailedRepository(room.messageFailedDao()).insert(roomMessageFailed)
@@ -115,9 +115,9 @@ class DataHandler(val context: Context):Serializable {
             )
 
             //Guardo el mensaje en memoria
-            if (messageList[idGroup] != null){
-                messageList[idGroup]!!.add(message)
-            } else messageList[idGroup] = mutableListOf(message)
+            if (MemoryData.messageList[idGroup] != null){
+                MemoryData.messageList[idGroup]!!.add(message)
+            } else MemoryData.messageList[idGroup] = mutableListOf(message)
 
 
             //Guardo el mensaje en local [ROOM]
@@ -144,7 +144,7 @@ class DataHandler(val context: Context):Serializable {
             )
 
             //Guardo el mensaje en memoria
-            messageList[idGroup]?.add(message)
+            MemoryData.messageList[idGroup]?.add(message)
 
             //Guardo el mensaje en local [ROOM]
             MessageFailedRepository(room.messageFailedDao()).insert(roomMessageFailed)
@@ -165,9 +165,9 @@ class DataHandler(val context: Context):Serializable {
             )
 
             //Guardo el mensaje en memoria
-            if (messageList[idGroup] != null){
-                messageList[idGroup]!!.add(message)
-            } else messageList[idGroup] = mutableListOf(message)
+            if (MemoryData.messageList[idGroup] != null){
+                MemoryData.messageList[idGroup]!!.add(message)
+            } else MemoryData.messageList[idGroup] = mutableListOf(message)
 
 
             //Guardo el mensaje en local [ROOM]
@@ -209,13 +209,13 @@ class DataHandler(val context: Context):Serializable {
 
     suspend fun saveMessageWithImageMemory(imageID: Long, groupId:Long, uri:String){
         try {
-            val oldMap = DataHandler.uriList[groupId]!!.toMutableMap()
+            val oldMap = MemoryData.uriList[groupId]!!.toMutableMap()
             oldMap[imageID] = Uri.parse(uri)
-            DataHandler.uriList[groupId] = oldMap
+            MemoryData.uriList[groupId] = oldMap
         } catch (e:Exception){
             val newMap = mapOf(imageID to Uri.parse(uri)).toMutableMap()
             newMap[imageID] = Uri.parse(uri)
-            DataHandler.uriList[groupId] = newMap
+            MemoryData.uriList[groupId] = newMap
         }
     }
 
@@ -246,7 +246,7 @@ class DataHandler(val context: Context):Serializable {
 
 
         //Guardo en memoria
-        groupList = groups.toMutableList()
+        MemoryData.groupList = groups.toMutableList()
         //AÑADO LOS NUEVOS GRUPOS Y USERGROUPS A LOCAL
         groups.forEach { group ->
 
@@ -280,29 +280,6 @@ class DataHandler(val context: Context):Serializable {
         GroupWithUsersRepository(room.groupWithUsersDao())
         //TODO PUSH
     }
-
-
-    companion object {
-
-        var forceMessagesUpdate = mutableStateOf(false)
-
-        var forceGroupsUpdate = mutableStateOf(false)
-
-        lateinit var user: User
-
-        lateinit var userList : MutableSet<User>
-
-        var groupList = mutableListOf<Group>()
-
-        lateinit var userGroupList: MutableSet<UserGroup>
-
-        //Map de idGrupo y los mensajes correspondientes
-        var messageList = mutableMapOf<Long, MutableList<Message>>()
-
-        var uriList = mutableMapOf<Long, Map<Long,Uri>>()
-
-        var notificationList = mutableMapOf<Long, Long>()
-
         fun bitmapToBlob(bitmap: Bitmap): ByteArray {
             val stream = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
@@ -332,8 +309,29 @@ class DataHandler(val context: Context):Serializable {
             return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
         }
 
-    }
 
+
+}
+
+object MemoryData{
+    var forceMessagesUpdate = mutableStateOf(false)
+
+    var forceGroupsUpdate = mutableStateOf(false)
+
+    lateinit var user: User
+
+    lateinit var userList : MutableSet<User>
+
+    var groupList = mutableListOf<Group>()
+
+    lateinit var userGroupList: MutableSet<UserGroup>
+
+    //Map de idGrupo y los mensajes correspondientes
+    var messageList = mutableMapOf<Long, MutableList<Message>>()
+
+    var uriList = mutableMapOf<Long, Map<Long,Uri>>()
+
+    var notificationList = mutableMapOf<Long, Long>()
 }
 
 

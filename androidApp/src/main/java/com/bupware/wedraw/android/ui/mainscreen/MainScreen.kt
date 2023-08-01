@@ -73,6 +73,7 @@ import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.Lexend
@@ -97,10 +98,10 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
     val context = LocalContext.current
 
     //region Forzar update de grupos de internet
-    if (DataHandler.forceGroupsUpdate.value){
-        DataHandler.forceGroupsUpdate.value = false
+    if (MemoryData.forceGroupsUpdate.value){
+        MemoryData.forceGroupsUpdate.value = false
         viewModel.groupList = emptyList<Group>().toMutableList()
-        viewModel.groupList = DataHandler.groupList
+        viewModel.groupList = MemoryData.groupList
         viewModel.showGroups = true
     }
     //endregion

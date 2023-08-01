@@ -3,6 +3,7 @@ package com.bupware.wedraw.android.core.api
 import android.util.Log
 import com.bupware.wedraw.android.core.utils.Converter
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.models.User
 import com.bupware.wedraw.android.logic.retrofit.repository.UserRepository
@@ -27,10 +28,10 @@ class PushNotificationManager : FirebaseMessagingService() {
             val imageId = if (message.data["imageId"].toString() == "null") null else message.data["imageId"]!!.toLong()
 
             //region Se añade el usuario si no existia
-            val isUserInMemory = DataHandler.userList.firstOrNull { it.id ==  message.data["senderId"].toString()}
+            val isUserInMemory = MemoryData.userList.firstOrNull { it.id ==  message.data["senderId"].toString()}
             if (isUserInMemory == null) {
                 val user = withContext(Dispatchers.IO) { UserRepository.getUserById(message.data["senderId"].toString())!!.first()}
-                DataHandler.userList.add(user)
+                MemoryData.userList.add(user)
             }
             //endregion
 
@@ -52,12 +53,12 @@ class PushNotificationManager : FirebaseMessagingService() {
 
             if (imageId != null) {
                 val bitmap = withContext(Dispatchers.IO) {MessageRepositoryRetrofit.getImage(imageId)!!.byteArray}
-                val uri = DataHandler(context).saveBitmapLocalOS(DataHandler.byteArrayToBitmap(bitmap!!))
+                val uri = DataHandler(context).saveBitmapLocalOS(DataHandler(context).byteArrayToBitmap(bitmap!!))
                 DataHandler(context).saveBitmapLocal(imageId!!,uri)
                 DataHandler(context).saveMessageWithImageMemory(imageID = imageId, groupId = message.data["groupId"]!!.toLong(), uri = uri.toString())
             }
 
-            DataHandler.forceMessagesUpdate.value = true
+            MemoryData.forceMessagesUpdate.value = true
 
         }
 

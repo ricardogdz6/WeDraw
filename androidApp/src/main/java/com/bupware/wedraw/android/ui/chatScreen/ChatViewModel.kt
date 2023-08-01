@@ -17,8 +17,8 @@ import androidx.lifecycle.viewmodel.compose.saveable
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
-import com.bupware.wedraw.android.logic.dataHandler.DataHandler.Companion.bitmapToBlob
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils
+import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Image
 import com.bupware.wedraw.android.logic.models.Message
 import com.bupware.wedraw.android.logic.retrofit.repository.GroupRepository
@@ -77,7 +77,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
     fun loadMessages(groupId:Long, context: Context){
         try {
-            messageList = DataHandler.messageList[groupId]!!.sortedBy { it.date }
+            messageList = MemoryData.messageList[groupId]!!.sortedBy { it.date }
         }catch (e:Exception){
             Log.i("chat",e.stackTraceToString())
             messageList = emptyList()
@@ -85,7 +85,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
         }
 
         try {
-            messageUrisList = DataHandler.uriList[groupId]!!.toMutableMap()
+            messageUrisList = MemoryData.uriList[groupId]!!.toMutableMap()
         }catch (e:Exception){
             Log.i("chat",e.stackTraceToString())
             messageUrisList = emptyMap<Long,Uri>().toMutableMap()
@@ -235,7 +235,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                             MessageRepository.createImage(
                                 Image(
                                     id = null,
-                                    byteArray = bitmapToBlob(bitmap)
+                                    byteArray = DataHandler(context).bitmapToBlob(bitmap)
                                 )
                             )
                         }
