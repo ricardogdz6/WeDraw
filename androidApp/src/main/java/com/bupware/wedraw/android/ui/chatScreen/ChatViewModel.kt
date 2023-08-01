@@ -1,5 +1,7 @@
 package com.bupware.wedraw.android.ui.chatScreen
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -138,7 +140,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
 
                 writingMessage = ""
 
-                moveLazyToBottom = true
+                chatGoBottom()
             }
         }
 
@@ -219,7 +221,7 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                     viewModelScope.launch {
 
                         addMessageLocal(bitmap.asImageBitmap())
-                        moveLazyToBottom = true //TODO IF OFFSET
+                        chatGoBottom()
 
                         //Se guarda en local system y obtengo la uri
                         val uri = withContext(Dispatchers.IO) {
@@ -279,6 +281,17 @@ class ChatScreenViewModel @Inject constructor(savedStateHandle: SavedStateHandle
                 }
 
         }
+    }
+
+    fun chatGoBottom(){
+        //TODO IF NO OFFSET
+        moveLazyToBottom = true
+    }
+
+    fun copyToClipboard(context: Context, text: String, label: String = "Copied Text") {
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(label, text)
+        clipboard.setPrimaryClip(clip)
     }
 
     fun pathHistory(): (Int, Int) -> Unit {

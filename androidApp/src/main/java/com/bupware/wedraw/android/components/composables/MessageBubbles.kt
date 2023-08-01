@@ -90,11 +90,11 @@ fun MessageBubbleHost(message: Message, showTriangle:Boolean, viewModel: ChatScr
                 when{
 
                     containsImageId && uriExist -> {
-                        MessageHostBodyImageID(bitmap = bitmap!!, message = message)
+                        MessageHostBodyImageID(bitmap = bitmap!!, message = message,showTriangle)
                     }
 
                     containsBitmap -> {
-                        MessageHostBodyBitmap(message = message)
+                        MessageHostBodyBitmap(message = message,showTriangle)
                     }
 
                     else -> MessageHostBodyText(message)
@@ -106,8 +106,20 @@ fun MessageBubbleHost(message: Message, showTriangle:Boolean, viewModel: ChatScr
 }
 
 @Composable
-fun MessageHostBodyImageID(bitmap: Bitmap, message: Message){
+fun MessageHostBodyImageID(bitmap: Bitmap, message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp)) {
+        if (showTriangle) {
+            Text(
+                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = blueVariant2WeDraw //TODO CAMBIAL.
+                , textAlign = TextAlign.Start
+            )
+        }
         Box() {
             Image(modifier = Modifier
                 .clip(RoundedCornerShape(15.dp)),
@@ -131,8 +143,20 @@ fun MessageHostBodyImageID(bitmap: Bitmap, message: Message){
 }
 
 @Composable
-fun MessageHostBodyBitmap(message: Message){
+fun MessageHostBodyBitmap(message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp)) {
+        if (showTriangle) {
+            Text(
+                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = blueVariant2WeDraw //TODO CAMBIAL.
+                , textAlign = TextAlign.Start
+            )
+        }
         Box() {
             Image(modifier = Modifier
                 .clip(RoundedCornerShape(15.dp)),
@@ -164,7 +188,7 @@ fun MessageHostBodyText(message: Message){
                 text = message.text,
                 modifier = Modifier
                     .widthIn(max = DeviceConfig.widthPercentage(75))
-                    .padding(top = 8.dp, start = 8.dp, end = 4.dp, bottom = 8.dp),
+                    .padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 8.dp),
                 fontSize = 14.sp,
                 color = Color.Black
             )
@@ -251,11 +275,11 @@ fun MessageBubble(message: Message, showTriangle:Boolean, viewModel: ChatScreenV
                 when{
 
                     containsImageId && uriExist -> {
-                        MessageBodyImageID(bitmap = bitmap!!, message = message)
+                        MessageBodyImageID(bitmap = bitmap!!, message = message,showTriangle)
                     }
 
                     containsBitmap -> {
-                        MessageBodyImageBitmap(message = message)
+                        MessageBodyImageBitmap(message = message,showTriangle)
                     }
 
                     else -> MessageBodyText(showTriangle,message)
@@ -268,9 +292,21 @@ fun MessageBubble(message: Message, showTriangle:Boolean, viewModel: ChatScreenV
 }
 
 @Composable
-fun MessageBodyImageID(bitmap: Bitmap,message: Message){
+fun MessageBodyImageID(bitmap: Bitmap,message: Message,showTriangle:Boolean){
 
     Column(Modifier.padding(5.dp).graphicsLayer(rotationY = 180f)) {
+        if (showTriangle) {
+            Text(
+                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = blueVariant2WeDraw //TODO CAMBIAL.
+                , textAlign = TextAlign.Start
+            )
+        }
         Box() {
             Image(modifier = Modifier.clip(RoundedCornerShape(15.dp)),bitmap = bitmap!!.asImageBitmap(), contentDescription = "")
             Column(Modifier.fillMaxSize(),
@@ -295,8 +331,20 @@ fun MessageBodyImageID(bitmap: Bitmap,message: Message){
 }
 
 @Composable
-fun MessageBodyImageBitmap(message: Message){
+fun MessageBodyImageBitmap(message: Message,showTriangle:Boolean){
     Column(Modifier.padding(5.dp).graphicsLayer(rotationY = 180f)) {
+        if (showTriangle) {
+            Text(
+                text = DataHandler.userList.first { it.id == message.senderId }.username.toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp, start = 8.dp, end = 8.dp, bottom = 4.dp),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = blueVariant2WeDraw //TODO CAMBIAL.
+                , textAlign = TextAlign.Start
+            )
+        }
         Box() {
             Image(modifier = Modifier.clip(RoundedCornerShape(15.dp)),bitmap = message.bitmap!!, contentDescription = "")
             Column(Modifier.fillMaxSize(),

@@ -20,35 +20,6 @@ class PushNotificationManager : FirebaseMessagingService() {
     @Override
     override fun onMessageReceived(message: RemoteMessage) {
 
-        //region REMOVE
-        //Log incoming message
-        Log.v("CloudMessage", "From ${message.from}")
-
-        //Log Data Payload
-        if (message.data.isNotEmpty()) {
-            Log.v("CloudMessage", "Message Data ${message.data}")
-        }
-
-        //Check if message contains a notification payload
-
-        message.data.let {
-            Log.v("CloudMessage", "Message Data Body ${it["body"]}")
-            Log.v("CloudMessage", "Message Data Title  ${it["title"]}")
-            //when app in forground that notification is not shown on status bar
-            //lets write a code to display notification in status bar when app in forground.
-            //showNotificationOnStatusBar(it)
-        }
-
-        if (message.notification != null) {
-
-            Log.v("CloudMessage", "Notification ${message.notification}")
-            Log.v("CloudMessage", "Notification Title ${message.notification!!.title}")
-            Log.v("CloudMessage", "Notification Body ${message.notification!!.body}")
-
-        }
-        //endregion
-
-
         val context = applicationContext
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -77,8 +48,6 @@ class PushNotificationManager : FirebaseMessagingService() {
                 DataHandler(context).saveBitmapLocal(imageId!!,uri)
                 DataHandler(context).saveMessageWithImageMemory(imageID = imageId, groupId = message.data["groupId"]!!.toLong(), uri = uri.toString())
             }
-
-
 
             //region Se añade el usuario si no existia
             val isUserInMemory = DataHandler.userList.firstOrNull { it.id ==  message.data["senderId"].toString()}
