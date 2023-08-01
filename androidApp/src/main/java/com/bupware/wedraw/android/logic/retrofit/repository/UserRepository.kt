@@ -2,13 +2,13 @@ package com.bupware.wedraw.android.logic.retrofit.repository
 
 import android.util.Log
 import com.bupware.wedraw.android.logic.models.User
+import com.bupware.wedraw.android.logic.models.UserDevice
 import com.bupware.wedraw.android.logic.retrofit.api.RetrofitClient
 import com.bupware.wedraw.android.logic.retrofit.services.UserService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.EOFException
 
 object UserRepository {
     private val userService = RetrofitClient.getRetrofit().create(UserService::class.java)
@@ -42,8 +42,23 @@ object UserRepository {
         })
     }
 
-    suspend fun getUserById(email:String): List<User>? = suspendCancellableCoroutine { continuation ->
-        userService.getUserById(email).enqueue(object : Callback<List<User>> {
+    suspend fun getUsersByGroupId(groupId:Long): List<User>? = suspendCancellableCoroutine { continuation ->
+        userService.getUsersByGroupId(groupId).enqueue(object : Callback<List<User>?> {
+            override fun onResponse(call: Call<List<User>?>, response: Response<List<User>?>) {
+                if (response.isSuccessful){
+                    continuation.resume(response.body(),null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<User>?>, t: Throwable) {
+                Log.i("error",t.toString())
+                continuation.cancel()
+            }
+        })
+    }
+
+    suspend fun getUserById(id:String): List<User>? = suspendCancellableCoroutine { continuation ->
+        userService.getUserById(id).enqueue(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if (response.isSuccessful){
                     continuation.resume(response.body(),null)
@@ -119,6 +134,43 @@ object UserRepository {
 
     }
 
+    //region UserDevice
 
+    suspend fun getUserDeviceByUserID(userID:String): List<UserDevice>? = suspendCancellableCoroutine { continuation ->
+        userService.getUserDeviceByUserID(userID).enqueue(object : Callback<List<UserDevice>> {
+            override fun onResponse(call: Call<List<UserDevice>>, response: Response<List<UserDevice>>) {
+                if (response.isSuccessful){
+                    continuation.resume(response.body(),null)
+                }
+            }
 
+            override fun onFailure(call: Call<List<UserDevice>>, t: Throwable) {
+                continuation.cancel()
+            }
+        })
+    }
+
+    suspend fun createUserDevice(userDevice: UserDevice): Boolean = suspendCancellableCoroutine { continuation ->
+        userService.createUserDevice(
+            userDevice
+        ).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    continuation.resume(true,null)
+                } else {
+                    continuation.resume(false,null)
+                }
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                if (t is java.io.EOFException) {
+                    continuation.resume(true,null)
+                } else {
+                    continuation.resume(false,null)
+                }
+            }
+        })
+    }
+
+    //endregion
 }

@@ -34,7 +34,7 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 
 //region MainScreen
-//TODO gestionar inputs y esas cosas
+
 @Composable
 fun TextFieldJoin(modificador: Modifier){
 
@@ -100,7 +100,8 @@ fun TextFieldMessage(value: String,onValueChange: (String) -> Unit){
                 disabledTextColor = Color.Transparent,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+                disabledIndicatorColor = Color.Transparent,
+                textColor = Color.Black
 
             )
         )
@@ -208,16 +209,6 @@ fun TextFieldNoPadding(
     BasicTextField(
         value = value,
         modifier = Modifier.fillMaxWidth(),
-
-        /*
-        modifier = modifier
-            .background(colors.backgroundColor(enabled).value, RoundedCornerShape(15.dp))
-            .indicatorLine(enabled, isError, interactionSource, colors)
-            .defaultMinSize(
-                minWidth = TextFieldDefaults.MinWidth,
-                minHeight = TextFieldDefaults.MinHeight
-            ),
-         */
         onValueChange = onValueChange,
         enabled = enabled,
         readOnly = readOnly,

@@ -1,20 +1,16 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -43,10 +38,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -58,6 +51,8 @@ import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
@@ -75,7 +70,22 @@ fun PreviewMain(){
 @Composable
 fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
 
-    //TODO QUITAR ESTE FIX
+    val context = LocalContext.current
+
+    //region Forzar update de grupos de internet
+    if (DataHandler.forceGroupsUpdate.value){
+        DataHandler.forceGroupsUpdate.value = false
+        viewModel.groupList = emptyList<Group>().toMutableList()
+        viewModel.groupList = DataHandler.groupList
+        viewModel.showGroups = true
+    }
+    //endregion
+
+    LaunchedEffect(Unit){
+        viewModel.initValues(context)
+    }
+
+
     BackHandler() {}
 
     SystemBarColor(color = Color(0xFF2C4560))
@@ -173,6 +183,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     //TODO ELIMINAR
     Column() {
     Button(onClick = {
+
         Firebase.auth.signOut();
 
         navController.navigate(Destinations.LoginScreen.ruta) {
@@ -180,7 +191,6 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
                 inclusive = true
             }
         }
-
 
 
     }) {
@@ -265,7 +275,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
     else if (viewModel.showGroups && viewModel.groupList.isEmpty()) {
 
         Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            //TODO ANIMACION VANISH?
             Text(text = stringResource(R.string.crea_o_nete_a_un_grupo), fontFamily = Lexend, fontWeight = FontWeight.Bold)
         }
 
@@ -296,7 +305,7 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
 
                 Column(Modifier.padding(bottom = 25.dp)) {
                     ChipPop(
-                        content = { GroupBar(viewModel.groupList[index].name, viewModel.groupList[index].id.toString() ,navController) },
+                        content = { GroupBar(viewModel.groupList.toList()[index].name, viewModel.groupList.toList()[index].id.toString() ,navController) },
                         show = visible
                     )
                 }
@@ -312,7 +321,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
-    //TODO quitar este hardcode
     LaunchedEffect(Unit){
         viewModel.showSettings = true
     }

@@ -67,7 +67,6 @@ class WeDrawWidgetConsolidator : GlanceAppWidget() {
 
         val dataStore = WeDrawPreferences(context)
         provideContent {
-            Log.i("wawa", "actualizando")
             val localcontext = LocalContext.current
 
             val glanceId = LocalGlanceId.current

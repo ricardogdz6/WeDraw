@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.logic.models
 
-import androidx.room.PrimaryKey
-import java.io.Serializable
+import androidx.compose.ui.graphics.ImageBitmap
 import java.util.Date
 import java.util.TimeZone
 
@@ -10,8 +9,9 @@ data class Message(
     val text: String,
     var timeZone: TimeZone?,
     var senderId: String,
-    var imageId: Long?,
+    var imageID: Long?,
     var groupId: Long,
-    var date: Date?
+    var date: Date?,
+    var bitmap: ImageBitmap?
 ): java.io.Serializable
 

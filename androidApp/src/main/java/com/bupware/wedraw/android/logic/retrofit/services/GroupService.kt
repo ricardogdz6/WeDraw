@@ -4,6 +4,7 @@ import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.User
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -30,10 +31,12 @@ interface GroupService {
     fun createGroup(@Path("name") name: String,@Path("leaderId") leaderId: String): Call<String?>
 
     @POST("/weDraw/groups/{userID}/{groupID}")
-    fun insertUsertoUserGroup(@Path("userID") userID: String,@Body groupID: Long): Call<Boolean>
+    fun insertUsertoUserGroup(@Path("userID") userID: String,@Path("groupID") groupID: Long): Call<Boolean>
 
     @PUT("/weDraw/groups/{id}")
     fun updateGroup(@Path("id") id: Long,@Body group: Group): Call<Boolean>
 
+    @DELETE("/weDraw/groups/exitGroup/{userID}/{groupID}")
+    fun exitGroup(@Path("userID") userID: String,@Path("groupID") groupID: Long): Call<Boolean>
 
 }

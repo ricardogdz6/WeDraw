@@ -1,19 +1,21 @@
 package com.bupware.wedraw.android.logic.navigation
 
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.bupware.wedraw.android.Login.LoginScreen
+import com.bupware.wedraw.android.ui.login.LoginScreen
 import com.bupware.wedraw.android.ui.chatScreen.ChatScreen
 import com.bupware.wedraw.android.ui.drawingScreen.DrawingScreen
 import com.bupware.wedraw.android.ui.mainscreen.MainScreen
 import com.bupware.wedraw.android.ui.splash.SplashScreen
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun NavigationHost (navController: NavHostController,startDestination: String) {
     NavHost(
@@ -39,7 +41,9 @@ fun NavigationHost (navController: NavHostController,startDestination: String) {
         //TODO NAVARGUMENTS
         composable("${Destinations.ChatScreen.ruta}/{groupId}", arguments = listOf(navArgument("groupId"){type = NavType.LongType})){ backStackEntry ->
             backStackEntry.arguments?.getLong("groupId")
-                ?.let { ChatScreen(navController=navController, groupId = it) }
+                ?.let {
+                    ChatScreen(navController =navController, groupId = it)
+                }
         }
     }
 }

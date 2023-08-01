@@ -1,9 +1,8 @@
 package com.bupware.wedraw.android.logic.models
 
-import java.io.Serializable
-import java.util.Date
+import java.sql.Blob
 
 data class Image(
     var id:Long?,
-    val bitmap: ByteArray,
+    val byteArray: ByteArray,
 ): java.io.Serializable

@@ -33,7 +33,6 @@ class WeDrawWidgetWorkManager(private val context: Context, params: WorkerParame
                 updateAppWidgetState(context = context, glanceId = glanceId) { prefs ->
 //                    Log.i("WeDrawWidgetWorkManager", "updateWidgetData: ${image.uri}")
 //                    prefs.setImageData(image)
-                    Log.i("wawa", "updateWidgetData: $prefs")
                 }
 
                 WeDrawWidgetConsolidator().update(context, glanceId)

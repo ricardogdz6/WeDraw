@@ -1,7 +1,6 @@
 package com.bupware.wedraw.android.components.buttons
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColorAsState
@@ -11,6 +10,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -51,6 +52,7 @@ import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
+import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.blueWeDraw
 import com.bupware.wedraw.android.theme.Lexend
@@ -59,7 +61,9 @@ import com.bupware.wedraw.android.theme.blueVariantWeDraw
 import com.bupware.wedraw.android.theme.greenWeDraw
 import com.bupware.wedraw.android.theme.redWeDraw
 import com.bupware.wedraw.android.theme.yellowWeDraw
+import com.bupware.wedraw.android.ui.chatScreen.ChatScreenViewModel
 import com.bupware.wedraw.android.ui.mainscreen.MainViewModel
+import io.ak1.drawbox.DrawController
 
 //region MainScreen
 @OptIn(ExperimentalAnimationApi::class)
@@ -338,7 +342,6 @@ fun JoinGroupButton(viewModel: MainViewModel = hiltViewModel()){
 
 @Composable
 fun PeopleLimitBar(){
-    //TODO quitar el hardcode del limit
     Row(
         Modifier
             .height(40.dp)
@@ -357,12 +360,11 @@ fun PeopleLimitBar(){
 
 @Composable
 fun PremiumInfoButton(){
-    Box(
-        Modifier
-            .clickable { /*TODO METER INFO*/ }
-            .background(Color.White, RoundedCornerShape(10.dp))
-            .fillMaxHeight()
-            .padding(start = 10.dp, end = 10.dp)
+    Box(Modifier
+        .clickable { /*TODO METER INFO*/ }
+        .background(Color.White, RoundedCornerShape(10.dp))
+        .fillMaxHeight()
+        .padding(start = 10.dp, end = 10.dp)
             ,contentAlignment = Alignment.Center) {
         Text(text = "?", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color.Black)
     }
@@ -373,9 +375,10 @@ fun JoinGroupSubButton(action: (Context) -> Unit) {
 
     val context = LocalContext.current
 
-    Box(Modifier
-        .width(IntrinsicSize.Max)
-        .clickable { action(context) }
+    Box(
+        Modifier
+            .width(IntrinsicSize.Max)
+            .clickable { action(context) }
     ) {
 
         Column(
@@ -472,39 +475,46 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
                 }
 
-                Column(
-                    Modifier
-                        .background(Color.Red, RoundedCornerShape(10.dp))
-                        .height(IntrinsicSize.Max)
-                        .width(40.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        modifier = Modifier,
-                        text = nombre,
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.End,
-                        fontFamily = Lexend
-                    )
-                }
+                if (DataHandler.notificationList[idGroup.toLong()] != 0.toLong() && DataHandler.notificationList[idGroup.toLong()] != null) {
 
-                Spacer(modifier = Modifier.width(10.dp))
-
-                Box(Modifier.padding(end = 10.dp)) {
-                    Box(
+                    Column(
                         Modifier
-                            .background(selectedColor, RoundedCornerShape(10.dp))
+                            .background(Color.Red, RoundedCornerShape(10.dp))
                             .height(IntrinsicSize.Max)
-                            .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
+                            .width(40.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
+                        Text(
                             modifier = Modifier,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.notification),
-                            tint = Color.White,
-                            contentDescription = "People in group"
+                            text = DataHandler.notificationList[idGroup.toLong()].toString(),
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.End,
+                            fontFamily = Lexend
                         )
                     }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Box(Modifier.padding(end = 10.dp)) {
+                        Box(
+                            Modifier
+                                .background(selectedColor, RoundedCornerShape(10.dp))
+                                .height(IntrinsicSize.Max)
+                                .width(IntrinsicSize.Max), contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier,
+                                imageVector = ImageVector.vectorResource(id = R.drawable.notification),
+                                tint = Color.White,
+                                contentDescription = "People in group"
+                            )
+                        }
+                    }
                 }
+
 
             }
         }
@@ -515,11 +525,11 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
 //region chatscreen
 @Composable
-fun SendMessageButton(action: (Context) -> Unit){
+fun SendMessageButton(action: (String,Context) -> Unit, viewModel: ChatScreenViewModel = hiltViewModel()){
 
     val context = LocalContext.current
 
-    Button(onClick = { action(context) }, shape = CircleShape,
+    Button(onClick = { action(viewModel.writingMessage,context) }, shape = CircleShape,
     colors = ButtonDefaults.buttonColors(
         backgroundColor = blueVariant2WeDraw
     ), modifier = Modifier.size(45.dp)) {
@@ -566,6 +576,179 @@ fun SwitchToDrawingButton(action: () -> Unit, drawingState:Boolean){
 
         }
     }
+}
+
+//endregion
+
+//region CHAT
+@Composable
+fun CircleColoredButton(color: Color, controller: DrawController){
+    Box(modifier = Modifier
+        .background(color, CircleShape)
+        .width(40.dp)
+        .fillMaxHeight()
+        .clip(CircleShape)
+        .clickable {
+            controller.changeColor(color)
+        }
+    )
+}
+
+@Composable
+fun MoreColorsButton(viewModel: ChatScreenViewModel = hiltViewModel()){
+    IconButton(modifier = Modifier
+        .background(Color.White, CircleShape)
+        .width(40.dp)
+        .fillMaxHeight(),onClick = {
+        viewModel.colorWheelShow = true
+    }) {
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.palette),
+            tint = blueVariant2WeDraw,
+            contentDescription = "MoreColors"
+        )
+    }
+}
+
+@Composable
+fun DrawButton(state: Boolean, action: () -> Unit){
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .width(40.dp)
+        .background(
+            color = if (state) Color(0xFFFFCC4D) else Color.White,
+            shape = RoundedCornerShape(5.dp)
+        ).clickable {
+        action()
+    }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.pen),
+                tint = if (state) Color.White else Color.Black,
+                contentDescription = "Draw"
+            )
+
+    }
+
+}
+
+@Composable
+fun EraseButton(state: Boolean, action: () -> Unit){
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .width(40.dp)
+        .background(
+            color = if (state) Color(0xFFFFCC4D) else Color.White,
+            shape = RoundedCornerShape(5.dp)
+        ).clickable {
+        action()
+    }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.eraser),
+                tint = if (state) Color.White else Color.Black,
+                contentDescription = "Draw"
+            )
+    }
+
+}
+
+@Composable
+fun SizeButtons(controller: DrawController,viewModel: ChatScreenViewModel = hiltViewModel()){
+    Row(
+        Modifier
+            .width(130.dp)
+            .background(Color.White, RoundedCornerShape(5.dp))
+            .fillMaxHeight()
+            .padding(5.dp), horizontalArrangement = Arrangement.Center) {
+
+        SizeButton(id = 1, state = viewModel.sizeState == 1, controller = controller)
+        Spacer(modifier = Modifier.width(5.dp))
+        SizeButton(id = 2, state = viewModel.sizeState == 2, controller = controller)
+        Spacer(modifier = Modifier.width(5.dp))
+        SizeButton(id = 3, state = viewModel.sizeState == 3, controller = controller)
+        
+    }
+}
+
+@Composable 
+fun SizeButton(controller: DrawController,id: Int, state:Boolean, viewModel: ChatScreenViewModel = hiltViewModel()){
+
+    val size = when(id) {
+        1 -> 10.dp
+        2 -> 20.dp
+        3 -> 30.dp
+        else -> 0.dp
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(35.dp)
+            .background(
+                color = if (state) Color(0xFFFFCC4D) else Color.White,
+                shape = RoundedCornerShape(5.dp)
+            )
+            .border(width = 1.dp, shape = RoundedCornerShape(5.dp), color = Color(0xFFFFCC4D))
+            .clickable {
+                viewModel.sizeState = id;
+                when (id) {
+                    1 -> controller.changeStrokeWidth(10f)
+                    2 -> controller.changeStrokeWidth(30f)
+                    3 -> controller.changeStrokeWidth(60f)
+                }
+            }
+            .clip(RoundedCornerShape(5.dp))
+        ,
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            modifier = Modifier.size(size),
+            imageVector = ImageVector.vectorResource(id = R.drawable.point),
+            tint = if (state) Color.White else Color.Black,
+            contentDescription = "Draw"
+        )
+    }
+
+}
+
+@Composable
+fun UndoButton(action: () -> Unit){
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .width(40.dp)
+        .background(
+            color = Color.White, shape = RoundedCornerShape(5.dp)
+        )
+        .clickable {
+            action()
+        }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.undo),
+                tint = Color.Black,
+                contentDescription = "Undo"
+            )
+    }
+
+}
+
+@Composable
+fun RedoButton(action: () -> Unit){
+    Column(modifier = Modifier
+        .fillMaxHeight()
+        .width(40.dp)
+        .background(color = Color.White, shape = RoundedCornerShape(5.dp))
+        .clickable { action() }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.redo),
+                tint = Color.Black,
+                contentDescription = "Redo"
+            )
+
+    }
+
 }
 
 //endregion

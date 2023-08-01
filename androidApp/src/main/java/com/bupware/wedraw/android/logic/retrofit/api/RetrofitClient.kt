@@ -1,8 +1,14 @@
 package com.bupware.wedraw.android.logic.retrofit.api
 
+import android.util.Log
 import com.google.gson.*
+import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import java.lang.reflect.Type
 import java.sql.Time
 import java.text.DateFormat
@@ -13,8 +19,7 @@ object RetrofitClient {
 
     //TODO QUITAR ESTA LINEA DEL MANIFEST android:usesCleartextTraffic="true"
 
-    //private const val BASE_URL = "http://ec2-13-40-218-75.eu-west-2.compute.amazonaws.com:5000/"
-    //private const val BASE_URL = "http://ec2-18-130-254-216.eu-west-2.compute.amazonaws.com:5000/"
+    //private const val BASE_URL = "http://ec2-15-188-118-107.eu-west-3.compute.amazonaws.com:8080/"
     private const val BASE_URL = "http://192.168.1.126:8080/"
 
     var gson = GsonBuilder()
@@ -22,15 +27,16 @@ object RetrofitClient {
         .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS")
         .registerTypeAdapter(Time::class.java, TimeDeserializer())
         .registerTypeAdapter(Time::class.java, TimeSerializer())
+        .registerTypeAdapter(ByteArray::class.java, ByteArrayDeserializer())
         .registerTypeAdapter(TimeZone::class.java, TimeZoneAdapter())
         .create()
 
-    //private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
-    //private val client = OkHttpClient.Builder().addInterceptor(logging).build()
+    private val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    private val client = OkHttpClient.Builder().addInterceptor(logging).build()
 
     private val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        //.client(client)
+        .client(client)
         .addConverterFactory(GsonConverterFactory.create(gson))
         .build()
 
@@ -76,5 +82,25 @@ class TimeZoneAdapter : JsonSerializer<TimeZone>, JsonDeserializer<TimeZone> {
 
     override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): TimeZone {
         return TimeZone.getTimeZone(json?.asString)
+    }
+}
+
+class ByteArrayDeserializer : JsonDeserializer<ByteArray> {
+    override fun deserialize(
+        json: JsonElement?,
+        typeOfT: Type?,
+        context: JsonDeserializationContext?
+    ): ByteArray {
+
+        // Verificar si el JsonElement es nulo o no contiene datos
+        if (json == null || json.isJsonNull || !json.isJsonPrimitive) {
+            return ByteArray(0)
+        }
+
+        // Obtener el contenido de la cadena del JsonElement
+        val base64String = json.asString
+
+        // Decodificar la cadena Base64 a un ByteArray
+        return android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
     }
 }

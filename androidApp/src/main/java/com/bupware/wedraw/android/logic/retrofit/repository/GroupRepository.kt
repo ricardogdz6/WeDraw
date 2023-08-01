@@ -43,6 +43,20 @@ object GroupRepository {
         })
     }
 
+    suspend fun exitGroup(userID:String, groupID: Long): Boolean = suspendCancellableCoroutine { continuation ->
+        groupService.exitGroup(userID, groupID = groupID).enqueue(object : Callback<Boolean> {
+            override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
+                if (response.isSuccessful) {
+                    continuation.resume(true,null)
+                } else continuation.resume(false,null)
+            }
+
+            override fun onFailure(call: Call<Boolean>, t: Throwable) {
+                continuation.resume(false,null)
+            }
+        })
+    }
+
     suspend fun getGroupByUserId(userId:String): List<Group>? = suspendCancellableCoroutine { continuation ->
         groupService.getGroupByUserId(userId).enqueue(object : Callback<List<Group>?> {
             override fun onResponse(call: Call<List<Group>?>, response: Response<List<Group>?>) {
@@ -52,7 +66,7 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<List<Group>?>, t: Throwable) {
-                continuation.cancel()
+                continuation.resume(null,null)
             }
         })
     }
@@ -76,7 +90,7 @@ object GroupRepository {
             override fun onResponse(call: Call<Boolean>, response: Response<Boolean>) {
                 if (response.isSuccessful) {
                     continuation.resume(response.body()!!,null)
-                }
+                } else continuation.resume(false,null)
             }
 
             override fun onFailure(call: Call<Boolean>, t: Throwable) {
@@ -95,7 +109,6 @@ object GroupRepository {
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable) {
-                Log.i("wawa",t.stackTraceToString())
                 continuation.cancel()
             }
         })
