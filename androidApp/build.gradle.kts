@@ -132,6 +132,8 @@ dependencies {
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
 
+    //Splash Screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
 
 

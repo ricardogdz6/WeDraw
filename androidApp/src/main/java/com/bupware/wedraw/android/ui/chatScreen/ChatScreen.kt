@@ -125,7 +125,6 @@ fun PreviewChatScreen(){
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
@@ -234,7 +233,9 @@ fun Footer(viewModel: ChatScreenViewModel = hiltViewModel()){
             .padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
 
         Column(Modifier.weight(1f)) {
-            TextFieldMessage(value = viewModel.writingMessage, onValueChange = {viewModel.writingMessage = it})
+            TextFieldMessage(value = viewModel.writingMessage, onValueChange = {viewModel.writingMessage = it}, placeholder = stringResource(
+                            R.string.escribe_un_mensaje)
+                        )
         }
         Spacer(modifier = Modifier.width(5.dp))
 
@@ -425,7 +426,7 @@ fun CanvasContent(controller: DrawController,viewModel: ChatScreenViewModel = hi
 
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(30.dp))
         }
 
         
@@ -444,8 +445,8 @@ fun CanvasButtons(controller: DrawController, viewModel: ChatScreenViewModel = h
             CanvasBottom(controller)
         }
 
-        Button(onClick = { viewModel.sendConfirmation = true }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)) {
-            Text(text = "Enviar", color = Color.White, fontFamily = Lexend, fontSize = 20.sp)
+        Button(shape = RoundedCornerShape(25.dp),onClick = { viewModel.sendConfirmation = true }, colors = ButtonDefaults.buttonColors(backgroundColor = blueVariant2WeDraw)) {
+            Text(text = stringResource(R.string.enviar), color = Color.White, fontFamily = Lexend, fontSize = 20.sp)
         }
     }
 
@@ -615,7 +616,7 @@ fun ChatTopBar(navController: NavController, groupName:String ,code:String ,view
                         .padding(4.dp)
                 ) {
                     Text(
-                        text = "CODIGO: $code",
+                        text = "${stringResource(R.string.code)}: $code",
                         color = blueVariant2WeDraw,
                         fontFamily = Lexend,
                         fontSize = 20.sp,

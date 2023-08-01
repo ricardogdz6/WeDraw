@@ -24,4 +24,11 @@
     <string name="env_a_un_dibujo_a_tus_amigos">¡Envía un dibujo a tus amigos!</string>
     <string name="confirmar">Confirmar</string>
     <string name="cancelar">Cancelar</string>
+    <string name="escribe_un_mensaje">Escribe un mensaje</string>
+    <string name="elige_un_nickname">"Elige un nickname: "</string>
+    <string name="validar">Validar</string>
+    <string name="acceder_con_google">Acceder con Google</string>
+    <string name="enviar">Enviar</string>
+    <string name="code">CÓDIGO</string>
+    <string name="hazte_premium_para_tener_m_s_grupos">Hazte premium para tener más grupos</string>
 </resources>

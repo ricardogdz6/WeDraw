@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.rememberNavController
 import com.bupware.wedraw.android.components.composables.SnackbarWrapper
 import com.bupware.wedraw.android.components.extra.GetDeviceConfig
@@ -37,6 +38,9 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        installSplashScreen()
+
         setContent {
             FirebaseApp.initializeApp(this);
 
@@ -62,6 +66,7 @@ fun StartingPoint(){
     val context = LocalContext.current
     val dataUtils = DataUtils()
     val scope = rememberCoroutineScope()
+
 
     LaunchedEffect(Unit) {
         if (Firebase.auth.currentUser != null) {

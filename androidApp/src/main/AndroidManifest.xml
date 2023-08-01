@@ -9,7 +9,8 @@
         android:supportsRtl="true"
         android:name = ".WeDraw"
         android:label = "WeDraw!"
-        android:theme="@style/AppTheme"
+        android:icon="@mipmap/ic_launcher"
+        android:theme="@style/Theme.App.SplashScreen"
         android:usesCleartextTraffic="true"
         android:screenOrientation="portrait">
         <activity

@@ -33,6 +33,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.io.Serializable
+import kotlin.system.measureTimeMillis
 import com.bupware.wedraw.android.roomData.tables.group.GroupRepository as GroupRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository as UserRepositoryRoom
 import com.bupware.wedraw.android.roomData.tables.group.Group as GroupRoom
@@ -41,8 +43,9 @@ import com.bupware.wedraw.android.roomData.tables.message.Message as MessageRoom
 import com.bupware.wedraw.android.roomData.tables.user.User as UserRoom
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
-class DataUtils {
+class DataUtils:Serializable {
     suspend fun initData(context: Context) {
+
 
         CoroutineScope(Dispatchers.Default).launch {
             withContext(Dispatchers.Default) {
@@ -51,48 +54,56 @@ class DataUtils {
         }
 
 
+
         //primero localmente a memoria
         withContext(Dispatchers.Default) {
 
-            DataHandler.groupList = Converter.converterGroupsEntityToGroupsList(
-                getGroupsLocal(context) ?: emptyList()
-            )
 
-            DataHandler.forceGroupsUpdate.value = true
+                DataHandler.groupList = Converter.converterGroupsEntityToGroupsList(
+                    getGroupsLocal(context) ?: emptyList()
+                )
 
-            Log.i("DataUtils", "initData: ${DataHandler.groupList}")
-            DataHandler.userList =
-                Converter.convertUsersEntityToUsersList(getUsersLocal(context) ?: emptySet())
-            Log.i("DataUtils", "initData: ${DataHandler.userList}")
-
-            DataHandler.messageList =
-                getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
-            Log.i("DataUtils", "initData: ${DataHandler.messageList}")
-
-            DataHandler.uriList = getMapOfMessageUri(context).toMutableMap()
-
-            initNotificationCounter(context)
-
-            /**
-             * Obtengo los grupos en remoto los paso a local y los meto en memoria.
-             * Si no hay grupos en remoto no hago nada.
-             * */
-            getGroupsRemote(context).also {
-                if (it != null) remoteGroupsToLocal(it, context)
-            }?.let {
-                DataHandler.groupList = it.toMutableList()
                 DataHandler.forceGroupsUpdate.value = true
+
+                Log.i("DataUtils", "initData: ${DataHandler.groupList}")
+                DataHandler.userList =
+                    Converter.convertUsersEntityToUsersList(
+                        getUsersLocal(context) ?: emptySet()
+                    )
+                Log.i("DataUtils", "initData: ${DataHandler.userList}")
+
+                DataHandler.messageList =
+                    getMapOfMessageByGroup(DataHandler.groupList, context).toMutableMap()
+                Log.i("DataUtils", "initData: ${DataHandler.messageList}")
+
+                DataHandler.uriList = getMapOfMessageUri(context).toMutableMap()
+
+                initNotificationCounter(context)
+
+                /**
+                 * Obtengo los grupos en remoto los paso a local y los meto en memoria.
+                 * Si no hay grupos en remoto no hago nada.
+                 * */
+                getGroupsRemote(context).also {
+                    if (it != null) remoteGroupsToLocal(it, context)
+                }?.let {
+                    DataHandler.groupList = it.toMutableList()
+                    DataHandler.forceGroupsUpdate.value = true
+                }
+
+
+                getUsersRemote(context).also {
+                    if (it != null) remoteUsersToLocal(it, context)
+                }
+
+
+                Log.i("DataUtils", "initData: ${DataHandler.groupList}")
+
+
+
             }
 
 
-            getUsersRemote(context).also{
-                if (it != null) remoteUsersToLocal(it,context)
-            }
-
-
-            Log.i("DataUtils", "initData: ${DataHandler.groupList}")
-
-        }
         sendPendingMessages(context)
         sendPendingMessagesWithImage(context)
 

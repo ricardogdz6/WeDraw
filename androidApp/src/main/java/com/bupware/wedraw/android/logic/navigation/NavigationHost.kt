@@ -38,7 +38,7 @@ fun NavigationHost (navController: NavHostController,startDestination: String) {
             MainScreen(navController = navController)
         }
 
-        //TODO NAVARGUMENTS
+
         composable("${Destinations.ChatScreen.ruta}/{groupId}", arguments = listOf(navArgument("groupId"){type = NavType.LongType})){ backStackEntry ->
             backStackEntry.arguments?.getLong("groupId")
                 ?.let {

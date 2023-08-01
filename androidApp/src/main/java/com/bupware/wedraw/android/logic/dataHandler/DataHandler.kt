@@ -29,12 +29,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
+import java.io.Serializable
 import java.sql.Blob
 import java.sql.Date
 import java.sql.SQLException
 import com.bupware.wedraw.android.logic.retrofit.repository.MessageRepository as MessageRepositoryRetrofit
 
-class DataHandler(val context: Context) {
+class DataHandler(val context: Context):Serializable {
 
     val room = WDDatabase.getDatabase(context = context)
     private val _groupListFlow: MutableStateFlow<Set<Group>> = MutableStateFlow(emptySet())

@@ -80,7 +80,7 @@ fun TextFieldUsername(value:String,onValueChange:(String)->Unit){
 
 
 @Composable
-fun TextFieldMessage(value: String,onValueChange: (String) -> Unit){
+fun TextFieldMessage(value: String,onValueChange: (String) -> Unit, placeholder:String){
 
 
     Column(modifier = Modifier
@@ -90,7 +90,7 @@ fun TextFieldMessage(value: String,onValueChange: (String) -> Unit){
         TextFieldNoPadding(
             modifier = Modifier.fillMaxWidth(),
             value = value,
-            placeholder = { Text(text = "Escribe un mensaje", color = Color.Black) },
+            placeholder = { Text(text = placeholder, color = Color.Black) },
             onValueChange = {onValueChange(it)},
             maxLines = 6,
             shape = RoundedCornerShape(20.dp),

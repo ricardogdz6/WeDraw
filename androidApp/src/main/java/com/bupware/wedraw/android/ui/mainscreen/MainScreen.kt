@@ -1,23 +1,42 @@
 package com.bupware.wedraw.android.ui.mainscreen
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -40,6 +59,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -50,6 +70,7 @@ import com.bupware.wedraw.android.components.buttons.GroupBar
 import com.bupware.wedraw.android.components.buttons.JoinGroupButton
 import com.bupware.wedraw.android.components.composables.ColorfulLines
 import com.bupware.wedraw.android.components.systembar.SystemBarColor
+import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.components.textfields.TextFieldUsername
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.models.Group
@@ -57,6 +78,9 @@ import com.bupware.wedraw.android.logic.navigation.Destinations
 import com.bupware.wedraw.android.theme.Lexend
 import com.bupware.wedraw.android.theme.blueVariant2WeDraw
 import com.bupware.wedraw.android.theme.blueWeDraw
+import com.bupware.wedraw.android.theme.greenWeDraw
+import com.bupware.wedraw.android.theme.redWeDraw
+import com.bupware.wedraw.android.theme.yellowWeDraw
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.delay
@@ -85,17 +109,24 @@ fun MainScreen(navController: NavController,viewModel: MainViewModel = hiltViewM
         viewModel.initValues(context)
     }
 
-
     BackHandler() {}
 
     SystemBarColor(color = Color(0xFF2C4560))
 
     MainScreenBody(navController = navController)
 
+    AnimatedVisibility(visible = viewModel.showSettings,
+        enter = slideInHorizontally(initialOffsetX = { fullWidth -> -fullWidth }),
+        exit =  slideOutHorizontally(targetOffsetX = { fullWidth -> -fullWidth })
+    ) {
+        SettingsMenu(navController)
+    }
+
     if (viewModel.askForUsername) UsernamePopUp()
 
     if (viewModel.navigateToChat) {viewModel.navigateToChat = false;navController.navigate(route = "${Destinations.ChatScreen.ruta}/${viewModel.targetNavigation}")}
 }
+
 
 @Composable
 fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hiltViewModel()){
@@ -110,51 +141,64 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     }
     //endregion
 
-    //Fondo de los backgrounds
-    Box {
-        GroupBackground(navController)
-        UpperBackgroundContent(navController)
-    }
+
+    val moveOffset by animateFloatAsState(
+        targetValue = if (viewModel.showSettings) 250f else 0f,
+        animationSpec = tween(easing = FastOutSlowInEasing)
+    )
+
+    //Movable Component
+    Column(Modifier.offset(x = moveOffset.dp)) {
+        Box() {
+            //Fondo de los backgrounds
+            Box {
+                GroupBackground(navController)
+                UpperBackgroundContent(navController)
+            }
 
 
-    //Boton +
-    Column(
-        Modifier
-            .fillMaxSize()
-            .padding(bottom = 30.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom
-    ) {
-        IconButton(
-            onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
-            modifier = Modifier
-                .size(70.dp)
-                .background(
-                    color = blueWeDraw,
-                    shape = CircleShape
+            //Boton +
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .padding(bottom = 30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                IconButton(
+                    onClick = { viewModel.moreOptionsEnabled = !viewModel.moreOptionsEnabled },
+                    modifier = Modifier
+                        .size(70.dp)
+                        .background(
+                            color = blueWeDraw,
+                            shape = CircleShape
+                        )
+
+                ) {
+                    Icon(
+                        imageVector = if (viewModel.moreOptionsEnabled) ImageVector.vectorResource(R.drawable.minus) else ImageVector.vectorResource(R.drawable.add),
+                        contentDescription = null,
+                        tint = Color.White,
+
+
+                        )
+                }
+
+            }
+
+            //Logo
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "background",
+                    modifier = Modifier
+                        .size(250.dp)
+                        .offset(y = (-40).dp)
                 )
-
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.add),
-                contentDescription = null,
-                tint = Color.White,
-
-
-            )
+            }
         }
 
-    }
 
-    //Logo
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        Image(
-            painter = painterResource(R.drawable.logo),
-            contentDescription = "background",
-            modifier = Modifier
-                .size(250.dp)
-                .offset(y = (-40).dp)
-        )
     }
 
     //Settings & Notifications
@@ -162,7 +206,7 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
 
         //Settings
         IconButton(modifier = Modifier.padding(top = 10.dp, start = 15.dp),onClick = {
-
+            viewModel.showSettings = !viewModel.showSettings
         }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.settings),
@@ -177,28 +221,6 @@ fun MainScreenBody(navController: NavController, viewModel: MainViewModel = hilt
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
         ColorfulLines()
     }
-
-
-
-    //TODO ELIMINAR
-    Column() {
-    Button(onClick = {
-
-        Firebase.auth.signOut();
-
-        navController.navigate(Destinations.LoginScreen.ruta) {
-            popUpTo(Destinations.MainScreen.ruta) {
-                inclusive = true
-            }
-        }
-
-
-    }) {
-        Text(text = "DESLOGUEAR")
-    }
-
-    }
-
 
 
 }
@@ -218,13 +240,20 @@ fun UsernamePopUp(viewModel: MainViewModel = hiltViewModel()){
 
         Column(
             Modifier
-                .background(Color.Red)
-                .fillMaxHeight(0.5f)
+                .background(blueVariant2WeDraw, RoundedCornerShape(15.dp))
+                .fillMaxHeight(0.3f)
                 .fillMaxWidth(0.9f), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "ELIGE NUEVO USERNAME")
-            TextFieldUsername(viewModel.username,onValueChange = {viewModel.username = it})
-            Button(onClick = { if (viewModel.username.isNotBlank()) viewModel.launchUpdateUsername(context) }) {
-                Text(text = "VALIDAR")
+            Text(text = stringResource(R.string.elige_un_nickname), fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Column(Modifier.padding(start = 10.dp, end = 10.dp)) {
+                TextFieldMessage(viewModel.username,onValueChange = {viewModel.username = it}, placeholder = "Nickname")
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(onClick = { if (viewModel.username.isNotBlank()) viewModel.launchUpdateUsername(context) },colors = ButtonDefaults.buttonColors(backgroundColor = greenWeDraw)) {
+                Text(text = stringResource(R.string.validar))
             }
         }
 
@@ -321,10 +350,6 @@ fun GroupContent(viewModel: MainViewModel = hiltViewModel(),navController: NavCo
 @Composable
 fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
-    LaunchedEffect(Unit){
-        viewModel.showSettings = true
-    }
-
     var buttonDelay by remember { mutableStateOf(false) }
     var buttonDelay2 by remember { mutableStateOf(false) }
 
@@ -353,4 +378,88 @@ fun SettingsContent(viewModel: MainViewModel = hiltViewModel()){
 
 }
 //endregion
+
+@Composable
+fun SettingsMenu(navController: NavController,viewModel: MainViewModel = hiltViewModel()){
+
+    val interactionSource = remember { MutableInteractionSource() }
+
+        Column() {
+            Box(Modifier.fillMaxSize()) {
+
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null
+                    ) { viewModel.showSettings = !viewModel.showSettings })
+
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = 90.dp, bottom = 60.dp, start = 0.dp, end = 160.dp)
+                        .background(
+                            Color.Black.copy(0.4f),
+                            RoundedCornerShape(topEnd = 15.dp, bottomEnd = 15.dp)
+                        ), verticalArrangement = Arrangement.Bottom) {
+
+                    Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                        Box(modifier = Modifier
+                            .fillMaxSize()
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {})
+
+                        Column(
+                            Modifier
+                                .padding(top = 5.dp)
+                                .fillMaxWidth(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Row() {
+                                Text(text = "WeDraw ", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 25.sp)
+                                Text(text = "B", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = blueWeDraw, fontSize = 25.sp)
+                                Text(text = "E", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = greenWeDraw, fontSize = 25.sp)
+                                Text(text = "T", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = yellowWeDraw, fontSize = 25.sp)
+                                Text(text = "A", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = redWeDraw, fontSize = 25.sp)
+                            }
+                        }
+
+                        Column(
+                            Modifier
+                                .padding(bottom = 20.dp)
+                                .align(Alignment.BottomCenter)) {
+                            LogOutButton(navController)
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+}
+
+@Composable
+fun LogOutButton(navController: NavController){
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable {
+                Firebase.auth.signOut();
+
+                navController.navigate(Destinations.LoginScreen.ruta) {
+                    popUpTo(Destinations.MainScreen.ruta) {
+                        inclusive = true
+                    }
+                }
+            }
+            .background(redWeDraw.copy(0.5f)), verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.logout),
+            contentDescription = null,
+            tint = Color.White)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(text = "Logout", fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 25.sp)
+    }
+}
 

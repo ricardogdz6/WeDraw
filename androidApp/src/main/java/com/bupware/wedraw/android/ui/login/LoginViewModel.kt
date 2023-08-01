@@ -23,6 +23,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : ViewModel() {
 
     var initNContinue by savedStateHandle.saveable { mutableStateOf(false) }
+    var stopLoading by savedStateHandle.saveable { mutableStateOf(false) }
 
     fun signInWithGoogleCredential(credential: AuthCredential, returningLambda:()->Unit) = viewModelScope.launch {
         try {
@@ -44,11 +45,5 @@ class LoginViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : V
         }
     }
 
-    fun initData(context : Context){
-        viewModelScope.launch {
-
-
-        }
-    }
 
 }

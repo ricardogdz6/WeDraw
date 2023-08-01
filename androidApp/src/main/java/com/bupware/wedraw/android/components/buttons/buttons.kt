@@ -12,6 +12,8 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bupware.wedraw.android.R
+import com.bupware.wedraw.android.components.composables.SnackbarManager
 import com.bupware.wedraw.android.components.textfields.CreateGroupTextfield
 import com.bupware.wedraw.android.components.textfields.JoinGroupTextfield
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
@@ -360,8 +364,11 @@ fun PeopleLimitBar(){
 
 @Composable
 fun PremiumInfoButton(){
+    val snackbarText = stringResource(R.string.hazte_premium_para_tener_m_s_grupos)
     Box(Modifier
-        .clickable { /*TODO METER INFO*/ }
+        .clickable {
+            SnackbarManager.newSnackbar(snackbarText, yellowWeDraw)
+        }
         .background(Color.White, RoundedCornerShape(10.dp))
         .fillMaxHeight()
         .padding(start = 10.dp, end = 10.dp)
@@ -445,7 +452,9 @@ fun GroupBar(nombre: String, idGroup: String,navController: NavController) {
 
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         //Esta row es el color de abajo
-        Box(Modifier.clickable{navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }){
+        Box(Modifier.clickable{navController.navigate(route = "${Destinations.ChatScreen.ruta}/$idGroup") }
+
+        ){
 
             Row(
                 Modifier

@@ -4,12 +4,16 @@ import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +22,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,12 +36,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -42,11 +54,15 @@ import com.bupware.wedraw.android.R
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
 import com.bupware.wedraw.android.logic.dataHandler.DataUtils
 import com.bupware.wedraw.android.logic.navigation.Destinations
+import com.bupware.wedraw.android.theme.Lexend
+import com.bupware.wedraw.android.theme.blueVariant2WeDraw
+import com.bupware.wedraw.android.theme.blueWeDraw
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 @Composable
 @Preview
@@ -61,26 +77,30 @@ fun LoginScreen(navController: NavController,viewModel: LoginViewModel = hiltVie
 
     BackHandler() {}
 
-    if (viewModel.initNContinue){
-        LaunchedEffect(Unit){
 
+    if (viewModel.initNContinue) {
+        LaunchedEffect(Unit) {
+
+            viewModel.stopLoading = true
             viewModel.initNContinue = false
 
             val datautils = DataUtils()
             viewModel.viewModelScope.launch {
-                datautils.initData(context).also { navController.navigate(route = Destinations.MainScreen.ruta) {
-                    navController.popBackStack()
-                } }
+
+                datautils.initData(context).also {
+                    viewModel.stopLoading = false
+                    navController.navigate(route = Destinations.MainScreen.ruta) {
+                        navController.popBackStack()
+                    }
+                }
+
             }
-
-
         }
-
-
     }
 
-
     LoginScreenBody(navController)
+
+    if (viewModel.stopLoading) LoadingInit()
 }
 
 @Composable
@@ -112,13 +132,13 @@ fun LoginScreenBody(navController: NavController, viewModel: LoginViewModel = hi
 fun TransparentBackground(navController: NavController) {
     Column(
         Modifier
-            .height(IntrinsicSize.Max)
+            .height(80.dp)
             .fillMaxWidth()
             .background(Color.Black.copy(0.4f), RoundedCornerShape(10.dp)),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        //TODO CAMBIAR ESTE BOTON DEFINTIVAMENTE
+
         LogWithGoogle(navController = navController)
 
     }
@@ -173,7 +193,17 @@ fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: Na
 
     }
 
-    Button(onClick = {
+    Button(
+        modifier = Modifier
+            .fillMaxWidth(0.90f)
+            .height(60.dp)
+        ,
+        contentPadding = PaddingValues(2.dp),
+        border = BorderStroke(4.dp,Color.White),
+        colors = ButtonDefaults.buttonColors(backgroundColor = blueWeDraw),
+        shape = RoundedCornerShape(15.dp),
+        onClick = {
+
         val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(context.getString(R.string.firebase_server_id))
             .requestEmail()
@@ -181,12 +211,42 @@ fun LogWithGoogle(viewModel: LoginViewModel = hiltViewModel(), navController: Na
 
         val googleSignInClient = GoogleSignIn.getClient(context, options)
         val signInIntent = googleSignInClient.signInIntent
-        googleSignInClient.signOut() // Agrega esta línea para asegurarte de que se muestre la pantalla de selección de cuenta cada vez
+        //googleSignInClient.signOut() // Agrega esta línea para asegurarte de que se muestre la pantalla de selección de cuenta cada vez
         launcher.launch(signInIntent)
+
     }) {
-        Text(text = "Logear con google")
+
+        Row(
+            Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(15.dp))
+                , verticalAlignment = Alignment.CenterVertically) {
+
+            Box(Modifier.weight(0.3f), contentAlignment = Alignment.Center) {
+                Image(painter = painterResource(R.drawable.googleicon), contentDescription = "Google Icon")
+            }
+
+            Box(Modifier.weight(1f)) {
+                Text(text = stringResource(R.string.acceder_con_google), fontFamily = Lexend, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 18.sp)
+
+            }
+
+        }
     }
 
+
+}
+
+@Composable
+fun LoadingInit(){
+    Box(contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(0.5f))
+            .clickable { })
+
+        CircularProgressIndicator(color = blueVariant2WeDraw)
+    }
 
 }
 
