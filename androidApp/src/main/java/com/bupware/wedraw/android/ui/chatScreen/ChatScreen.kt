@@ -104,6 +104,7 @@ import com.bupware.wedraw.android.components.extra.GetDeviceConfig
 import com.bupware.wedraw.android.components.extra.keyboardAsState
 import com.bupware.wedraw.android.components.textfields.TextFieldMessage
 import com.bupware.wedraw.android.logic.dataHandler.DataHandler
+import com.bupware.wedraw.android.logic.dataHandler.DataUtils
 import com.bupware.wedraw.android.logic.dataHandler.MemoryData
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.theme.Lexend
@@ -129,8 +130,10 @@ fun PreviewChatScreen(){
 @Composable
 fun ChatScreen(navController: NavController, groupId: Long, viewModel: ChatScreenViewModel = hiltViewModel()){
 
+
     val context = LocalContext.current
     val controller = rememberDrawController()
+
 
     LaunchedEffect(Unit){
         viewModel.groupId = groupId

@@ -633,6 +633,7 @@ class DataUtils:Serializable {
                         )
                     }
                     MemoryData.user = user
+                    MemoryData.user = user
                     return true
                 } else {
                     Log.e("Error", "Usuario no existe, no puede actualizarse")
@@ -643,7 +644,7 @@ class DataUtils:Serializable {
         }
     }
 
-    private suspend fun getUserGroups(context: Context): List<Group> {
+    suspend fun getUserGroups(context: Context): List<Group> {
         val userId = Firebase.auth.currentUser?.uid.toString()
         Log.i("hilos", "getUserGroups")
         val group = withContext(Dispatchers.Default) {

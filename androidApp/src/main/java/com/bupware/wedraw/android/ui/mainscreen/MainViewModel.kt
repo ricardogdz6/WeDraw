@@ -139,11 +139,17 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                 )
             }
 
-
             val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
-
             groupList = updatedGroups
-            MemoryData.groupList += updatedGroups
+
+            withContext(Dispatchers.Default) {
+                GroupRepository.insertUsertoUserGroup(
+                    userId = Firebase.auth.currentUser?.uid.toString(),
+                    groupId = groupList.first{it.code == returningCode}.id!!
+                )
+            }
+
+            DataHandler(context).saveGroupLocal(groupList.first { it.code == returningCode })
 
             targetNavigation = groupList.first { it.code == returningCode }.id!!
             moreOptionsEnabled = !moreOptionsEnabled
@@ -189,20 +195,20 @@ class MainViewModel @Inject constructor(savedStateHandle: SavedStateHandle) : Vi
                             redWrong
                         )
                     } else {
+
                         withContext(Dispatchers.Default) {
                             GroupRepository.insertUsertoUserGroup(
                                 userId = Firebase.auth.currentUser?.uid.toString(),
-                                groupId = groupId!!
+                                groupId = groupId
                             )
                         }
 
-
                         val updatedGroups = withContext(Dispatchers.Default) {getUserGroups(context)}
                         groupList = updatedGroups
-                        MemoryData.groupList += updatedGroups
+                        DataHandler(context).saveGroupLocal(groupList.first { it.id == groupId })
 
 
-                        targetNavigation = groupId!!
+                        targetNavigation = groupId
                         moreOptionsEnabled = !moreOptionsEnabled
                         expandJoinGroup = false
                         joinCode = ""

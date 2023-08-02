@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import com.bupware.wedraw.android.logic.models.Group
 import com.bupware.wedraw.android.logic.models.Message
@@ -20,9 +21,12 @@ import com.bupware.wedraw.android.roomData.tables.message.MessageWithImageFailed
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupUserCrossRef
 import com.bupware.wedraw.android.roomData.tables.relationTables.groupUserMessages.GroupWithUsersRepository
 import com.bupware.wedraw.android.roomData.tables.user.UserRepository
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -118,7 +122,6 @@ class DataHandler(val context: Context):Serializable {
             if (MemoryData.messageList[idGroup] != null){
                 MemoryData.messageList[idGroup]!!.add(message)
             } else MemoryData.messageList[idGroup] = mutableListOf(message)
-
 
             //Guardo el mensaje en local [ROOM]
             MessageRepository(room.messageDao()).insert(roomMessage)
@@ -267,6 +270,31 @@ class DataHandler(val context: Context):Serializable {
             GroupRepository(room.groupDao()).insert(roomGroup)
 
         }
+
+    }
+
+    suspend fun saveGroupLocal(group:Group){
+
+        //Guardo en memoria
+        MemoryData.groupList.add(group)
+
+        //Guardo group y usergroup room
+        val roomGroup = com.bupware.wedraw.android.roomData.tables.group.Group(
+            groupId = group.id!!, name = group.name, code = group.code
+        )
+
+        val userGroups = group.userGroups!!.filter { it.userID.id != Firebase.auth.currentUser?.uid.toString() }
+
+        userGroups.forEach { userGroup ->
+            val roomUserGroup = GroupUserCrossRef(
+                groupId = group.id!!,
+                userId = userGroup.userID.id.toString(),
+                isAdmin = userGroup.isAdmin
+            )
+            GroupWithUsersRepository(room.groupWithUsersDao()).insert(roomUserGroup)
+        }
+
+        GroupRepository(room.groupDao()).insert(roomGroup)
 
     }
 
