@@ -24,5 +24,7 @@
 ## Links
 
 [Ricardo Gallego Domínguez (Linkedin)](https://www.linkedin.com/in/ricardo-gallego-domínguez-928a80213)
+[Naim Cheddi Elkhattabi (Linkedin)](https://www.linkedin.com/in/naim-cheddi-elkhattabi-b3257823a/)
+
 ### Download WeDraw BETA
 [WeDraw APK](https://drive.google.com/file/d/1i6p9DhYIxJ7-kTKz0jiqMi2Zt_NevBWQ/view?usp=sharing)
